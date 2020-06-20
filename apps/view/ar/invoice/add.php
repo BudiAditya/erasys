@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html xmlns="http://www.w3.org/1999/html">
+<html>
 <?php
 /** @var $invoice Invoice */ /** @var $sales Karyawan[] */
 $counter = 0;
@@ -14,9 +14,8 @@ $counter = 0;
 
     <script type="text/javascript" src="<?php print($helper->path("public/js/jquery.easyui.min.js")); ?>"></script>
 
-    <script type="text/javascript" src="<?php print($helper->path("public/js/qz/dependencies/rsvp-3.1.0.min.js")); ?>"></script>
-    <script type="text/javascript" src="<?php print($helper->path("public/js/qz/dependencies/sha-256.min.js")); ?>"></script>
-    <script type="text/javascript" src="<?php print($helper->path("public/js/qz/qz-tray.js")); ?>"></script>
+    <!-- direct printing -->
+    <script src="<?php print($helper->path("public/js/recta.js"));?>"></script>
 
     <link rel="stylesheet" type="text/css" href="<?php print($helper->path("public/css/common.css")); ?>"/>
     <link rel="stylesheet" type="text/css" href="<?php print($helper->path("public/css/jquery-ui.css")); ?>"/>
@@ -204,7 +203,7 @@ $bpdf = base_url('public/images/button/').'pdf.png';
                         printf('<td>%s</td>', $detail->ItemDescs);
                         printf('<td>%s</td>', $detail->ItemNote);
                         printf('<td class="right">%s</td>', number_format($detail->Qty,0));
-                        printf('<td>%s</td>', $detail->SatKecil);
+                        printf('<td>%s</td>', $detail->SatJual);
                         printf('<td class="right">%s</td>', number_format($detail->Price,0));
                         printf('<td class="right">%s</td>', $detail->DiscFormula);
                         printf('<td class="right">%s</td>', number_format($detail->DiscAmount,0));
@@ -215,7 +214,7 @@ $bpdf = base_url('public/images/button/').'pdf.png';
                         }
                         printf('<td class="right">%s</td>', number_format($detail->SubTotal,0));
                         print("<td class='center'>");
-                        $dtx = addslashes($detail->Id.'|'.$detail->ItemCode.'|'.str_replace('"',' in',$detail->ItemDescs).'|'.$detail->ItemId.'|'.$detail->Qty.'|'.$detail->SatBesar.'|'.$detail->Price.'|'.$detail->DiscFormula.'|'.$detail->DiscAmount.'|'.$detail->SubTotal.'|'.$detail->ItemNote.'|'.$detail->IsFree.'|'.$detail->ItemHpp.'|'.$detail->ExSoNo);
+                        $dtx = addslashes($detail->Id.'|'.$detail->ItemCode.'|'.str_replace('"',' in',$detail->ItemDescs).'|'.$detail->ItemId.'|'.$detail->Qty.'|'.$detail->SatJual.'|'.$detail->Price.'|'.$detail->DiscFormula.'|'.$detail->DiscAmount.'|'.$detail->SubTotal.'|'.$detail->ItemNote.'|'.$detail->IsFree.'|'.$detail->ItemHpp.'|'.$detail->ExSoNo);
                         printf('&nbsp<img src="%s" alt="Edit barang" title="Edit barang" style="cursor: pointer" onclick="return feditdetail(%s,%s);"/>',$bedit,"'".$dtx."'",$invoice->CustomerId);
                         printf('&nbsp<img src="%s" alt="Hapus barang" title="Hapus barang" style="cursor: pointer" onclick="return fdeldetail(%s);"/>',$bclose,"'".$dtx."'");
                         print("</td>");
@@ -265,19 +264,23 @@ $bpdf = base_url('public/images/button/').'pdf.png';
                         <td colspan="2" align="right">Biaya Lain :</td>
                         <td colspan="9"><b><input type="text" class="bold" id="OtherCosts" name="OtherCosts" size="60" maxlength="150" value="<?php print($invoice->OtherCosts != null ? $invoice->OtherCosts : '-'); ?>"/></b></td>
                         <td><input type="text" class="right bold" style="width: 150px" id="OtherCostsAmount" name="OtherCostsAmount" value="<?php print($invoice->OtherCostsAmount != null ? number_format($invoice->OtherCostsAmount,0) : 0); ?>"/></td>
-                        <?php if ($acl->CheckUserAccess("ar.invoice", "print")) { ?>
-                            <td class='center'><?php printf('<img src="%s" id="bCetakPdf" alt="Cetak PDF Invoice" title="Proses cetak PDF invoice" style="cursor: pointer;"/>',$bpdf);?></td>
+                        <?php if ($acl->CheckUserAccess("ar.invoice", "print") && $invoice->Id > 0) { ?>
+                            <td class='center'>
+                                <?php
+                                    if ($userCabRpm == 4){
+                                        printf('<img src="%s" id="bCetak" alt="Cetak Invoice" title="Proses cetak invoice" style="cursor: pointer;"/>',$bcetak);
+                                    }else {
+                                        printf('<img src="%s" id="bCetakPdf" alt="Cetak PDF Invoice" title="Proses cetak PDF invoice" style="cursor: pointer;"/>', $bpdf);
+                                    }
+                                ?>
+
+                            </td>
                         <?php }else{ ?>
                             <td>&nbsp</td>
                         <?php } ?>
                     </tr>
                     <tr>
-                        <?php if ($acl->CheckUserAccess("ar.invoice", "print")) { ?>
-                            <td class='left'><?php printf('<img src="%s" id="bCetak" alt="Cetak Invoice" title="Proses cetak invoice" style="cursor: pointer;"/>',$bcetak);?></td>
-                        <?php }else{ ?>
-                            <td>&nbsp</td>
-                        <?php } ?>
-                        <td colspan="10" align="right">Grand Total :</td>
+                        <td colspan="11" align="right">Grand Total :</td>
                         <td><input type="text" class="right bold" style="width: 150px;" id="TotalAmount" name="TotalAmount" value="<?php print($invoice->TotalAmount != null ? number_format($invoice->TotalAmount,0) : 0); ?>" readonly/></td>
                         <td class='center'><?php printf('<img src="%s" id="bKembali" alt="Daftar Invoice" title="Kembali ke daftar invoice" style="cursor: pointer;"/>',$bkembali);?></td>
                     </tr>
@@ -290,10 +293,10 @@ $bpdf = base_url('public/images/button/').'pdf.png';
     Copyright &copy; 2016 - 2018  PT. Rekasystem Technology
 </div>
 <!-- Form Add/Edit Invoice Detail -->
-<div id="dlg" class="easyui-dialog" style="width:1130px;height:220px;padding:5px 5px"
+<div id="dlg" class="easyui-dialog" style="width:1200px;height:220px;padding:5px 5px"
      closed="true" buttons="#dlg-buttons">
     <form id="fm" method="post" novalidate>
-        <table cellpadding="0" cellspacing="0" class="tablePadding tableBorder" style="font-size: 12px;font-family: tahoma">
+        <table cellpadding="0" cellspacing="0" class="tablePadding tableBorder" style="width: 100%;font-size: 12px;font-family: tahoma">
             <tr>
                 <td class="right">Ex Sales Order No:</td>
                 <td colspan="8"><input class="easyui-combogrid" id="dExSoNo" name="dExSoNo" style="width:600px"/></td>
@@ -306,8 +309,8 @@ $bpdf = base_url('public/images/button/').'pdf.png';
                 <th>Kode Produk**</th>
                 <th>Nama Produk</th>
                 <th>Notes</th>
-                <th>Qty</th>
                 <th>Satuan</th>
+                <th>Qty</th>
                 <th>Harga</th>
                 <th>Discount (Per Item)</th>
                 <th>Gratis</th>
@@ -315,7 +318,7 @@ $bpdf = base_url('public/images/button/').'pdf.png';
             </tr>
             <tr>
                 <td>
-                    <input type="text" id="aItemCode" name="aItemCode" size="20" value="" required/>
+                    <input type="text" id="aItemCode" name="aItemCode" size="15" value="" required/>
                     <input type="hidden" id="aItemId" name="aItemId" value="0"/>
                     <input type="hidden" id="aId" name="aId" value="0"/>
                     <input type="hidden" id="aQtyStock" name="aQtyStock" value="0"/>
@@ -327,16 +330,18 @@ $bpdf = base_url('public/images/button/').'pdf.png';
                     <input type="hidden" id="aSoNo" name="aSoNo" value=""/>
                 </td>
                 <td>
-                    <input type="text" id="aItemDescs" name="aItemDescs" size="50" value="" disabled/>
+                    <input type="text" id="aItemDescs" name="aItemDescs" size="40" value="" disabled/>
                 </td>
                 <td>
                     <input type="text" id="aItemNote" name="aItemNote" size="10" value=""/>
                 </td>
                 <td>
-                    <input class="right" type="text" id="aQty" name="aQty" size="5" value="0"/>
+                    <select class="bold" name="aSatuan" id="aSatuan" required>
+                        <option value=""></option>
+                    </select>
                 </td>
                 <td>
-                    <input type="text" id="aSatuan" name="aSatuan" size="5" value="" disabled/>
+                    <input class="right" type="text" id="aQty" name="aQty" size="5" value="0"/>
                 </td>
                 <td>
                     <input class="right" type="text" id="aPrice" name="aPrice" size="10" value="0"/>
@@ -363,6 +368,7 @@ $bpdf = base_url('public/images/button/').'pdf.png';
 </div>
 
 <script type="text/javascript">
+    var printer = new Recta('1122334455', '1811');
     $( function() {
         var userCabId,custId,custLevel,salesId,invoiceId,userCompId,userLevel,allowMinus;
         userCabId = "<?php print($invoice->CabangId > 0 ? $invoice->CabangId : $userCabId);?>";
@@ -378,6 +384,8 @@ $bpdf = base_url('public/images/button/').'pdf.png';
         //BatchFocusRegister(addetail);
         //var addmaster = ["CabangId", "InvoiceDate","CustomerId", "SalesId", "InvoiceDescs", "PaymentType","CreditTerms","BaseAmount","Disc1Pct","Disc1Amount","TaxPct","TaxAmount","OtherCosts","OtherCostsAmount","TotalAmount","bUpdate","bKembali"];
         //BatchFocusRegister(addmaster);
+        var satBesar, satKecil, isiKecil, itemPrice, itemHpp, itemCode;
+        isiKecil = 1;
         $("#InvoiceDate").customDatePicker({ showOn: "focus" });
         $('#GudangId').combobox({
             onChange: function(data){
@@ -495,7 +503,7 @@ $bpdf = base_url('public/images/button/').'pdf.png';
             columns:[[
                 {field:'item_code',title:'Kode',width:80},
                 {field:'item_name',title:'Nama Produk',width:220},
-                {field:'satuan',title:'Satuan',width:40},
+                {field:'satbesar',title:'Satuan',width:40},
                 {field:'qty_stock',title:'Stock',width:40,align:'right'},
                 {field:'qty_order',title:'Order',width:40,align:'right'},
                 {field:'price',title:'Harga',width:40,align:'right'}
@@ -507,7 +515,7 @@ $bpdf = base_url('public/images/button/').'pdf.png';
                 console.log(bkode);
                 var bnama = row.item_name;
                 console.log(bnama);
-                var satuan = row.satuan;
+                var satuan = row.satbesar;
                 console.log(satuan);
                 var bqstock = row.qty_stock;
                 console.log(bqstock);
@@ -519,6 +527,19 @@ $bpdf = base_url('public/images/button/').'pdf.png';
                 console.log(issale);
                 var bprice = row.price;
                 console.log(bprice);
+                itemCode = bkode;
+                satBesar = row.satbesar;
+                satKecil = row.satkecil;
+                isiKecil = row.isikecil;
+                //add satuan option
+                $("#aSatuan").empty();
+                $("#aSatuan").append('<option value=""></option>');
+                if (satBesar != '' && satBesar != null) {
+                    $("#aSatuan").append('<option value="'+satBesar+'">'+satBesar+'</option>');
+                }
+                if (satKecil != '' && satKecil != null) {
+                    $("#aSatuan").append('<option value="'+satKecil+'">'+satKecil+'</option>');
+                }
                 $('#aItemId').val(bid);
                 $('#aItemCode').val(bkode);
                 $('#aItemDescs').val(bnama);
@@ -536,7 +557,7 @@ $bpdf = base_url('public/images/button/').'pdf.png';
                         $('#aQty').val(1);
                     }
                     //$('#aQty').focus();
-                    getItemPrice(bkode,custLevel);
+                    getItemPrice(itemCode,custLevel);
                     //hitDetail();
                 }else{
                     $('#aQty').val(0);
@@ -549,7 +570,7 @@ $bpdf = base_url('public/images/button/').'pdf.png';
         });
 
         $("#aItemCode").change(function(e){
-            //$ret = "OK|".$setprice->ItemId.'|'.$items->Bnama.'|'.$items->Bsatbesar.'|'.$setprice->QtyStock.'|'.$setprice->HrgBeli.'|'.$setprice->HrgJual1;
+            //$ret = "OK|".$setprice->ItemId.'|'.$setprice->ItemName.'|'.$setprice->Satuan.'|'.$setprice->QtyStock.'|'.$setprice->HrgBeli.'|'.$setprice->SatBesar.'|'.$setprice->SatKecil.'|'.$setprice->IsiKecil;
             var itc = $("#aItemCode").val();
             var lvl = $("#CustLevel").val();
             var cbi = gudangId;
@@ -560,11 +581,23 @@ $bpdf = base_url('public/images/button/').'pdf.png';
                     if (status == 'success'){
                         var dtx = data.split('|');
                         if (dtx[0] == 'OK'){
+                            satBesar = dtx[6];
+                            satKecil = dtx[7];
+                            isiKecil = dtx[8];
+                            //add satuan option
+                            $("#aSatuan").empty();
+                            $("#aSatuan").append('<option value=""></option>');
+                            if (satBesar != '' && satBesar != null) {
+                                $("#aSatuan").append('<option value="'+satBesar+'">'+satBesar+'</option>');
+                            }
+                            if (satKecil != '' && satKecil != null) {
+                                $("#aSatuan").append('<option value="'+satKecil+'">'+satKecil+'</option>');
+                            }
                             $('#aItemId').val(dtx[1]);
                             $('#aItemDescs').val(dtx[2]);
                             $('#aSatuan').val(dtx[3]);
                             $('#aItemHpp').val(dtx[5]);
-                            $('#aPrice').val(dtx[6]);
+                            $('#aPrice').val(dtx[9]);
                             $('#aDiscFormula').val(0);
                             $('#aDiscAmount').val(0);
                             $('#aQtyStock').val(Number(dtx[4]));
@@ -600,11 +633,11 @@ $bpdf = base_url('public/images/button/').'pdf.png';
                 var url = "<?php print($helper->site_url("ar.invoice/getStockQty/"));?>"+cbi+"/"+itc;
                 $.get(url, function(data, status){
                     $('#aQtyStock').val(data);
-                    stk = Number($('#aQtyStock').val());
+                    stk = Number(data);
                     stk = stk + qta;
-                    if (stk > 0 && stk >= qty) {
+                    if (stk > 0 && stk >= (qty * isiKecil)) {
                         hitDetail();
-                    }else if (stk >= 0 && stk < qty){
+                    }else if (stk >= 0 && stk < (qty * isiKecil)){
                         if (confirm('Maaf, Stock tidak mencukupi!\nApakah tetap diproses?')){
                             hitDetail();
                         }else{
@@ -624,9 +657,9 @@ $bpdf = base_url('public/images/button/').'pdf.png';
                     }
                 });
             }else{
-                if (stk > 0 && stk >= qty) {
+                if (stk > 0 && stk >= (qty * isiKecil)) {
                     hitDetail();
-                }else if (stk >= 0 && stk < qty){
+                }else if (stk >= 0 && stk < (qty * isiKecil)){
                     if (confirm('Maaf, Stock tidak mencukupi!\nApakah tetap diproses?')){
                         hitDetail();
                     }else{
@@ -645,6 +678,10 @@ $bpdf = base_url('public/images/button/').'pdf.png';
                     }
                 }
             }
+        });
+
+        $("#aSatuan").change(function(e){
+            getItemPriceByUnit(itemCode,custLevel,this.value,satBesar,satKecil,isiKecil);
         });
 
         $("#aPrice").change(function(e){
@@ -741,22 +778,14 @@ $bpdf = base_url('public/images/button/').'pdf.png';
         });
 
         $("#bCetak").click(function(){
-            var uip = '<?php print($userIpAdd);?>';
-            var ptp = <?php print($userCabRpm);?>;
+            //var uip = '<?php print($userIpAdd);?>';
+            //var ptp = <?php print($userCabRpm);?>;
             var printCnt = <?php print($invoice->PrintCount);?>;
             if (printCnt > 0){
                 alert('ER - Invoice/Struk sudah pernah di-print!');
             }else {
-                if ((uip.substr(0, 3) == '127') || (uip.substr(0, 3) == '::1') && (ptp == 1 || ptp == 4)) {
-                    if (confirm('Cetak Struk Invoice ini?')) {
-                        $.get('<?php print($helper->site_url("ar.invoice/printdirect/").$invoice->Id."/".$userCabRpm."/".$userCabRpn); ?>', function (e) {
-                            alert('OK - Send Data to Printer');
-                        });
-                    }
-                } else {
-                    if (confirm('Cetak invoice ini?')) {
-                        printDirect()
-                    }
+                if (confirm('Cetak Struk Invoice ini?')) {
+                    rectaPrint();
                 }
             }
         });
@@ -816,23 +845,62 @@ $bpdf = base_url('public/images/button/').'pdf.png';
         });
     }
 
+    function getItemPriceByUnit(itemCode,custLevel,unitJual,unitBesar,unitKecil,isiUnit){
+        var iPrice = 0;
+        var kPrice = 0;
+        var iHpp = 0;
+        var url = "<?php print($helper->site_url("ar.invoice/getItemPrice/"));?>"+itemCode+"/"+custLevel;
+        alert(url);
+        $.get(url, function(data, status) {
+            var dtz = data.split('|');
+            iHpp   = Number(dtz[0]);
+            iPrice = Number(dtz[1]);
+            kPrice = Number(dtz[2]);
+            if (unitJual != unitBesar){
+                if (unitJual == unitKecil && isiUnit > 0){
+                    iHpp   = Math.round(iHpp/isiUnit,2);
+                    if (kPrice > 0) {
+                        iPrice = kPrice;
+                    }else{
+                        iPrice = Math.round(iPrice / isiUnit, 2);
+                    }
+                }
+            }
+            $('#aPrice').val(iPrice);
+            $('#aItemHpp').val(iHpp);
+            hitDetail();
+        });
+    }
+
     function newItem(cid){
-        $('#dlg').dialog('open').dialog('setTitle','Tambah Detail Produk yang dijual');
-        $('#fm').form('clear');
-        var urz = "<?php print($helper->site_url('ar.invoice/getjson_solists/'.$userCabId.'/'));?>"+cid;
-        $('#dExSoNo').combogrid('grid').datagrid('load',urz);
-        url= "<?php print($helper->site_url("ar.invoice/add_detail/".$invoice->Id));?>";
-        $('#aItemCode').focus();
+        salesId = $("#SalesId").combobox('getValue');
+        gudangId = $("#GudangId").combobox('getValue');
+        custId = $("#CustomerId").combobox('getValue');
+        if (salesId > 0 && gudangId > 0 && custId > 0) {
+            $('#dlg').dialog('open').dialog('setTitle', 'Tambah Detail Produk yang dijual');
+            $('#fm').form('clear');
+            var urz = "<?php print($helper->site_url('ar.invoice/getjson_solists/' . $userCabId . '/'));?>" + cid;
+            $('#dExSoNo').combogrid('grid').datagrid('load', urz);
+            url = "<?php print($helper->site_url("ar.invoice/add_detail/" . $invoice->Id));?>";
+            $('#aItemCode').focus();
+        }else{
+            alert("Data Invoice belum lengkap!");
+            $("#CustomerId").focus();
+        }
     }
 
     function feditdetail(dta,cid){
         //$dtx = addslashes($detail->Id.'|'.$detail->ItemCode.'|'.str_replace('"',' in',$detail->ItemDescs).'|'.$detail->ItemId.'|'.$detail->Qty.'|'.$detail->SatBesar.'|'.$detail->Price.'|'.$detail->DiscFormula.'|'.$detail->DiscAmount.'|'.$detail->SubTotal.'|'.$detail->ItemNote.'|'.$detail->IsFree.'|'.$detail->ItemHpp.'|'.$detail->ExSoNo);
+        //getItemPriceByUnit(itemCode,custLevel,this.value,satBesar,satKecil,isiKecil);
         var dtx = dta.split('|');
         $('#aMode').val(1);
         $('#aId').val(dtx[0]);
         $('#aItemId').val(dtx[3]);
         $('#aItemCode').val(dtx[1]);
         $('#aItemDescs').val(dtx[2]);
+        //add satuan option
+        $("#aSatuan").empty();
+        $("#aSatuan").append('<option value="' + dtx[5] + '">' + dtx[5] + '</option>');
         $('#aSatuan').val(dtx[5]);
         $('#aPrice').val(dtx[6]);
         $('#aQty').val(dtx[4]);
@@ -936,7 +1004,8 @@ $bpdf = base_url('public/images/button/').'pdf.png';
                                             aItemHpp: ahpp,
                                             aItemNote: aint,
                                             aIsFree: aisf,
-                                            aSoNo: asno
+                                            aSoNo: asno,
+                                            aSatuan: $('#aSatuan').val()
                                         }).done(function (data) {
                                             var rsx = data.split('|');
                                             if (rsx[0] == 'OK') {
@@ -1001,7 +1070,8 @@ $bpdf = base_url('public/images/button/').'pdf.png';
                                     aItemHpp: ahpp,
                                     aItemNote: aint,
                                     aIsFree: aisf,
-                                    aSoNo: asno
+                                    aSoNo: asno,
+                                    aSatuan: $('#aSatuan').val()
                                 }).done(function (data) {
                                     var rsx = data.split('|');
                                     if (rsx[0] == 'OK') {
@@ -1127,13 +1197,18 @@ $bpdf = base_url('public/images/button/').'pdf.png';
 
     function hitDetail(){
         var isFree = Number($("#aIsFree").val());
+        var dQty = Number($("#aQty").val());
+        var dPrice = Number($("#aPrice").val());
+        var dDiscFormula = $("#aDiscFormula").val();
         var subTotal = 0;
         var discAmount = 0;
         var totalDetail = 0;
-        if (isFree == 0){
-            subTotal = (Number($("#aQty").val()) * Number($("#aPrice").val()));
-            discAmount = hitDiscFormula(Number($("#aPrice").val()),$("#aDiscFormula").val());
-            totalDetail = subTotal - (discAmount * Number($("#aQty").val()));
+        if (isFree == 0 && dQty > 0 && dPrice > 0){
+            subTotal = Math.round(dQty * dPrice,0);
+            if (dDiscFormula != '' && dDiscFormula != '0') {
+                discAmount = hitDiscFormula(dPrice, dDiscFormula);
+            }
+            totalDetail = subTotal - (Math.round(discAmount * dQty,0));
         }
         $('#aDiscAmount').val(discAmount);
         $('#aSubTotal').val(totalDetail);
@@ -1179,39 +1254,86 @@ $bpdf = base_url('public/images/button/').'pdf.png';
         }
     }
 
-    function printDirect() {
-        qz.websocket.connect().then(function() {
-            //alert("Not Connected!");
-        });
-        $.get('<?php print($helper->site_url("ar.invoice/printdirect/").$invoice->Id."/".$userCabRpm); ?>', function(ajson, status){
-            var config = qz.configs.create("<?php print($userCabRpn);?>");
-            var data = JSON.parse(ajson);
-            //var datx = ['\x1B' + '\x40','\x1B' + '\x67','\x1B' + '\x47'];  //cetak double-strike
-            //var datx = ['\x1B' + '\x40','\x1B' + '\x67','\x1B' + '\x43' + '\x1E']; //cetak biasa 15 cpi 30 lines
-            var datx = ['\x1B' + '\x40','\x1B' + '\x67']; //cetak biasa 15 cpi
-            for ( var i = 0; i < data.length; i++ ) {
-                datx.push(data[i]+'\n');
-            }
-            //datx.push('\x0C'); // form feed
-            qz.print(config, datx).catch(function(e) { console.error(e); });
-        });
+    function rectaPrint() {
+        var urx = "<?php print($helper->site_url("ar/invoice/getStrukData"));?>";
+        var ivi = "<?php print($invoice->Id);?>";
+        var dvalue = {ivid: ivi};
+        $.ajax(
+            {
+                url : urx,
+                type: "POST",
+                data : dvalue,
+                success: function(data, textStatus, jqXHR)
+                {
+                    printer.open().then(function () {
+                        $.each(JSON.parse(data), function () {
+                            $.each(this, function (name, value) {
+                                //console.log(name + '=' + value);
+                                if (name == 'format'){
+                                    switch(value) {
+                                        case "AC":
+                                            printer.align('center');
+                                            break;
+                                        case "AL":
+                                            printer.align('left');
+                                            break;
+                                        case "AR":
+                                            printer.align('right');
+                                            break;
+                                        case "B1":
+                                            printer.bold(true);
+                                            break;
+                                        case "B0":
+                                            printer.bold(false);
+                                            break;
+                                        case "U1":
+                                            printer.underline(true);
+                                            break;
+                                        case "U0":
+                                            printer.underline(false);
+                                            break;
+                                        default:
+                                            printer.align('left');
+                                            break;
+                                    }
+                                }else {
+                                    printer.text(value);
+                                }
+                            });
+                        });
+                        printer.feed(7);
+                        printer.cut();
+                        printer.print();
+                    })
+                },
+                error: function(jqXHR, textStatus, errorThrown)
+                {
+                    alert(textStatus);
+                }
+            });
     }
 
-    function hitDiscFormula(nAmount,dFormula){
-        var retVal = 0;
-        if (nAmount > 0 && dFormula != '' && dFormula != '0'){
+    function hitDiscFormula(nAmount,dFormula) {
+        nAmount = Number(nAmount);
+        if (nAmount > 0 && dFormula != '' && dFormula != '0') {
             var aFormula = dFormula.split('+');
             var nDiscount = 0;
             var pDiscount = 0;
-            for (var i = 0;i < aFormula.length; i++){
+            var retVal = 0;
+            for (var i = 0; i < aFormula.length; i++) {
                 pDiscount = aFormula[i];
-                nDiscount = Math.round(nAmount * (pDiscount)/100,0);
-                retVal+= nDiscount;
-                nAmount-= retVal;
+                nAmount -= nDiscount;
+                nDiscount = round(nAmount * (pDiscount / 100), 0);
+                retVal += nDiscount;
             }
         }
         return retVal;
     }
+
+    //fungsi pembulatan
+    function round(value, decimals) {
+        return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
+    }
 </script>
-</body>
+<!-- </body> -->
 </html>
