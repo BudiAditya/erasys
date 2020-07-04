@@ -162,8 +162,9 @@ class Stock extends EntityBase {
 
         // get pembelian
         $sqx = "Insert Into `tmp_card` (trx_date,trx_type,trx_url,price,masuk,relasi)";
-        $sqx.= " Select a.grn_date,concat('Pembelian - ',a.grn_no),concat('ap.purchase/view/',a.id),b.price,b.purchase_qty,concat(a.supplier_name,' (',a.supplier_code,')')";
+        $sqx.= " Select a.grn_date,concat('Pembelian - ',a.grn_no),concat('ap.purchase/view/',a.id),b.price,b.purchase_qty * coalesce(c.bisisatkecil,1),concat(a.supplier_name,' (',a.supplier_code,')')";
         $sqx.= " From vw_ap_purchase_master as a Join t_ap_purchase_detail as b On a.grn_no = b.grn_no And a.cabang_id = b.cabang_id";
+        $sqx.= " Join m_barang as c On b.item_code = c.bkode";
         $sqx.= " Where b.item_code = ?item_code and a.gudang_id = ?cabang_id and a.is_deleted = 0 and a.grn_status <> 3";
         $this->connector->CommandText = $sqx;
         $this->connector->AddParameter("?item_code", $this->ItemCode, "char");
@@ -182,8 +183,9 @@ class Stock extends EntityBase {
 
         // get return ex penjualan
         $sqx = "Insert Into `tmp_card` (trx_date,trx_type,trx_url,price,masuk,relasi)";
-        $sqx.= " Select a.rj_date,concat('Return - ',a.rj_no),concat('ar.arreturn/view/',a.id),0,b.qty_retur,concat(a.customer_name,' (',a.customer_code,')')";
+        $sqx.= " Select a.rj_date,concat('Return - ',a.rj_no),concat('ar.arreturn/view/',a.id),0,b.qty_retur * fcUnitConversion(b.item_code,coalesce(b.satretur,c.bsatbesar),c.bsatkecil),concat(a.customer_name,' (',a.customer_code,')')";
         $sqx.= " From vw_ar_return_master a Join t_ar_return_detail b On a.cabang_id = b.cabang_id And a.rj_no = b.rj_no";
+        $sqx.= " Join m_barang as c On b.item_code = c.bkode";
         $sqx.= " Where b.item_code = ?item_code and a.cabang_id = ?cabang_id and a.is_deleted = 0 and a.rj_status <> 3";
         $this->connector->CommandText = $sqx;
         $this->connector->AddParameter("?item_code", $this->ItemCode, "char");
@@ -211,8 +213,9 @@ class Stock extends EntityBase {
 
         // get penjualan
         $sqx = "Insert Into `tmp_card` (trx_date,trx_type,trx_url,price,keluar,relasi,notes)";
-        $sqx.= " Select a.invoice_date,concat('Penjualan - ',a.invoice_no),concat('ar.invoice/view/',a.id),b.price,b.qty,concat(a.customer_name,' (',a.customer_code,')'),b.item_note";
+        $sqx.= " Select a.invoice_date,concat('Penjualan - ',a.invoice_no),concat('ar.invoice/view/',a.id),b.price,b.qty * fcUnitConversion(b.item_code,coalesce(b.satjual,c.bsatbesar),c.bsatkecil),concat(a.customer_name,' (',a.customer_code,')'),b.item_note";
         $sqx.= " From vw_ar_invoice_master as a Join t_ar_invoice_detail as b On a.invoice_no = b.invoice_no And a.cabang_id = b.cabang_id";
+        $sqx.= " Join m_barang as c On b.item_code = c.bkode";
         $sqx.= " Where b.item_code = ?item_code and a.gudang_id = ?cabang_id and a.is_deleted = 0 and a.invoice_status <> 3";
         $this->connector->CommandText = $sqx;
         $this->connector->AddParameter("?item_code", $this->ItemCode, "char");
@@ -231,8 +234,9 @@ class Stock extends EntityBase {
 
         // get return ex pembelian
         $sqx = "Insert Into `tmp_card` (trx_date,trx_type,trx_url,price,keluar,relasi)";
-        $sqx.= " Select a.rb_date,concat('Return - ',a.rb_no),concat('ap.apreturn/view/',a.id),0,b.qty_retur,concat(a.supplier_name,' (',a.supplier_code,')')";
+        $sqx.= " Select a.rb_date,concat('Return - ',a.rb_no),concat('ap.apreturn/view/',a.id),0,b.qty_retur * coalesce(c.bisisatkecil,1),concat(a.supplier_name,' (',a.supplier_code,')')";
         $sqx.= " From vw_ap_return_master a Join t_ap_return_detail b On a.cabang_id = b.cabang_id And a.rb_no = b.rb_no";
+        $sqx.= " Join m_barang as c On b.item_code = c.bkode";
         $sqx.= " Where b.item_code = ?item_code and a.cabang_id = ?cabang_id and a.is_deleted = 0 and a.rb_status <> 3";
         $this->connector->CommandText = $sqx;
         $this->connector->AddParameter("?item_code", $this->ItemCode, "char");
@@ -491,9 +495,14 @@ class Stock extends EntityBase {
         $rs = $this->connector->ExecuteNonQuery();
 
         // try get all tmp card data
-        $sqx = "Select a.item_code, b.bnama as item_name, b.bsatbesar as satuan, sum(a.awal) as sAwal, sum(a.beli) as sBeli, sum(a.asyin) as sAsyin, sum(a.xin) as sXin, sum(a.rjual) as sRjual, sum(a.asyout) as sAsyout, sum(a.jual) as sJual, sum(a.xout) as sXout, sum(a.rbeli) as sRbeli, sum(a.koreksi) as sKoreksi ";
-        $sqx.= " From tmp_mutasi as a Join m_barang as b On a.item_code = b.bkode Group By a.item_code Order By a.item_code,b.bnama,b.bsatbesar";
+        //$sqx = "Select a.item_code, b.bnama as item_name, b.bsatbesar as satuan, sum(a.awal) as sAwal, sum(a.beli) as sBeli, sum(a.asyin) as sAsyin, sum(a.xin) as sXin, sum(a.rjual) as sRjual, sum(a.asyout) as sAsyout, sum(a.jual) as sJual, sum(a.xout) as sXout, sum(a.rbeli) as sRbeli, sum(a.koreksi) as sKoreksi ";
+        //$sqx.= " From tmp_mutasi as a Join m_barang as b On a.item_code = b.bkode Group By a.item_code Order By a.item_code,b.bnama,b.bsatbesar";
+        $sqx = "Select a.item_code, c.bnama as item_name, c.bsatkecil as satuan, coalesce(b.hrg_beli,0) as hrg_beli, coalesce(b.hrg_jual1,0) as hrg_jual, sum(a.awal) as sAwal, sum(a.beli) as sBeli, sum(a.asyin) as sAsyin, sum(a.xin) as sXin, sum(a.rjual) as sRjual, sum(a.asyout) as sAsyout, sum(a.jual) as sJual, sum(a.xout) as sXout, sum(a.rbeli) as sRbeli, sum(a.koreksi) as sKoreksi ";
+        $sqx.= " From tmp_mutasi as a Left Join vw_m_itemprice as b On a.item_code = b.item_code And b.cabang_id = ?cabangId";
+        $sqx.= " Left Join m_barang c ON a.item_code = c.bkode";
+        $sqx.= " Group By a.item_code, c.bnama, c.bsatkecil, b.hrg_beli, b.hrg_jual1 Order By a.item_code, c.bnama, c.bsatkecil";
         $this->connector->CommandText = $sqx;
+        $this->connector->AddParameter("?cabangId", $cabangId);
         $rs = $this->connector->ExecuteQuery();
         return $rs;
     }

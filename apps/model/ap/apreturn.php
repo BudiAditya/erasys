@@ -168,7 +168,7 @@ class ApReturn extends EntityBase {
 		$this->connector->AddParameter("?rb_date", $this->RbDate);
         $this->connector->AddParameter("?supplier_id", $this->SupplierId);
 		$this->connector->AddParameter("?rb_descs", $this->RbDescs);
-        $this->connector->AddParameter("?rb_amount", $this->RbAmount);
+        $this->connector->AddParameter("?rb_amount", $this->RbAmount == null ? 0 : $this->RbAmount);
         $this->connector->AddParameter("?rb_status", $this->RbStatus);
         $this->connector->AddParameter("?createby_id", $this->CreatebyId);
 		$rs = $this->connector->ExecuteNonQuery();
@@ -197,7 +197,7 @@ WHERE id = ?id";
         $this->connector->AddParameter("?rb_date", $this->RbDate);
         $this->connector->AddParameter("?supplier_id", $this->SupplierId);
         $this->connector->AddParameter("?rb_descs", $this->RbDescs);
-        $this->connector->AddParameter("?rb_amount", $this->RbAmount);
+        $this->connector->AddParameter("?rb_amount", $this->RbAmount == null ? 0 : $this->RbAmount);
         $this->connector->AddParameter("?rb_status", $this->RbStatus);
         $this->connector->AddParameter("?updateby_id", $this->UpdatebyId);
 		$this->connector->AddParameter("?id", $id);

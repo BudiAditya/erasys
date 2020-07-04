@@ -379,8 +379,8 @@ WHERE id = ?id";
         return strval($row["valresult"]);
     }
 
-    public function UpdateCaraBayar($id,$wti,$wbi){
-        $this->connector->CommandText = "Update t_ap_payment_master a Set a.warkat_type_id = $wti,a.warkat_bank_id = $wbi WHERE a.id = $id";
+    public function UpdateCaraBayar($id,$wti,$wbi,$ket){
+        $this->connector->CommandText = "Update t_ap_payment_master a Set a.warkat_type_id = $wti,a.warkat_bank_id = $wbi,a.payment_descs = '".$ket."' WHERE a.id = $id";
         return $this->connector->ExecuteNonQuery();
     }
 }

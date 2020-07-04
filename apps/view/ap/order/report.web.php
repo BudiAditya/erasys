@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html xmlns="http://www.w3.org/1999/html">
+<html>
 <?php /** @var $suppliers Contacts[] */ ?>
 <head>
 	<title>ERASYS - Rekapitulasi Purchase Order</title>
@@ -237,5 +237,5 @@
         </table>
         <!-- end web report -->
 <?php }} ?>
-</body>
+<!-- </body> -->
 </html>

@@ -88,7 +88,7 @@ class Items extends EntityBase {
 		return $result;
 	}
 
-    public function LoadItemList($entityId,$cabangId,$itemStatus = 1,$orderBy = "a.bkode", $includeDeleted = false) {
+    public function LoadItemList($entityId,$cabangId,$isGlobal = 1,$itemStatus = 1,$orderBy = "a.bkode", $includeDeleted = false) {
         $sqx = "SELECT a.* FROM vw_m_barang AS a ";
         if ($itemStatus == -1){
             $sqx.= "Where a.bisaktif > -1";
@@ -98,7 +98,11 @@ class Items extends EntityBase {
         if ($includeDeleted) {
             $sqx.= " And a.is_deleted = 0";
         }
-        $sqx.= " And Not (a.item_level = 1 And a.entity_id <> $entityId) And Not (a.item_level = 2 And a.def_cabang_id <> $cabangId)";
+        if ($isGlobal == 1) {
+            $sqx .= " And Not (a.item_level = 1 And a.entity_id <> $entityId) And Not (a.item_level = 2 And a.def_cabang_id <>$cabangId)";
+        }else{
+            $sqx .= " And (a.item_level > 0 And a.entity_id = $entityId)";
+        }
         $sqx.= " ORDER BY $orderBy;";
         $this->connector->CommandText = $sqx;
         $rs = $this->connector->ExecuteQuery();
@@ -255,12 +259,16 @@ class Items extends EntityBase {
         return $result;
     }
 
-    public function GetJSonItems($entityId,$cabangId,$filter = null,$sort = 'a.bnama',$order = 'ASC') {
+    public function GetJSonItems($entityId,$cabangId,$isGlobal = 1,$filter = null,$sort = 'a.bnama',$order = 'ASC') {
         $sql = "SELECT a.bid, a.bkode, a.bnama, a.bsatbesar, a.bsatkecil, a.bqtystock, a.bhargabeli, a.bhargajual1 FROM vw_m_barang as a Where a.is_deleted = 0 And a.bisaktif = 1";
         if ($filter != null){
             $sql.= " And (a.bkode Like '%$filter%' Or a.bnama Like '%$filter%')";
         }
-        $sql.= " And Not (a.item_level = 1 And a.entity_id <> $entityId) And Not (a.item_level = 2 And a.def_cabang_id <>$cabangId)";
+        if ($isGlobal == 1) {
+            $sql .= " And Not (a.item_level = 1 And a.entity_id <> $entityId) And Not (a.item_level = 2 And a.def_cabang_id <>$cabangId)";
+        }else{
+            $sql .= " And (a.item_level > 0 And a.entity_id = $entityId)";
+        }
         $this->connector->CommandText = $sql;
         $data['count'] = $this->connector->ExecuteQuery()->GetNumRows();
         $sql.= " Order By $sort $order";

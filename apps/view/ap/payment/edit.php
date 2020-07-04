@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html xmlns="http://www.w3.org/1999/html">
+<html>
 <?php
 /** @var $payment Payment */ /** @var $banks Bank[] */
 ?>
@@ -154,7 +154,8 @@
                 if (confirm('**Proses ini hanya meng-Update Cara Bayar & Kas/Bank** \nTetap dilanjutkan?')){
                     var wti = $("#WarkatTypeId").combobox('getValue');
                     var wbi = $("#WarkatBankId").combobox('getValue');
-                    var urz = '<?php print($helper->site_url("ap.payment/updatecarabayar/".$payment->Id."/")); ?>'+wti+'/'+wbi;
+                    var ket = $("#PaymentDescs").textbox('getValue');
+                    var urz = '<?php print($helper->site_url("ap.payment/updatecarabayar/".$payment->Id."/")); ?>'+wti+'/'+wbi+'/'+ket;
                     //alert(urz);
                     $.get(urz, function(data, status){
                         if (data == 1){
@@ -342,8 +343,6 @@ $baddnew = base_url('public/images/button/').'create_new.png';
                 <td><input type="text" class="right bold" style="width: 120px" id="PaymentAmount" name="PaymentAmount" value="<?php print($payment->PaymentAmount != null ? $payment->PaymentAmount : 0); ?>"/></td>
                 <td>Alokasi</td>
                 <td><input type="text" class="right bold" style="width: 120px" id="AllocateAmount" name="AllocateAmount" value="<?php print($payment->AllocateAmount != null ? $payment->AllocateAmount : 0); ?>" readonly/></td>
-                <td>Sisa</td>
-                <td><input type="text" class="right bold" style="width: 120px" id="BalanceAmount" name="BalanceAmount" value="<?php print($payment->BalanceAmount != null ? $payment->BalanceAmount : 0); ?>" readonly/></td>
             </tr>
             <tr>
                 <td>Keterangan</td>
@@ -355,6 +354,8 @@ $baddnew = base_url('public/images/button/').'create_new.png';
                         <option value="2" <?php print($payment->PaymentStatus == 2 ? 'selected="selected"' : '');?>>2 - Batal</option>
                     </select>
                 </td>
+                <td>Sisa</td>
+                <td><input type="text" class="right bold" style="width: 120px" id="BalanceAmount" name="BalanceAmount" value="<?php print($payment->BalanceAmount != null ? $payment->BalanceAmount : 0); ?>" readonly/></td>
             </tr>
             <tr>
                 <td colspan="7">
@@ -433,10 +434,10 @@ $baddnew = base_url('public/images/button/').'create_new.png';
     </form>
 </div>
 <div id="ft" style="padding:5px; text-align: center; font-family: verdana; font-size: 9px" >
-    Copyright &copy; 2016 - 2018  CV. Erasystem Infotama
+    Copyright &copy; 2016 - 2020  <a href='http://rekasys.com'><b>Rekasys Inc</b></a>
 </div>
 <!-- Form Add Payment Detail -->
-<div id="dlg" class="easyui-dialog" style="width:750px;height:150px;padding:5px 5px"
+<div id="dlg" class="easyui-dialog" style="width:800px;height:150px;padding:5px 5px"
      closed="true" buttons="#dlg-buttons">
     <form id="fm" method="post" novalidate>
         <table cellpadding="0" cellspacing="0" class="tablePadding tableBorder" style="font-size: 12px;font-family: tahoma">
@@ -478,5 +479,5 @@ $baddnew = base_url('public/images/button/').'create_new.png';
     <a href="javascript:void(0)" class="easyui-linkbutton c6" iconCls="icon-ok" onclick="saveDetail()" style="width:90px">Proses</a>
     <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:$('#dlg').dialog('close')" style="width:90px">Batal</a>
 </div>
-</body>
+<!-- </body> -->
 </html>

@@ -20,11 +20,12 @@
     <script type="text/javascript">
         $(document).ready(function () {
             var elements = ["ItemCode","PriceDate","MaxDisc","HrgBeli","Markup1","HrgJual1","Markup2","HrgJual2","Markup3","HrgJual3","Markup4","HrgJual4","Markup5","HrgJual5","Markup6","HrgJual6","Submit"];
+            var itu = "<?php print($setprices->Satuan);?>";
             BatchFocusRegister(elements);
             $("#PriceDate").customDatePicker({ showOn: "focus" });
 
             $('#ItemSearch').combogrid({
-                panelWidth:560,
+                panelWidth:500,
                 url: "<?php print($helper->site_url("master.items/getjson_items"));?>",
                 idField:'bid',
                 textField:'bnama',
@@ -33,8 +34,7 @@
                 columns:[[
                     {field:'bkode',title:'Kode',width:50,sortable:true},
                     {field:'bnama',title:'Nama Barang',sortable:true,width:150},
-                    {field:'bsatbesar',title:'Sat. Besar',width:50},
-                    {field:'bsatkecil',title:'Sat. Kecil',width:50}
+                    {field:'bsatbesar',title:'Satuan',width:40}
                 ]],
                 onSelect: function(index,row){
                     var bid = row.bid;
@@ -43,15 +43,30 @@
                     console.log(bkode);
                     var bnama = row.bnama;
                     console.log(bnama);
-                    var satbesar = row.bsatbesar;
-                    console.log(satbesar);
-                    var satkecil = row.bsatkecil;
-                    console.log(satkecil);
+                    var satuan = row.bsatbesar;
+                    console.log(satuan);
                     $('#ItemId').val(bid);
                     $('#ItemCode').val(bkode);
                     $('#ItemDescs').val(bnama);
-                    $('#SatBesar').val(satbesar);
-                    $('#SatKecil').val(satkecil);
+                    $('#Satuan').val(satuan);
+                    //add satuan option
+                    $("#Satuan").empty();
+                    if (itu == row.bsatbesar) {
+                        $("#Satuan").append('<option value="'+row.bsatbesar+'" selected="selected">'+row.bsatbesar+'</option>');
+                    }else{
+                        if (row.bsatbesar != '' && row.bsatbesar != null){
+                            $("#Satuan").append('<option value="'+row.bsatbesar+'">'+row.bsatbesar+'</option>');
+                        }
+                    }
+                    if (row.bsatkecil != row.bsatbesar) {
+                        if (itu == row.bsatkecil) {
+                            $("#Satuan").append('<option value="' + row.bsatkecil + '" selected="selected">' + row.bsatkecil + '</option>');
+                        } else {
+                            if (row.bsatkecil != '' && row.bsatkecil != null) {
+                                $("#Satuan").append('<option value="' + row.bsatkecil + '">' + row.bsatkecil + '</option>');
+                            }
+                        }
+                    }
                 }
             });
 
@@ -67,8 +82,25 @@
                             if (dtx[0] == 'OK'){
                                 $('#ItemId').val(dtx[1]);
                                 $('#ItemDescs').val(dtx[2]);
-                                $('#SatBesar').val(dtx[3]);
-                                $('#SatKecil').val(dtx[7]);
+                                //$('#Satuan').val(dtx[3]);
+                                //add satuan option
+                                $("#Satuan").empty();
+                                if (itu == dtx[3]) {
+                                    $("#Satuan").append('<option value="'+dtx[3]+'" selected="selected">'+dtx[3]+'</option>');
+                                }else{
+                                    if (dtx[3] != '' && dtx[3] != null){
+                                        $("#Satuan").append('<option value="'+dtx[3]+'">'+dtx[3]+'</option>');
+                                    }
+                                }
+                                if (dtx[3] == dtx[7]) {
+                                    if (itu == dtx[7]) {
+                                        $("#Satuan").append('<option value="' + dtx[7] + '" selected="selected">' + dtx[7] + '</option>');
+                                    } else {
+                                        if (dtx[7] != '' && dtx[7] != null) {
+                                            $("#Satuan").append('<option value="' + dtx[7] + '">' + dtx[7] + '</option>');
+                                        }
+                                    }
+                                }
                             }
                         }
                     });
@@ -191,72 +223,76 @@ $crDate = date(JS_DATE, strtotime(date('Y-m-d')));
                     <input type="hidden" id="ItemId" name="ItemId" value="<?php print($setprices->ItemId);?>"/>
                     <input type="hidden" id="Id" name="Id" value="<?php print($setprices->Id);?>"/>
                 </td>
-                <td class="bold right">Per Tanggal</td>
+                <td class="bold right">Tanggal</td>
                 <td><input type="text" class="bold" size="10" id="PriceDate" name="PriceDate" value="<?php print($setprices->FormatPriceDate(JS_DATE));?>" required/></td>
             </tr>
             <tr>
                 <td class="bold right">Nama Barang</td>
                 <td colspan="3"><input type="text" class="bold" id="ItemDescs" name="ItemDescs" style="width:490px" value="<?php print(htmlspecialchars($setprices->ItemName));?>" disabled/></td>
+                <td class="bold right">Satuan</td>
+                <td>
+                    <select class="bold" name="Satuan" id="Satuan" required>
+                        <?php
+                        if ($setprices->SatBesar != '' && $setprices->SatBesar != null) {
+                            if ($setprices->SatBesar == $setprices->Satuan) {
+                                printf("<option value='%s' selected='selected'>%s</option>", $setprices->SatBesar, $setprices->SatBesar);
+                            } else {
+                                printf("<option value='%s'>%s</option>", $setprices->SatBesar, $setprices->SatBesar);
+                            }
+                        }
+                        if ($setprices->SatKecil != '' && $setprices->SatKecil != null) {
+                            if ($setprices->SatKecil == $setprices->Satuan) {
+                                printf("<option value='%s' selected='selected'>%s</option>", $setprices->SatKecil, $setprices->SatKecil);
+                            } else {
+                                printf("<option value='%s'>%s</option>", $setprices->SatKecil, $setprices->SatKecil);
+                            }
+                        }
+                        ?>
+
+                    </select>
+                </td>
             </tr>
             <tr>
-                <td class="bold right">Harga Beli</td>
-                <td><input class="bold right" type="text" id="HrgBeli" name="HrgBeli" size="10" value="<?php print($setprices->HrgBeli == null ? 0 : $setprices->HrgBeli);?>"/>&nbsp;<sup>(* Per Satuan Besar)</sup></td>
-            </tr>
-            <tr>
-                <td class="bold right">Max Discount Jual</td>
+                <td class="bold right">Max Discount</td>
                 <td><input class="bold right" type="text" id="MaxDisc" name="MaxDisc" size="3" value="<?php print($setprices->MaxDisc == null ? 0 : $setprices->MaxDisc);?>"/>%</td>
-                <td class="bold right">Satuan Besar</td>
-                <td><input type="text" class="bold" id="SatBesar" name="SatBesar" size="10" value="<?php print($setprices->SatBesar);?>" readonly/></td>
-                <td class="bold right">Satuan Kecil</td>
-                <td><input type="text" class="bold" id="SatKecil" name="SatKecil" size="10" value="<?php print($setprices->SatKecil);?>" readonly/></td>
+                <td class="bold right">Harga Beli</td>
+                <td><input class="bold right" type="text" id="HrgBeli" name="HrgBeli" size="10" value="<?php print($setprices->HrgBeli == null ? 0 : $setprices->HrgBeli);?>"/></td>
             </tr>
             <tr>
                 <td class="bold right">Mark Up1</td>
                 <td><input class="bold right" type="text" id="Markup1" name="Markup1" size="3" value="<?php print($setprices->Markup1 == null ? 0 : $setprices->Markup1);?>"/>%</td>
-                <td class="bold right">Harga Jual1 Besar</td>
+                <td class="bold right">Harga Jual1</td>
                 <td><input class="bold right" type="text" id="HrgJual1" name="HrgJual1" size="10" value="<?php print($setprices->HrgJual1 == null ? 0 : $setprices->HrgJual1);?>"/></td>
-                <td class="bold right">Harga Jual1 Kecil</td>
-                <td><input class="bold right" type="text" id="HrgJual1k" name="HrgJual1k" size="10" value="<?php print($setprices->HrgJual1k == null ? 0 : $setprices->HrgJual1k);?>"/></td>
             </tr>
             <tr>
                 <td class="bold right">Mark Up2</td>
                 <td><input class="bold right" type="text" id="Markup2" name="Markup2" size="3" value="<?php print($setprices->Markup2 == null ? 0 : $setprices->Markup2);?>"/>%</td>
-                <td class="bold right">Harga Jual2 Besar</td>
+                <td class="bold right">Harga Jual2</td>
                 <td><input class="bold right" type="text" id="HrgJual2" name="HrgJual2" size="10" value="<?php print($setprices->HrgJual2 == null ? 0 : $setprices->HrgJual2);?>"/></td>
-                <td class="bold right">Harga Jual2 Kecil</td>
-                <td><input class="bold right" type="text" id="HrgJual2k" name="HrgJual2k" size="10" value="<?php print($setprices->HrgJual2k == null ? 0 : $setprices->HrgJual2k);?>"/></td>
             </tr>
             <tr>
                 <td class="bold right">Mark Up3</td>
                 <td><input class="bold right" type="text" id="Markup3" name="Markup3" size="3" value="<?php print($setprices->Markup3 == null ? 0 : $setprices->Markup3);?>"/>%</td>
-                <td class="bold right">Harga Jual3 Besar</td>
+                <td class="bold right">Harga Jual3</td>
                 <td><input class="bold right" type="text" id="HrgJual3" name="HrgJual3" size="10" value="<?php print($setprices->HrgJual3 == null ? 0 : $setprices->HrgJual3);?>"/></td>
-                <td class="bold right">Harga Jual3 Kecil</td>
-                <td><input class="bold right" type="text" id="HrgJual3k" name="HrgJual3k" size="10" value="<?php print($setprices->HrgJual3k == null ? 0 : $setprices->HrgJual3k);?>"/></td>
             </tr>
             <tr>
                 <td class="bold right">Mark Up4</td>
                 <td><input class="bold right" type="text" id="Markup4" name="Markup4" size="3" value="<?php print($setprices->Markup4 == null ? 0 : $setprices->Markup4);?>"/>%</td>
-                <td class="bold right">Harga Jual4 Besar</td>
+                <td class="bold right">Harga Jual4</td>
                 <td><input class="bold right" type="text" id="HrgJual4" name="HrgJual4" size="10" value="<?php print($setprices->HrgJual4 == null ? 0 : $setprices->HrgJual4);?>"/></td>
-                <td class="bold right">Harga Jual4 Kecil</td>
-                <td><input class="bold right" type="text" id="HrgJual4k" name="HrgJual4k" size="10" value="<?php print($setprices->HrgJual4k == null ? 0 : $setprices->HrgJual4k);?>"/></td>
             </tr>
             <tr>
                 <td class="bold right">Mark Up5</td>
                 <td><input class="bold right" type="text" id="Markup5" name="Markup5" size="3" value="<?php print($setprices->Markup5 == null ? 0 : $setprices->Markup5);?>"/>%</td>
-                <td class="bold right">Harga Jual5 Besar</td>
+                <td class="bold right">Harga Jual5</td>
                 <td><input class="bold right" type="text" id="HrgJual5" name="HrgJual5" size="10" value="<?php print($setprices->HrgJual5 == null ? 0 : $setprices->HrgJual5);?>"/></td>
-                <td class="bold right">Harga Jual5 Kecil</td>
-                <td><input class="bold right" type="text" id="HrgJual5k" name="HrgJual5k" size="10" value="<?php print($setprices->HrgJual5k == null ? 0 : $setprices->HrgJual5k);?>"/></td>
             </tr>
             <tr>
                 <td class="bold right">Mark Up6</td>
                 <td><input class="bold right" type="text" id="Markup6" name="Markup6" size="3" value="<?php print($setprices->Markup6 == null ? 0 : $setprices->Markup6);?>"/>%</td>
-                <td class="bold right">Harga Jual6 Besar</td>
+                <td class="bold right">Harga Jual6</td>
                 <td><input class="bold right" type="text" id="HrgJual6" name="HrgJual6" size="10" value="<?php print($setprices->HrgJual6 == null ? 0 : $setprices->HrgJual6);?>"/></td>
-                <td class="bold right">Harga Jual6 Kecil</td>
-                <td><input class="bold right" type="text" id="HrgJual6k" name="HrgJual6k" size="10" value="<?php print($setprices->HrgJual6k == null ? 0 : $setprices->HrgJual6k);?>"/></td>
             </tr>
             <tr>
                 <td>&nbsp;</td>

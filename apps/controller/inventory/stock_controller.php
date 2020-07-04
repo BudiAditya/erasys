@@ -19,7 +19,7 @@ class StockController extends AppController {
         $settings["columns"][] = array("name" => "a.kode", "display" => "Cabang", "width" => 100);
         $settings["columns"][] = array("name" => "a.item_code", "display" => "Kode", "width" => 120);
         $settings["columns"][] = array("name" => "a.bnama", "display" => "Nama Produk", "width" =>300);
-        $settings["columns"][] = array("name" => "a.bsatbesar", "display" => "Satuan", "width" =>100);
+        $settings["columns"][] = array("name" => "a.bsatkecil", "display" => "Satuan", "width" =>100);
         $settings["columns"][] = array("name" => "format(a.qty_stock,2)", "display" => "Qty Stock", "width" => 70, "align" => "right");
         $settings["columns"][] = array("name" => "a.supplier_name", "display" => "Supplier", "width" =>150);
 
@@ -32,13 +32,12 @@ class StockController extends AppController {
             $acl = AclManager::GetInstance();
             $settings["title"] = "Daftar Stock Produk";
             if ($acl->CheckUserAccess("inventory.stock", "view")) {
-                $settings["actions"][] = array("Text" => "Kartu Stock", "Url" => "inventory.stock/card/%s", "Class" => "bt_view", "ReqId" => 1,"Confirm" => "Tampilkan Kartu Stock item yang dipilih?");
+                $settings["actions"][] = array("Text" => "Kartu Stock", "Url" => "inventory.stock/card/%s", "Class" => "bt_view", "ReqId" => 1,"Confirm" => "");
                 $settings["actions"][] = array("Text" => "separator", "Url" => null);
-                $settings["actions"][] = array("Text" => "Mutasi Stock", "Url" => "inventory.stock/mutasi", "Class" => "bt_report", "ReqId" => 0,"Confirm" => "Tampilkan Mutasi Stock?");
+                $settings["actions"][] = array("Text" => "Stock Per Periode", "Url" => "inventory.stock/stkdetail", "Class" => "bt_report", "ReqId" => 0,"Confirm" => "");
+                $settings["actions"][] = array("Text" => "Stock Terakhir", "Url" => "inventory.stock/report", "Class" => "bt_report", "ReqId" => 0);
                 $settings["actions"][] = array("Text" => "separator", "Url" => null);
                 $settings["actions"][] = array("Text" => "Daftar Stock Produk", "Url" => "inventory.stock/stock_list/xls", "Class" => "bt_excel", "ReqId" => 0);
-                $settings["actions"][] = array("Text" => "separator", "Url" => null);
-                $settings["actions"][] = array("Text" => "Laporan Stock Produk", "Url" => "inventory.stock/report", "Class" => "bt_report", "ReqId" => 0);
                 $settings["actions"][] = array("Text" => "separator", "Url" => null);
                 $settings["actions"][] = array("Text" => "Periksa & Hitung Ulang Stock", "Url" => "inventory.stock/recount", "Class" => "bt_edit", "ReqId" => 0,"Confirm" => "Mulai Proses hitung ulang stock?");
             }
@@ -91,7 +90,7 @@ class StockController extends AppController {
         $this->Set("company_name", $company->CompanyName);
     }
 
-    public function mutasi(){
+    public function stkdetail(){
         require_once(MODEL . "master/company.php");
         require_once(MODEL . "master/cabang.php");
         // proses pembuatan mutasi stock
@@ -103,6 +102,7 @@ class StockController extends AppController {
             $cabangId =  $this->GetPostValue("cabangId");
             $startDate =  strtotime($this->GetPostValue("startDate"));
             $endDate = strtotime($this->GetPostValue("endDate"));
+            $rType = $this->GetPostValue("rType");
             $outPut = $this->GetPostValue("outPut");
             if ($cabangId <> $this->userCabangId){
                 $this->persistence->SaveState("error", "Maaf Anda tidak boleh mengakses Mutasi Stock cabang ini!");
@@ -114,6 +114,7 @@ class StockController extends AppController {
             $cabangId = $this->userCabangId;
             $startDate = mktime(0, 0, 0, $month, 1, $year);
             $endDate = time();
+            $rType = 1;
             $outPut = 0;
             $mstock = null;
         }
@@ -137,6 +138,7 @@ class StockController extends AppController {
         $this->Set("startDate",$startDate);
         $this->Set("endDate",$endDate);
         $this->Set("outPut",$outPut);
+        $this->Set("rType",$rType);
         $this->Set("userCabId",$this->userCabangId);
         $this->Set("userCabCode",$cabCode);
         $this->Set("userCabName",$cabName);

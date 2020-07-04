@@ -64,6 +64,9 @@ class HomeController extends AppController {
                                     $this->persistence->SaveState("cabang_kode", $userAdmin->CabangKode);
                                     $this->persistence->SaveState("cabang_name", $userAdmin->CabangName);
                                     $this->persistence->SaveState("area_id", $userAdmin->AreaId);
+                                    $this->persistence->SaveState("is_global_items",1);
+                                    $this->persistence->SaveState("is_allow_minus",1);
+                                    $this->persistence->SaveState("is_auto_price",0);
                                 } else {
                                     /** @var $usercab Cabang */
                                     $this->persistence->SaveState("entity_id", $usercab->EntityId);
@@ -73,6 +76,9 @@ class HomeController extends AppController {
                                     $this->persistence->SaveState("cabang_kode", $usercab->Kode);
                                     $this->persistence->SaveState("cabang_name", $usercab->NamaCabang);
                                     $this->persistence->SaveState("area_id", $usercab->AreaId);
+                                    $this->persistence->SaveState("is_global_items", $usercab->IsUseGlobalItems);
+                                    $this->persistence->SaveState("is_allow_minus", $usercab->AllowMinus);
+                                    $this->persistence->SaveState("is_auto_price", $usercab->IsAutoUpdateSalePrice);
                                 }
                                 $this->persistence->SaveState("user_lvl", $userAdmin->UserLvl);
                                 $this->persistence->SaveState("sys_start_date", $userAdmin->SysStartDate);

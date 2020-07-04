@@ -273,7 +273,6 @@ $bpdf = base_url('public/images/button/').'pdf.png';
                                         printf('<img src="%s" id="bCetakPdf" alt="Cetak PDF Invoice" title="Proses cetak PDF invoice" style="cursor: pointer;"/>', $bpdf);
                                     }
                                 ?>
-
                             </td>
                         <?php }else{ ?>
                             <td>&nbsp</td>

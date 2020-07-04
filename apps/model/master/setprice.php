@@ -7,24 +7,34 @@ class SetPrice extends EntityBase {
     public $ItemCode;
     public $ItemName;
     public $Satuan;
+    public $SatJual;
     public $PriceDate;
-    public $HrgBeli;
-    public $MaxDisc;
-    public $Markup1;
-    public $Markup2;
-    public $Markup3;
-    public $Markup4;
-    public $Markup5;
-    public $Markup6;
-    public $HrgJual1;
-    public $HrgJual2;
-    public $HrgJual3;
-    public $HrgJual4;
-    public $HrgJual5;
-    public $HrgJual6;
-    public $QtyStock;
-    public $CreatebyId;
-    public $UpdatebyId;
+    public $HrgBeli = 0;
+    public $MaxDisc = 0;
+    public $Markup1 = 0;
+    public $Markup2 = 0;
+    public $Markup3 = 0;
+    public $Markup4 = 0;
+    public $Markup5 = 0;
+    public $Markup6 = 0;
+    public $HrgJual1 = 0;
+    public $HrgJual2 = 0;
+    public $HrgJual3 = 0;
+    public $HrgJual4 = 0;
+    public $HrgJual5 = 0;
+    public $HrgJual6 = 0;
+    public $QtyStock = 0;
+    public $CreatebyId = 0;
+    public $UpdatebyId = 0;
+    public $SatBesar;
+    public $SatKecil;
+    public $IsiKecil = 0;
+    public $HrgJual1k = 0;
+    public $HrgJual2k = 0;
+    public $HrgJual3k = 0;
+    public $HrgJual4k = 0;
+    public $HrgJual5k = 0;
+    public $HrgJual6k = 0;
 
 	public function __construct($id = null) {
 		parent::__construct();
@@ -40,7 +50,8 @@ class SetPrice extends EntityBase {
 		$this->ItemId = $row["item_id"];
         $this->ItemCode = $row["item_code"];
         $this->ItemName = $row["item_name"];
-        $this->Satuan = $row["satuan"];
+        $this->Satuan = $row["bsatbesar"];
+        $this->SatJual = $row["bsatbesar"];
         $this->PriceDate = strtotime($row["price_date"]);
         $this->HrgBeli = $row["hrg_beli"];
         $this->MaxDisc = $row["max_disc"];
@@ -59,6 +70,15 @@ class SetPrice extends EntityBase {
         $this->QtyStock = $row["qty_stock"];
         $this->CreatebyId = $row["createby_id"];
         $this->UpdatebyId = $row["updateby_id"];
+        $this->SatBesar = $row["bsatbesar"];
+        $this->SatKecil = $row["bsatkecil"];
+        $this->IsiKecil = $row["bisisatkecil"];
+        $this->HrgJual1k = $row["hrg_jual1k"];
+        $this->HrgJual2k = $row["hrg_jual2k"];
+        $this->HrgJual3k = $row["hrg_jual3k"];
+        $this->HrgJual4k = $row["hrg_jual4k"];
+        $this->HrgJual5k = $row["hrg_jual5k"];
+        $this->HrgJual6k = $row["hrg_jual6k"];
 	}
 
     public function FormatPriceDate($format = HUMAN_DATE) {
@@ -108,9 +128,9 @@ class SetPrice extends EntityBase {
 
     public function FindByKode($cabangId=0,$itemCode) {
         if ($cabangId > 0){
-            $this->connector->CommandText = "SELECT a.* FROM vw_m_itempricestock AS a WHERE a.cabang_id = ?cabangId And a.item_code = ?itemCode";
+            $this->connector->CommandText = "SELECT a.* FROM vw_m_itempricestock AS a WHERE a.cabang_id = ?cabangId And a.item_code = '" . $itemCode . "'";
         }else{
-            $this->connector->CommandText = "SELECT a.* FROM vw_m_itempricestock AS a WHERE a.item_code = ?itemCode Limit 1";
+            $this->connector->CommandText = "SELECT a.* FROM vw_m_itempricestock AS a WHERE a.item_code = '" . $itemCode . "' Limit 1";
         }
         $this->connector->AddParameter("?cabangId", $cabangId);
         $this->connector->AddParameter("?itemCode", $itemCode);
@@ -140,28 +160,35 @@ class SetPrice extends EntityBase {
     }
 
 	public function Insert() {
-        $sql = 'INSERT INTO m_set_price(satuan,cabang_id,item_id,item_code,price_date,hrg_beli,max_disc,markup1,markup2,markup3,markup4,markup5,markup6,hrg_jual1,hrg_jual2,hrg_jual3,hrg_jual4,hrg_jual5,hrg_jual6,createby_id,create_time)';
-        $sql.= ' VALUES(?satuan,?cabang_id,?item_id,?item_code,?price_date,?hrg_beli,?max_disc,?markup1,?markup2,?markup3,?markup4,?markup5,?markup6,?hrg_jual1,?hrg_jual2,?hrg_jual3,?hrg_jual4,?hrg_jual5,?hrg_jual6,?createby_id,now())';
+        $sql = 'INSERT INTO m_set_price(satjual,satuan,cabang_id,item_id,item_code,price_date,hrg_beli,max_disc,markup1,markup2,markup3,markup4,markup5,markup6,hrg_jual1,hrg_jual2,hrg_jual3,hrg_jual4,hrg_jual5,hrg_jual6,hrg_jual1k,hrg_jual2k,hrg_jual3k,hrg_jual4k,hrg_jual5k,hrg_jual6k,createby_id,create_time)';
+        $sql.= ' VALUES(?satjual,?satuan,?cabang_id,?item_id,?item_code,?price_date,?hrg_beli,?max_disc,?markup1,?markup2,?markup3,?markup4,?markup5,?markup6,?hrg_jual1,?hrg_jual2,?hrg_jual3,?hrg_jual4,?hrg_jual5,?hrg_jual6,?hrg_jual1k,?hrg_jual2k,?hrg_jual3k,?hrg_jual4k,?hrg_jual5k,?hrg_jual6k,?createby_id,now())';
 		$this->connector->CommandText = $sql;
 		$this->connector->AddParameter("?satuan", $this->Satuan);
+        $this->connector->AddParameter("?satjual", $this->SatJual);
         $this->connector->AddParameter("?cabang_id", $this->CabangId);
         $this->connector->AddParameter("?item_id", $this->ItemId);
         $this->connector->AddParameter("?item_code", $this->ItemCode,"char");
         $this->connector->AddParameter("?price_date", $this->PriceDate);
-        $this->connector->AddParameter("?hrg_beli", $this->HrgBeli);
-        $this->connector->AddParameter("?max_disc", $this->MaxDisc);
-        $this->connector->AddParameter("?markup1", $this->Markup1);
-        $this->connector->AddParameter("?markup2", $this->Markup2);
-        $this->connector->AddParameter("?markup3", $this->Markup3);
-        $this->connector->AddParameter("?markup4", $this->Markup4);
-        $this->connector->AddParameter("?markup5", $this->Markup5);
-        $this->connector->AddParameter("?markup6", $this->Markup6);
-        $this->connector->AddParameter("?hrg_jual1", $this->HrgJual1);
-        $this->connector->AddParameter("?hrg_jual2", $this->HrgJual2);
-        $this->connector->AddParameter("?hrg_jual3", $this->HrgJual3);
-        $this->connector->AddParameter("?hrg_jual4", $this->HrgJual4);
-        $this->connector->AddParameter("?hrg_jual5", $this->HrgJual5);
-        $this->connector->AddParameter("?hrg_jual6", $this->HrgJual6);
+        $this->connector->AddParameter("?hrg_beli", $this->HrgBeli == null || $this->HrgBeli == '' ? 0 : $this->HrgBeli);
+        $this->connector->AddParameter("?max_disc", $this->MaxDisc == null || $this->MaxDisc == '' ? 0 : $this->MaxDisc);
+        $this->connector->AddParameter("?markup1", $this->Markup1 == null || $this->Markup1 == '' ? 0 : $this->Markup1);
+        $this->connector->AddParameter("?markup2", $this->Markup2 == null || $this->Markup2 == '' ? 0 : $this->Markup2);
+        $this->connector->AddParameter("?markup3", $this->Markup3 == null || $this->Markup3 == '' ? 0 : $this->Markup3);
+        $this->connector->AddParameter("?markup4", $this->Markup4 == null || $this->Markup4 == '' ? 0 : $this->Markup4);
+        $this->connector->AddParameter("?markup5", $this->Markup5 == null || $this->Markup5 == '' ? 0 : $this->Markup5);
+        $this->connector->AddParameter("?markup6", $this->Markup6 == null || $this->Markup6 == '' ? 0 : $this->Markup6);
+        $this->connector->AddParameter("?hrg_jual1", $this->HrgJual1 == null || $this->HrgJual1 == '' ? 0 : $this->HrgJual1);
+        $this->connector->AddParameter("?hrg_jual2", $this->HrgJual2 == null || $this->HrgJual2 == '' ? 0 : $this->HrgJual2);
+        $this->connector->AddParameter("?hrg_jual3", $this->HrgJual3 == null || $this->HrgJual3 == '' ? 0 : $this->HrgJual3);
+        $this->connector->AddParameter("?hrg_jual4", $this->HrgJual4 == null || $this->HrgJual4 == '' ? 0 : $this->HrgJual4);
+        $this->connector->AddParameter("?hrg_jual5", $this->HrgJual5 == null || $this->HrgJual5 == '' ? 0 : $this->HrgJual5);
+        $this->connector->AddParameter("?hrg_jual6", $this->HrgJual6 == null || $this->HrgJual6 == '' ? 0 : $this->HrgJual6);
+        $this->connector->AddParameter("?hrg_jual1k", $this->HrgJual1k == null || $this->HrgJual1k == '' ? 0 : $this->HrgJual1k);
+        $this->connector->AddParameter("?hrg_jual2k", $this->HrgJual2k == null || $this->HrgJual2k == '' ? 0 : $this->HrgJual2k);
+        $this->connector->AddParameter("?hrg_jual3k", $this->HrgJual3k == null || $this->HrgJual3k == '' ? 0 : $this->HrgJual3k);
+        $this->connector->AddParameter("?hrg_jual4k", $this->HrgJual4k == null || $this->HrgJual4k == '' ? 0 : $this->HrgJual4k);
+        $this->connector->AddParameter("?hrg_jual5k", $this->HrgJual5k == null || $this->HrgJual5k == '' ? 0 : $this->HrgJual5k);
+        $this->connector->AddParameter("?hrg_jual6k", $this->HrgJual6k == null || $this->HrgJual6k == '' ? 0 : $this->HrgJual6k);
         $this->connector->AddParameter("?createby_id", $this->CreatebyId);
         $rs = $this->connector->ExecuteNonQuery();
         if ($rs == 1) {
@@ -175,27 +202,34 @@ class SetPrice extends EntityBase {
         $this->connector->CommandText = 'Insert Into m_set_price_history Select a.* From m_set_price as a Where a.id = ?id';
         $this->connector->AddParameter("?id", $id);
         $rs = $this->connector->ExecuteNonQuery();
-        $sql = 'UPDATE m_set_price SET satuan = ?satuan,cabang_id = ?cabang_id,item_id = ?item_id,item_code = ?item_code,price_date = ?price_date,hrg_beli = ?hrg_beli,max_disc = ?max_disc,markup1 = ?markup1,markup2 = ?markup2,markup3 = ?markup3,markup4 = ?markup4,markup5 = ?markup5,markup6 = ?markup6,hrg_jual1 = ?hrg_jual1,hrg_jual2 = ?hrg_jual2,hrg_jual3 = ?hrg_jual3,hrg_jual4 = ?hrg_jual4,hrg_jual5 = ?hrg_jual5,hrg_jual6 = ?hrg_jual6,updateby_id = ?updateby_id,update_time = now() WHERE id = ?id';
+        $sql = 'UPDATE m_set_price SET satjual = ?satjual,satuan = ?satuan,cabang_id = ?cabang_id,item_id = ?item_id,item_code = ?item_code,price_date = ?price_date,hrg_beli = ?hrg_beli,max_disc = ?max_disc,markup1 = ?markup1,markup2 = ?markup2,markup3 = ?markup3,markup4 = ?markup4,markup5 = ?markup5,markup6 = ?markup6,hrg_jual1 = ?hrg_jual1,hrg_jual2 = ?hrg_jual2,hrg_jual3 = ?hrg_jual3,hrg_jual4 = ?hrg_jual4,hrg_jual5 = ?hrg_jual5,hrg_jual6 = ?hrg_jual6,hrg_jual1k = ?hrg_jual1k,hrg_jual2k = ?hrg_jual2k,hrg_jual3k = ?hrg_jual3k,hrg_jual4k = ?hrg_jual4k,hrg_jual5k = ?hrg_jual5k,hrg_jual6k = ?hrg_jual6k,updateby_id = ?updateby_id,update_time = now() WHERE id = ?id';
         $this->connector->CommandText = $sql;
         $this->connector->AddParameter("?satuan", $this->Satuan);
+        $this->connector->AddParameter("?satjual", $this->SatJual);
         $this->connector->AddParameter("?cabang_id", $this->CabangId);
         $this->connector->AddParameter("?item_id", $this->ItemId);
         $this->connector->AddParameter("?item_code", $this->ItemCode,"char");
         $this->connector->AddParameter("?price_date", $this->PriceDate);
-        $this->connector->AddParameter("?hrg_beli", $this->HrgBeli);
-        $this->connector->AddParameter("?max_disc", $this->MaxDisc);
-        $this->connector->AddParameter("?markup1", $this->Markup1);
-        $this->connector->AddParameter("?markup2", $this->Markup2);
-        $this->connector->AddParameter("?markup3", $this->Markup3);
-        $this->connector->AddParameter("?markup4", $this->Markup4);
-        $this->connector->AddParameter("?markup5", $this->Markup5);
-        $this->connector->AddParameter("?markup6", $this->Markup6);
-        $this->connector->AddParameter("?hrg_jual1", $this->HrgJual1);
-        $this->connector->AddParameter("?hrg_jual2", $this->HrgJual2);
-        $this->connector->AddParameter("?hrg_jual3", $this->HrgJual3);
-        $this->connector->AddParameter("?hrg_jual4", $this->HrgJual4);
-        $this->connector->AddParameter("?hrg_jual5", $this->HrgJual5);
-        $this->connector->AddParameter("?hrg_jual6", $this->HrgJual6);
+        $this->connector->AddParameter("?hrg_beli", $this->HrgBeli == null || $this->HrgBeli == '' ? 0 : $this->HrgBeli);
+        $this->connector->AddParameter("?max_disc", $this->MaxDisc == null || $this->MaxDisc == '' ? 0 : $this->MaxDisc);
+        $this->connector->AddParameter("?markup1", $this->Markup1 == null || $this->Markup1 == '' ? 0 : $this->Markup1);
+        $this->connector->AddParameter("?markup2", $this->Markup2 == null || $this->Markup2 == '' ? 0 : $this->Markup2);
+        $this->connector->AddParameter("?markup3", $this->Markup3 == null || $this->Markup3 == '' ? 0 : $this->Markup3);
+        $this->connector->AddParameter("?markup4", $this->Markup4 == null || $this->Markup4 == '' ? 0 : $this->Markup4);
+        $this->connector->AddParameter("?markup5", $this->Markup5 == null || $this->Markup5 == '' ? 0 : $this->Markup5);
+        $this->connector->AddParameter("?markup6", $this->Markup6 == null || $this->Markup6 == '' ? 0 : $this->Markup6);
+        $this->connector->AddParameter("?hrg_jual1", $this->HrgJual1 == null || $this->HrgJual1 == '' ? 0 : $this->HrgJual1);
+        $this->connector->AddParameter("?hrg_jual2", $this->HrgJual2 == null || $this->HrgJual2 == '' ? 0 : $this->HrgJual2);
+        $this->connector->AddParameter("?hrg_jual3", $this->HrgJual3 == null || $this->HrgJual3 == '' ? 0 : $this->HrgJual3);
+        $this->connector->AddParameter("?hrg_jual4", $this->HrgJual4 == null || $this->HrgJual4 == '' ? 0 : $this->HrgJual4);
+        $this->connector->AddParameter("?hrg_jual5", $this->HrgJual5 == null || $this->HrgJual5 == '' ? 0 : $this->HrgJual5);
+        $this->connector->AddParameter("?hrg_jual6", $this->HrgJual6 == null || $this->HrgJual6 == '' ? 0 : $this->HrgJual6);
+        $this->connector->AddParameter("?hrg_jual1k", $this->HrgJual1k == null || $this->HrgJual1k == '' ? 0 : $this->HrgJual1k);
+        $this->connector->AddParameter("?hrg_jual2k", $this->HrgJual2k == null || $this->HrgJual2k == '' ? 0 : $this->HrgJual2k);
+        $this->connector->AddParameter("?hrg_jual3k", $this->HrgJual3k == null || $this->HrgJual3k == '' ? 0 : $this->HrgJual3k);
+        $this->connector->AddParameter("?hrg_jual4k", $this->HrgJual4k == null || $this->HrgJual4k == '' ? 0 : $this->HrgJual4k);
+        $this->connector->AddParameter("?hrg_jual5k", $this->HrgJual5k == null || $this->HrgJual5k == '' ? 0 : $this->HrgJual5k);
+        $this->connector->AddParameter("?hrg_jual6k", $this->HrgJual6k == null || $this->HrgJual6k == '' ? 0 : $this->HrgJual6k);
         $this->connector->AddParameter("?updateby_id", $this->UpdatebyId);
 		$this->connector->AddParameter("?id", $id);
 		$rs = $this->connector->ExecuteNonQuery();
@@ -206,8 +240,8 @@ class SetPrice extends EntityBase {
         $this->connector->CommandText = 'Delete From m_set_price Where cabang_id = ?tcabang_id';
         $this->connector->AddParameter("?tcabang_id", $tCabangId);
         $rs = $this->connector->ExecuteNonQuery();
-        $sql = 'INSERT INTO m_set_price (cabang_id,item_id,item_code,price_date,hrg_beli,max_disc,markup1,markup2,markup3,markup4,markup5,markup6,hrg_jual1,hrg_jual2,hrg_jual3,hrg_jual4,hrg_jual5,hrg_jual6,createby_id,create_time)';
-        $sql.= ' Select ?tcabang_id,item_id,item_code,price_date,hrg_beli,max_disc,markup1,markup2,markup3,markup4,markup5,markup6,hrg_jual1,hrg_jual2,hrg_jual3,hrg_jual4,hrg_jual5,hrg_jual6,createby_id,now()';
+        $sql = 'INSERT INTO m_set_price (cabang_id,item_id,item_code,price_date,hrg_beli,max_disc,markup1,markup2,markup3,markup4,markup5,markup6,hrg_jual1,hrg_jual2,hrg_jual3,hrg_jual4,hrg_jual5,hrg_jual6,hrg_jual1k,hrg_jual2k,hrg_jual3k,hrg_jual4k,hrg_jual5k,hrg_jual6k,createby_id,create_time)';
+        $sql.= ' Select ?tcabang_id,item_id,item_code,price_date,hrg_beli,max_disc,markup1,markup2,markup3,markup4,markup5,markup6,hrg_jual1,hrg_jual2,hrg_jual3,hrg_jual4,hrg_jual5,hrg_jual6,hrg_jual1k,hrg_jual2k,hrg_jual3k,hrg_jual4k,hrg_jual5k,hrg_jual6k,createby_id,now()';
         $sql.= ' From m_set_price Where cabang_id = ?fcabang_id Order By price_date,item_code;';
         $this->connector->CommandText = $sql;
         $this->connector->AddParameter("?fcabang_id", $fCabangId);
@@ -227,13 +261,13 @@ class SetPrice extends EntityBase {
     }
 
     public function DeleteByKode($cabangId,$itemCode) {
-        $this->connector->CommandText = 'Insert Into m_set_price_history Select a.* From m_set_price as a Where a.cabang_id = ?cabangId And a.item_code = ?itemCode';
+        $this->connector->CommandText = "Insert Into m_set_price_history Select a.* From m_set_price as a Where a.cabang_id = ?cabangId And a.item_code = '". $itemCode . "'";
         $this->connector->AddParameter("?cabangId", $cabangId);
-        $this->connector->AddParameter("?itemCode", $itemCode);
+        $this->connector->AddParameter("?itemCode", $itemCode, varchar);
         $rs = $this->connector->ExecuteNonQuery();
-        $this->connector->CommandText = 'Delete From m_set_price Where cabang_id = ?cabangId And item_code = ?itemCode';
+        $this->connector->CommandText = "Delete From m_set_price Where cabang_id = ?cabangId And item_code = '". $itemCode . "'";
         $this->connector->AddParameter("?cabangId", $cabangId);
-        $this->connector->AddParameter("?itemCode", $itemCode);
+        $this->connector->AddParameter("?itemCode", $itemCode, varchar);
         $rs = $this->connector->ExecuteNonQuery();
         return $rs;
     }
@@ -262,6 +296,7 @@ class SetPrice extends EntityBase {
                 $rows[$i]['cabang_name'] = $row['cabang_name'];
                 $rows[$i]['item_code'] = $row['item_code'];
                 $rows[$i]['satuan'] = $row['satuan'];
+                $rows[$i]['satjual'] = $row['satjual'];
                 $rows[$i]['price_date'] = $row['price_date'];
                 $rows[$i]['hrg_beli'] = $row['hrg_beli'];
                 $rows[$i]['max_disc'] = $row['max_disc'];
@@ -277,6 +312,12 @@ class SetPrice extends EntityBase {
                 $rows[$i]['hrg_jual4'] = $row['hrg_jual4'];
                 $rows[$i]['hrg_jual5'] = $row['hrg_jual5'];
                 $rows[$i]['hrg_jual6'] = $row['hrg_jual6'];
+                $rows[$i]['hrg_jual1k'] = $row['hrg_jual1k'];
+                $rows[$i]['hrg_jual2k'] = $row['hrg_jual2k'];
+                $rows[$i]['hrg_jual3k'] = $row['hrg_jual3k'];
+                $rows[$i]['hrg_jual4k'] = $row['hrg_jual4k'];
+                $rows[$i]['hrg_jual5k'] = $row['hrg_jual5k'];
+                $rows[$i]['hrg_jual6k'] = $row['hrg_jual6k'];
                 $rows[$i]['item_name'] = $row['item_name'];
                 $rows[$i]['bsatbesar'] = $row['bsatbesar'];
                 $rows[$i]['bsatkecil'] = $row['bsatkecil'];
@@ -329,7 +370,7 @@ class SetPrice extends EntityBase {
     }
 
     public function GetJSonItemStock($alomin = 0,$cabang_id,$filter = null,$sort = 'b.bnama',$order = 'ASC') {
-        $sql = "SELECT a.item_id,a.item_code,b.bnama as item_name,b.bsatkecil as satuan,a.qty_stock FROM t_ic_stockcenter AS a INNER JOIN m_barang AS b ON a.item_code = b.bkode";
+        $sql = "SELECT a.item_id,a.item_code,b.bnama as item_name,b.bsatkecil as satkecil,b.bsatbesar as satbesar,b.bisisatkecil as isikecil,a.qty_stock,b.is_stock,b.is_sale,0 as qty_order, 0 as price FROM t_ic_stockcenter AS a INNER JOIN m_barang AS b ON a.item_code = b.bkode";
         if ($alomin == 1){
             $sql.= " Where a.cabang_id = $cabang_id";
         }else{
@@ -351,14 +392,18 @@ class SetPrice extends EntityBase {
         return $result;
     }
 
-    public function GetJSonItemPrice($entityId,$cabangId,$filter,$sort = 'a.bnama',$order = 'ASC') {
+    public function GetJSonItemPrice($entityId,$cabangId,$isGlobalItems = 1,$filter,$sort = 'a.bnama',$order = 'ASC') {
         $sql = "SELECT a.bid as item_id,a.bkode as item_code,a.bnama as item_name,a.bsatbesar as sat_besar,a.bsatkecil as sat_kecil,coalesce(b.hrg_beli,0) as hrg_beli,coalesce(b.hrg_jual,0) as hrg_jual,b.satuan";
         $sql.= " FROM m_barang as a LEFT JOIN (Select c.item_code,c.satuan,max(c.hrg_beli) as hrg_beli, max(c.hrg_jual1) as hrg_jual From m_set_price as c Group By c.item_code,c.satuan) as b";
         $sql.= " ON a.bkode = b.item_code Left Join m_cabang as d On a.def_cabang_id = d.id Where a.bisaktif = 1";
         if ($filter != null){
             $sql.= " And (a.bkode Like '%$filter%' Or a.bnama Like '%$filter%')";
         }
-        $sql.= " And Not (a.item_level = 1 And d.entity_id <> ".$entityId.") And Not (a.item_level = 2 And a.def_cabang_id <>".$cabangId.")";
+        if ($isGlobalItems == 1) {
+            $sql .= " And Not (a.item_level = 1 And d.entity_id <> " . $entityId . ") And Not (a.item_level = 2 And a.def_cabang_id <>" . $cabangId . ")";
+        }else{
+            $sql .= " And (a.item_level > 0 And d.entity_id = " . $entityId . ")";
+        }
         $this->connector->CommandText = $sql;
         $data['count'] = $this->connector->ExecuteQuery()->GetNumRows();
         $sql.= " Order By $sort $order";
@@ -375,19 +420,26 @@ class SetPrice extends EntityBase {
     public function GetItemPrice($itemCode,$level,$cabId = 0){
         $sql = "SELECT a.hrg_beli,";
         if($level == -1){
-            $sql.= "if(a.hrg_beli = 0, a.hrg_jual1, a.hrg_beli) as hrg_jual";
+            $sql.= "if(a.hrg_beli = 0, a.hrg_jual1, a.hrg_beli) as hrg_jual,";
+            $sql.= "if(a.hrg_beli = 0, a.hrg_jual1k, a.hrg_beli) as hrg_jualk";
         }elseif($level == 1){
-            $sql.= "if(a.hrg_jual2 = 0, a.hrg_jual1, a.hrg_jual2) as hrg_jual";
+            $sql.= "if(a.hrg_jual2 = 0, a.hrg_jual1, a.hrg_jual2) as hrg_jual,";
+            $sql.= "if(a.hrg_jual2k = 0, a.hrg_jual1k, a.hrg_jual2k) as hrg_jualk";
         }elseif($level == 2){
-            $sql.= "if(a.hrg_jual3 = 0, a.hrg_jual1, a.hrg_jual3) as hrg_jual";
+            $sql.= "if(a.hrg_jual3 = 0, a.hrg_jual1, a.hrg_jual3) as hrg_jual,";
+            $sql.= "if(a.hrg_jual3k = 0, a.hrg_jual1k, a.hrg_jual3k) as hrg_jualk";
         }elseif($level == 3){
-            $sql.= "if(a.hrg_jual4 = 0, a.hrg_jual1, a.hrg_jual4) as hrg_jual";
+            $sql.= "if(a.hrg_jual4 = 0, a.hrg_jual1, a.hrg_jual4) as hrg_jual,";
+            $sql.= "if(a.hrg_jual4k = 0, a.hrg_jual1k, a.hrg_jual4k) as hrg_jualk";
         }elseif($level == 4){
-            $sql.= "if(a.hrg_jual5 = 0, a.hrg_jual1, a.hrg_jual5) as hrg_jual";
+            $sql.= "if(a.hrg_jual5 = 0, a.hrg_jual1, a.hrg_jual5) as hrg_jual,";
+            $sql.= "if(a.hrg_jual5k = 0, a.hrg_jual1k, a.hrg_jual5k) as hrg_jualk";
         }elseif($level == 5){
-            $sql.= "if(a.hrg_jual6 = 0, a.hrg_jual1, a.hrg_jual6) as hrg_jual";
+            $sql.= "if(a.hrg_jual6 = 0, a.hrg_jual1, a.hrg_jual6) as hrg_jual,";
+            $sql.= "if(a.hrg_jual6k = 0, a.hrg_jual1k, a.hrg_jual6k) as hrg_jualk";
         }else{
-            $sql.= "a.hrg_jual1 as hrg_jual";
+            $sql.= "a.hrg_jual1 as hrg_jual,";
+            $sql.= "a.hrg_jual1k as hrg_jualk";
         }
         if ($cabId > 0) {
             $sql .= " FROM vw_m_itemprice as a Where a.cabang_id = $cabId And a.item_code = '" . $itemCode . "';";
@@ -396,10 +448,10 @@ class SetPrice extends EntityBase {
         }
         $this->connector->CommandText = $sql;
         $rs = $this->connector->ExecuteQuery();
-        $result = '0|0';
+        $result = '0|0|0';
         if ($rs) {
             $row = $rs->FetchAssoc();
-            $result = $row["hrg_beli"].'|'.$row["hrg_jual"];
+            $result = $row["hrg_beli"].'|'.$row["hrg_jual"].'|'.$row["hrg_jualk"];
         }
         return $result;
     }

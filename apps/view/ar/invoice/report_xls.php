@@ -73,11 +73,18 @@ if ($JnsLaporan < 3) {
         $tBalance = 0;
         while ($rpt = $Reports->FetchAssoc()) {
             $row++;
-            if ($ivn <> $rpt["invoice_no"]) {
+            //khusus RJY Laporan Normal
+            if ($company_id == 3) {
+                if ($ivn <> $rpt["invoice_no"]) {
+                    $nmr++;
+                    $sma = false;
+                } else {
+                    $sma = true;
+                }
+            }else{
+                //lainnya laporan aneh :)
                 $nmr++;
                 $sma = false;
-            } else {
-                $sma = true;
             }
             if (!$sma) {
                 $sheet->setCellValue("A$row", $nmr);
@@ -144,7 +151,7 @@ if ($JnsLaporan < 3) {
             $row++;
             $nmr++;
             $sheet->setCellValue("A$row", $nmr);
-            $sheet->setCellValue("B$row", $rpt['item_code']);
+            $sheet->setCellValue("B$row", $rpt['item_code'],PHPExcel_Cell_DataType::TYPE_STRING);
             $sheet->setCellValue("C$row", $rpt['item_descs']);
             $sheet->setCellValue("D$row", $rpt['satuan']);
             $sheet->setCellValue("E$row", $rpt['sum_qty']);

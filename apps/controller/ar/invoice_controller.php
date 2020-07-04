@@ -26,11 +26,12 @@ class InvoiceController extends AppController {
         $settings["columns"][] = array("name" => "a.invoice_no", "display" => "No. Invoice", "width" => 80);
         $settings["columns"][] = array("name" => "a.customer_name", "display" => "Nama Customer", "width" => 150);
         $settings["columns"][] = array("name" => "a.sales_name", "display" => "Salesman", "width" => 100);
-        $settings["columns"][] = array("name" => "a.invoice_descs", "display" => "Keterangan", "width" => 150);
+        $settings["columns"][] = array("name" => "a.invoice_descs", "display" => "Keterangan", "width" => 100);
         $settings["columns"][] = array("name" => "if(a.payment_type = 0,'Cash','Credit')", "display" => "Cara Bayar", "width" => 60);
-        $settings["columns"][] = array("name" => "format(a.total_amount,0)", "display" => "Nilai Penjualan", "width" => 90, "align" => "right");
-        $settings["columns"][] = array("name" => "format(a.paid_amount,0)", "display" => "Terbayar", "width" => 90, "align" => "right");
-        $settings["columns"][] = array("name" => "format(a.balance_amount,0)", "display" => "OutStanding", "width" => 90, "align" => "right");
+        $settings["columns"][] = array("name" => "format(a.total_amount,0)", "display" => "Penjualan", "width" => 80, "align" => "right");
+        $settings["columns"][] = array("name" => "format(a.total_return,0)", "display" => "Retur", "width" => 80, "align" => "right");
+        $settings["columns"][] = array("name" => "format(a.paid_amount,0)", "display" => "Terbayar", "width" => 80, "align" => "right");
+        $settings["columns"][] = array("name" => "format(a.balance_amount,0)", "display" => "OutStanding", "width" => 80, "align" => "right");
         $settings["columns"][] = array("name" => "a.due_date", "display" => "JTP", "width" => 60);
         $settings["columns"][] = array("name" => "a.admin_name", "display" => "Admin", "width" => 80);
         $settings["columns"][] = array("name" => "if(a.invoice_status = 0,'Draft',if(a.invoice_status = 1,'Posted',if(a.invoice_status = 2,'Approved','Void')))", "display" => "Status", "width" => 40);
@@ -76,6 +77,7 @@ class InvoiceController extends AppController {
             $settings["actions"][] = array("Text" => "separator", "Url" => null);
             if ($acl->CheckUserAccess("ar.invoice", "view")) {
                 $settings["actions"][] = array("Text" => "Laporan", "Url" => "ar.invoice/report","Target"=>"_blank","Class" => "bt_report", "ReqId" => 0);
+                $settings["actions"][] = array("Text" => "Statistik", "Url" => "ar.dashboard","Target"=>"_blank","Class" => "bt_report", "ReqId" => 0);
             }
             $settings["actions"][] = array("Text" => "separator", "Url" => null);
             if ($acl->CheckUserAccess("ar.invoice", "approve")) {
@@ -86,6 +88,12 @@ class InvoiceController extends AppController {
                     "Error" => "Mohon memilih Data Invoice terlebih dahulu sebelum proses pembatalan.",
                     "Confirm" => "Apakah anda mau membatalkan approval data invoice yang dipilih ?\nKlik OK untuk melanjutkan prosedur");
             }
+            /*
+            if ($acl->CheckUserAccess("ar.invoice", "print")) {
+                $settings["actions"][] = array("Text" => "separator", "Url" => null);
+                $settings["actions"][] = array("Text" => "Print Struk", "Url" => "ar.invoice/printstruk", "Class" => "bt_print", "ReqId" => 2, "Confirm" => "Cetak Invoice yang dipilih?", "Target" => "_blank");
+            }
+            */
         } else {
             $settings["from"] = "vw_ar_invoice_master AS a";
             if ($_GET["query"] == "") {
@@ -402,9 +410,10 @@ class InvoiceController extends AppController {
             $invdetail->ItemNote = $this->GetPostValue("aItemNote");
             $invdetail->IsFree = $this->GetPostValue("aIsFree");
             $invdetail->ExSoNo = $this->GetPostValue("aSoNo");
+            $invdetail->SatJual = $this->GetPostValue("aSatuan");
             // periksa apa sudah ada item dengan harga yang sama, kalo ada gabungkan saja
             $invdetail_exists = new InvoiceDetail();
-            $invdetail_exists = $invdetail_exists->FindDuplicate($invdetail->CabangId,$invdetail->InvoiceId,$invdetail->ItemId,$invdetail->Price,$invdetail->DiscFormula,$invdetail->DiscAmount,$invdetail->IsFree,$invdetail->ExSoNo);
+            $invdetail_exists = $invdetail_exists->FindDuplicate($invdetail->CabangId,$invdetail->InvoiceId,$invdetail->ItemId,$invdetail->Price,$invdetail->DiscFormula,$invdetail->DiscAmount,$invdetail->IsFree,$invdetail->ExSoNo,$invdetail->SatJual);
             if ($invdetail_exists != null){
                 // proses penggabungan disini
                 /** @var $invdetail_exists InvoiceDetail */
@@ -425,7 +434,7 @@ class InvoiceController extends AppController {
                     $rs = $invdetail->Update($invdetail_exists->Id);
                     if ($rs > 0) {
                         $log = $log->UserActivityWriter($this->userCabangId,'ar.invoice','Merge Invoice Detail-> Item Code: '.$invdetail->ItemCode.' = '.$invdetail->Qty,$invoice->InvoiceNo,'Success');
-                        print('OK|Proses simpan update berhasil!');
+                        print('OK|Proses update data berhasil!');
                     } else {
                         $log = $log->UserActivityWriter($this->userCabangId,'ar.invoice','Merge Invoice Detail-> Item Code: '.$invdetail->ItemCode.' = '.$invdetail->Qty,$invoice->InvoiceNo,'Failed');
                         print('ER|Gagal proses update data!');
@@ -472,6 +481,7 @@ class InvoiceController extends AppController {
             $invdetail->ItemNote = $this->GetPostValue("aItemNote");
             $invdetail->IsFree = $this->GetPostValue("aIsFree");
             $invdetail->ExSoNo = $this->GetPostValue("aSoNo");
+            $invdetail->SatJual = $this->GetPostValue("aSatuan");
             $items = new Items($invdetail->ItemId);
             if ($items != null){
                 $invdetail->ItemCode = $items->Bkode;
@@ -582,6 +592,7 @@ class InvoiceController extends AppController {
         $customer = $customer->LoadAll();
         $loader = new Company($this->userCompanyId);
         $this->Set("company_name", $loader->CompanyName);
+        $this->Set("company_id",$this->userCompanyId);
         $loader = new Karyawan();
         $sales = $loader->LoadAll();
         //load data cabang
@@ -1173,6 +1184,155 @@ class InvoiceController extends AppController {
 
     }
 
+    public function getStrukData(){
+        $ivid    = $_POST["ivid"];
+        $invoice = new Invoice();
+        $sale = $invoice->FindById($ivid);
+        $data = array();
+        $i = 0;
+        if ($sale != null){
+            $data[$i]['format'] = 'AC';
+            $data[$i]['text'] = '';
+            $i++;
+            $data[$i]['format'] = 'B1';
+            $data[$i]['text'] = $sale->CabangCode;
+            $i++;
+            $data[$i]['format'] = 'B0';
+            $data[$i]['text'] = $sale->OutletName;
+            $i++;
+            $data[$i]['format'] = 'AC';
+            $data[$i]['text'] = 'STRUK PENJUALAN';
+            $i++;
+            $data[$i]['format'] = 'AL';
+            //1234567890123456789012345678901234567890
+            $data[$i]['text'] = '----------------------------------------';
+            $i++;
+            $data[$i]['format'] = 'AL';
+            $data[$i]['text']   = '#'.$sale->InvoiceNo.'  DATE: '.$sale->FormatInvoiceDate(JS_DATE);
+            $i++;
+            $data[$i]['format'] = 'AL';
+            $data[$i]['text']   = 'CST: '.left($sale->CustomerName.' ('.$sale->CustomerCode.')',31);
+            $i++;
+            $data[$i]['format'] = 'AL';
+            $data[$i]['text']   = '----------------------------------------';
+            $i++;
+            $data[$i]['format'] = 'AL';
+            $data[$i]['text']   = 'Nama Barang      Qty    Harga     Jumlah';
+            $i++;
+            $data[$i]['format'] = 'AL';
+            $data[$i]['text']   = '----------------------------------------';
+            $saledetails = $sale->LoadDetails();
+            $tx1 = null;
+            $txt = null;
+            $qtotal = 0;
+            $qjenis = 0;
+            foreach ($saledetails as $idx => $detail){
+                $tx1 = left($detail->ItemCode . str_repeat(' ', 16 - strlen($detail->ItemCode)), 16);
+                $tx1 = $tx1.str_repeat(' ',16 - strlen($tx1));
+                $tx2 = number_format($detail->Qty,0,',','');
+                $tx2 = str_repeat(' ',4-strlen($tx2)).$tx2;
+                $tx3 = number_format($detail->Price,0);
+                $tx3 = str_repeat(' ',9-strlen($tx3)).$tx3;
+                if ($detail->IsFree == 0){
+                    $tx4 = number_format(round($detail->Qty*$detail->Price,0),0);
+                }else{
+                    $tx4 = 'Free/Bonus';
+                }
+                $tx4 = str_repeat(' ',11-strlen($tx4)).$tx4;
+                $i++;
+                $data[$i]['format'] = 'AL';
+                $data[$i]['text']   = left($detail->ItemDescs.' ('.trim(left($detail->SatJual,3)).')',40);
+                $i++;
+                $data[$i]['format'] = 'AL';
+                $data[$i]['text']   = $tx1.$tx2.$tx3.$tx4;
+                if ($detail->DiscAmount > 0){
+                    $tx1 = '-'.$detail->DiscFormula.'% ('.number_format($detail->DiscAmount,0).')';
+                    $i++;
+                    $data[$i]['format'] = 'AL';
+                    $data[$i]['text']   = str_repeat(' ',40-strlen($tx1)).$tx1;
+                }
+                $qjenis++;
+                $qtotal += $detail->Qty;
+            }
+            $i++;
+            $data[$i]['format'] = 'AL';
+            $data[$i]['text'] = '----------------------------------------';
+            $tx1 = $qtotal.' item(s)';
+            $tx1 = $tx1.str_repeat(' ',18-strlen($tx1));
+            $tx2 = 'Sub Total '.number_format($sale->BaseAmount,0);
+            $tx2 = str_repeat(' ',22-strlen($tx2)).$tx2;
+            $i++;
+            $data[$i]['format'] = 'AL';
+            $data[$i]['text'] = $tx1.$tx2;
+            if ($sale->Disc1Amount > 0){
+                $tx1 = 'Discount '.$sale->Disc1Pct.'% = '.number_format($sale->Disc1Amount,0).'-';
+                $i++;
+                $data[$i]['format'] = 'AL';
+                $data[$i]['text'] = str_repeat(' ',40-strlen($tx1)).$tx1;
+            }
+            if ($sale->TaxAmount > 0){
+                $i++;
+                $data[$i]['format'] = 'AL';
+                $data[$i]['text'] = '----------------------------------------';
+                $tx1 = 'DPP '.number_format($sale->BaseAmount - $sale->Disc1Amount,0).'+';
+                $i++;
+                $data[$i]['format'] = 'AL';
+                $data[$i]['text'] = str_repeat(' ',40-strlen($tx1)).$tx1;
+                $tx1 = 'PPN '.$sale->TaxPct.'% = '.number_format($sale->TaxAmount,0).'+';
+                $i++;
+                $data[$i]['format'] = 'AL';
+                $data[$i]['text'] = str_repeat(' ',40-strlen($tx1)).$tx1;
+            }
+            if ($sale->OtherCostsAmount > 0){
+                if (strlen($sale->OtherCosts) < 5){
+                    $tx1 = 'Biaya Lain-lain '.number_format($sale->OtherCostsAmount,0).'+';
+                }else{
+                    $tx1 = left($sale->OtherCosts,29).' '.number_format($sale->OtherCostsAmount,0).'+';
+                }
+                $i++;
+                $data[$i]['format'] = 'AL';
+                $data[$i]['text'] = str_repeat(' ',40-strlen($tx1)).$tx1;
+            }
+            $i++;
+            $data[$i]['format'] = 'AL';
+            $data[$i]['text'] = '----------------------------------------';
+            if ($sale->PaymentType == 1){
+                $tx1 = '- Kredit '.$sale->CreditTerms.' hari';
+            }else{
+                $tx1 = '- Tunai';
+            }
+            $i++;
+            $data[$i]['format'] = 'AL';
+            $data[$i]['text'] = $tx1.str_repeat(' ',40-strlen($tx1.$tx2)).$tx2;
+            $i++;
+            $data[$i]['format'] = 'AL';
+            $data[$i]['text'] = '----------------------------------------';
+            $tx1 = "*".strtoupper($sale->AdminName)."*";
+            $tx2 = date("Y-m-d h:i:s");
+            $i++;
+            $data[$i]['format'] = 'AL';
+            $data[$i]['text'] = $tx1.str_repeat(' ',40-strlen($tx1.$tx2)).$tx2;
+            $i++;
+            $data[$i]['format'] = 'AL';
+            $data[$i]['text'] = '';
+            $i++;
+            $data[$i]['format'] = 'AC';
+            $data[$i]['text'] = 'BARANG YANG SUDAH DIBELI TIDAK BOLEH';
+            $i++;
+            $data[$i]['format'] = 'AC';
+            $data[$i]['text'] = 'DITUKAR/DIKEMBALIKAN';
+            $i++;
+            $data[$i]['format'] = 'AC';
+            $data[$i]['text'] = 'TERIMA KASIH ATAS KUNJUNGAN ANDA';
+        }
+        print json_encode($data);
+    }
+
+    public function printerCounter($invId){
+        $invoice = new Invoice();
+        $invoice->UpdatePrintCounter($invId,AclManager::GetInstance()->GetCurrentUser()->Id);
+    }
+
     public function getitempricestock_json($level,$cabangId){
         require_once(MODEL . "master/setprice.php");
         $filter = isset($_POST['q']) ? strval($_POST['q']) : '';
@@ -1203,7 +1363,7 @@ class InvoiceController extends AppController {
             $setprice = $setprice->FindByKode($cabangId,$bkode);
             $items = null;
             if ($setprice != null){
-                $ret = "OK|".$setprice->ItemId.'|'.$setprice->ItemName.'|'.$setprice->Satuan.'|'.$setprice->QtyStock.'|'.$setprice->HrgBeli;
+                $ret = "OK|".$setprice->ItemId.'|'.$setprice->ItemName.'|'.$setprice->Satuan.'|'.$setprice->QtyStock.'|'.$setprice->HrgBeli.'|'.$setprice->SatBesar.'|'.$setprice->SatKecil.'|'.$setprice->IsiKecil;
                 if ($level == -1 && $setprice->HrgBeli > 0){
                     $ret.= '|'.$setprice->HrgBeli;
                 }elseif($level == 1 && $setprice->HrgJual2 > 0){
@@ -1342,6 +1502,25 @@ class InvoiceController extends AppController {
             print("ER");
         }
     }
+
+    //proses cetak struk invoice
+    public function printstruk() {
+        $ids = $this->GetGetValue("id", array());
+        if (count($ids) == 0) {
+            $this->persistence->SaveState("error", "Harap pilih data yang akan dicetak !");
+            redirect_url("ar.invoice");
+            return;
+        }
+        $report = array();
+        foreach ($ids as $id) {
+            $inv = new Invoice();
+            $inv = $inv->LoadById($id);
+            $inv->LoadDetails();
+            $report[] = $inv;
+        }
+        $this->Set("report", $report);
+    }
+
 }
 
 

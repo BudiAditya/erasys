@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html xmlns="http://www.w3.org/1999/html">
+<html>
 <?php
 /** @var $order Order */ 
 ?>
@@ -149,5 +149,5 @@
 <div id="ft" style="padding:5px; text-align: center; font-family: verdana; font-size: 9px" >
     Copyright &copy; 2016  CV. Erasystem Infotama
 </div>
-</body>
+<!-- </body> -->
 </html>

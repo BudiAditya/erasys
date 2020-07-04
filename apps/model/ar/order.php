@@ -339,7 +339,7 @@ On a.id = b.so_id Set a.base_amount = b.sumPrice, a.disc1_amount = if(a.disc1_pc
 
     public function GetItemSoItems($soNo,$gdId) {
         //$sql = "SELECT a.item_id,a.item_code,b.bnama as item_name,b.bsatkecil as satuan,a.qty_stock,b.is_stock,b.is_sale,b.is_purchase FROM t_ic_stockcenter AS a INNER JOIN m_barang AS b ON a.item_code = b.bkode";
-        $sql = "SELECT a.item_id,a.item_code,a.item_descs as item_name,b.bsatkecil as satuan,a.order_qty-a.send_qty as qty_order,c.qty_stock,b.is_stock,b.is_sale,b.is_purchase,a.price";
+        $sql = "SELECT a.item_id,a.item_code,a.item_descs as item_name,b.bsatkecil as satkecil,b.bsatbesar as satbesar,b.bisisatkecil as isikecil,a.order_qty-a.send_qty as qty_order,c.qty_stock,b.is_stock,b.is_sale,b.is_purchase,a.price";
         $sql.= " From t_ar_so_detail AS a Join m_barang AS b On a.item_code = b.bkode Join t_ic_stockcenter AS c On a.item_code = c.item_code";
         $sql.= " Where  c.cabang_id = ".$gdId." And a.so_no = '".$soNo."' And a.order_qty - a.send_qty > 0";
         $this->connector->CommandText = $sql;

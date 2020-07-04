@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html xmlns="http://www.w3.org/1999/html">
+<html>
 <?php
 /** @var $purchase Purchase */
 ?>
@@ -255,7 +255,7 @@ $bpdf = base_url('public/images/button/').'pdf.png';
     </form>
 </div>
 <div id="ft" style="padding:5px; text-align: center; font-family: verdana; font-size: 9px" >
-    Copyright &copy; 2016 - 2018  CV. Erasystem Infotama
+    Copyright &copy; 2016 - 2020  <a href='http://rekasys.com'><b>Rekasys Inc</b></a>
 </div>
 <!-- Form Add Grn Detail -->
 <div id="dlg" class="easyui-dialog" style="width:1100px;height:200px;padding:5px 5px"
@@ -672,21 +672,27 @@ $bpdf = base_url('public/images/button/').'pdf.png';
     }
 
     function hitDiscFormula(nAmount,dFormula) {
-        var retVal = 0;
+        nAmount = Number(nAmount);
         if (nAmount > 0 && dFormula != '' && dFormula != '0') {
             var aFormula = dFormula.split('+');
             var nDiscount = 0;
             var pDiscount = 0;
+            var retVal = 0;
             for (var i = 0; i < aFormula.length; i++) {
                 pDiscount = aFormula[i];
-                nDiscount = Math.round(nAmount * (pDiscount) / 100, 0);
+                nAmount -= nDiscount;
+                nDiscount = round(nAmount * (pDiscount / 100), 0);
                 retVal += nDiscount;
-                nAmount -= retVal;
             }
         }
         return retVal;
     }
 
+    //fungsi pembulatan
+    function round(value, decimals) {
+        return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
+    }
+
 </script>
-</body>
+<!-- </body> -->
 </html>

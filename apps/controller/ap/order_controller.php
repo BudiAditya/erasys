@@ -5,6 +5,7 @@ class OrderController extends AppController {
     private $userLevel;
     private $trxMonth;
     private $trxYear;
+    private $isGlobalItems;
 
     protected function Initialize() {
         require_once(MODEL . "ap/order.php");
@@ -13,6 +14,7 @@ class OrderController extends AppController {
         $this->userLevel = $this->persistence->LoadState("user_lvl");
         $this->trxMonth = $this->persistence->LoadState("acc_month");
         $this->trxYear = $this->persistence->LoadState("acc_year");
+        $this->isGlobalItems = $this->persistence->LoadState("is_global_items");
     }
 
     public function index() {
@@ -505,7 +507,7 @@ class OrderController extends AppController {
         require_once(MODEL . "master/setprice.php");
         $filter = isset($_POST['q']) ? strval($_POST['q']) : '';
         $setprice = new SetPrice();
-        $itemlists = $setprice->GetJSonItemPrice($this->userCompanyId,$this->userCabangId,$filter,$order);
+        $itemlists = $setprice->GetJSonItemPrice($this->userCompanyId,$this->userCabangId,$this->isGlobalItems,$filter,$order);
         echo json_encode($itemlists);
     }
 

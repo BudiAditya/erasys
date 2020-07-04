@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html xmlns="http://www.w3.org/1999/html">
+<html>
 <?php
 /** @var $order Order */
 ?>
@@ -490,13 +490,13 @@ $baddnew = base_url('public/images/button/').'create_new.png';
     </form>
 </div>
 <div id="ft" style="padding:5px; text-align: center; font-family: verdana; font-size: 9px" >
-    Copyright &copy; 2016 - 2018  CV. Erasystem Infotama
+    Copyright &copy; 2016 - 2020  <a href='http://rekasys.com'><b>Rekasys Inc</b></a>
 </div>
 <!-- Form Add Po Detail -->
-<div id="dlg" class="easyui-dialog" style="width:950px;height:200px;padding:5px 5px"
+<div id="dlg" class="easyui-dialog" style="width:1100px;height:200px;padding:5px 5px"
      closed="true" buttons="#dlg-buttons">
     <form id="fm" method="post" novalidate>
-        <table cellpadding="0" cellspacing="0" class="tablePadding tableBorder" style="font-size: 12px;font-family: tahoma">
+        <table cellpadding="0" cellspacing="0" class="tablePadding tableBorder" style="width:100%;font-size: 12px;font-family: tahoma">
             <tr>
                 <td class="right bold">Cari Data Barang:</td>
                 <td colspan="6"><input id="aItemSearch" name="aItemSearch" style="width: 500px"/></td>
@@ -545,5 +545,5 @@ $baddnew = base_url('public/images/button/').'create_new.png';
     <a href="javascript:void(0)" class="easyui-linkbutton c6" iconCls="icon-ok" onclick="saveDetail()" style="width:90px">Simpan</a>
     <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:$('#dlg').dialog('close')" style="width:90px">Batal</a>
 </div>
-</body>
+<!-- </body> -->
 </html>

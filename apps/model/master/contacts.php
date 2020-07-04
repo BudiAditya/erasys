@@ -213,6 +213,25 @@ ORDER BY $orderBy";
         return $result;
     }
 
+    public function LoadSupplierByEntity($entityId = 0, $operator = "=", $orderBy = "a.contact_code", $includeDeleted = false) {
+        if ($entityId > 0) {
+            $this->connector->CommandText = "SELECT a.* FROM m_contacts AS a WHERE a.is_deleted = 0 And a.contacttype_id = 2 And a.entity_id ".$operator." ?entityId ORDER BY $orderBy";
+        } else {
+            $this->connector->CommandText = "SELECT a.* FROM m_contacts AS a WHERE a.is_deleted = 0 AND a.contacttype_id = 2 ORDER BY $orderBy";
+        }
+        $this->connector->AddParameter("?entityId", $entityId);
+        $rs = $this->connector->ExecuteQuery();
+        $result = array();
+        if ($rs != null) {
+            while ($row = $rs->FetchAssoc()) {
+                $temp = new Contacts();
+                $temp->FillProperties($row);
+                $result[] = $temp;
+            }
+        }
+        return $result;
+    }
+
 	/**
 	 * @param int $id
 	 * @return Contact

@@ -48,7 +48,7 @@ if ($userTypeHarga == 0){
 }else{
     $sheet->setCellValue("F$row","Harga Jual");
     $sheet->setCellValue("G$row","Nilai Stock");
-    $sheet->getStyle("A$row:HG")->applyFromArray(array_merge($center, $allBorders));
+    $sheet->getStyle("A$row:G$row")->applyFromArray(array_merge($center, $allBorders));
 }
 $nmr = 0;
 $str = $row;

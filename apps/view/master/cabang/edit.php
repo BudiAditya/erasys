@@ -50,7 +50,7 @@
             </tr>
             <tr>
                 <td>Area</td>
-                <td><select name="AreaId" class="text2" id="AreaId" required>
+                <td><select name="AreaId" class="text2" id="AreaId" required style="width: 150px">
                         <option value=""></option>
                         <?php
                         foreach ($areas as $area) {
@@ -65,7 +65,7 @@
             </tr>
             <tr>
                 <td>Jenis Cabang</td>
-                <td><select id="CabType" name="CabType" >
+                <td><select id="CabType" name="CabType" style="width: 150px">
                         <option value="0" <?php print($cabang->CabType == 0 ? 'selected="selected"' : '');?>>Outlet + Gudang</option>
                         <option value="1" <?php print($cabang->CabType == 1 ? 'selected="selected"' : '');?>>Outlet Saja</option>
                         <option value="2" <?php print($cabang->CabType == 2 ? 'selected="selected"' : '');?>>Gudang Saja</option>
@@ -82,11 +82,11 @@
             </tr>
             <tr>
                 <td>Nama Outlet</td>
-                <td><input type="text" class="text2" name="NamaCabang" id="NamaCabang" maxlength="50" size="50" value="<?php print($cabang->NamaCabang); ?>" /></td>
+                <td><input type="text" class="text2" name="NamaCabang" id="NamaCabang" maxlength="50" size="50" value="<?php print($cabang->NamaCabang); ?>"/></td>
             </tr>
             <tr>
                 <td>Alamat</td>
-                <td colspan="2"><input type="text" class="text2" name="Alamat" id="Alamat" maxlength="250" size="50" value="<?php print($cabang->Alamat); ?>" /></td>
+                <td><input type="text" class="text2" name="Alamat" id="Alamat" maxlength="250" size="50" value="<?php print($cabang->Alamat); ?>" /></td>
             </tr>
             <tr>
                 <td>P I C</td>
@@ -94,15 +94,31 @@
             </tr>
             <tr>
                 <td>Aturan Stock</td>
-                <td><select id="AllowMinus" name="AllowMinus" >
+                <td><select id="AllowMinus" name="AllowMinus" style="width: 150px">
                         <option value="0" <?php print($cabang->AllowMinus == 0 ? 'selected="selected"' : '');?>>0 - Tidak Boleh Minus</option>
                         <option value="1" <?php print($cabang->AllowMinus == 1 ? 'selected="selected"' : '');?>>1 - Boleh Minus</option>
                     </select>
                 </td>
             </tr>
             <tr>
+                <td>Items Global</td>
+                <td><select id="IsUseGlobalItems" name="IsUseGlobalItems" style="width: 150px">
+                        <option value="0" <?php print($cabang->IsUseGlobalItems == 0 ? 'selected="selected"' : '');?>>0 - Tidak Tampilkan </option>
+                        <option value="1" <?php print($cabang->IsUseGlobalItems == 1 ? 'selected="selected"' : '');?>>1 - Tampilkan </option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
+                <td>Update Harga</td>
+                <td><select id="IsAutoUpdateSalePrice" name="IsAutoUpdateSalePrice" style="width: 150px">
+                        <option value="0" <?php print($cabang->IsAutoUpdateSalePrice == 0 ? 'selected="selected"' : '');?>>0 - Manual </option>
+                        <option value="1" <?php print($cabang->IsAutoUpdateSalePrice == 1 ? 'selected="selected"' : '');?>>1 - Otomatis </option>
+                    </select>
+                </td>
+            </tr>
+            <tr>
                 <td>Raw Printing Mode</td>
-                <td><select id="RawPrintMode" name="RawPrintMode" >
+                <td><select id="RawPrintMode" name="RawPrintMode" style="width: 150px">
                         <option value="0">--Pilih Print Mode--</option>
                         <option value="1" <?php print($cabang->RawPrintMode == 1 ? 'selected="selected"' : '');?>>1 - Plain Paper</option>
                         <option value="2" <?php print($cabang->RawPrintMode == 2 ? 'selected="selected"' : '');?>>2 - Form Paper</option>
@@ -129,5 +145,5 @@
 		</table>
 	</form>
 </fieldset>
-</body>
+<!-- </body> -->
 </html>

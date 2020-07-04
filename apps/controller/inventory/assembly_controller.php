@@ -5,6 +5,7 @@ class AssemblyController extends AppController {
     private $userLevel;
     private $trxMonth;
     private $trxYear;
+    private $isGlobalItems;
 
     protected function Initialize() {
         require_once(MODEL . "inventory/assembly.php");
@@ -14,6 +15,7 @@ class AssemblyController extends AppController {
         $this->userLevel = $this->persistence->LoadState("user_lvl");
         $this->trxMonth = $this->persistence->LoadState("acc_month");
         $this->trxYear = $this->persistence->LoadState("acc_year");
+        $this->isGlobalItems = $this->persistence->LoadState("is_global_items");
     }
 
     public function index() {
@@ -424,7 +426,7 @@ class AssemblyController extends AppController {
         }
         //load items
         $loader = new Items();
-        $items = $loader->LoadItemList($this->userCompanyId,$this->userCabangId,1,"a.bnama");
+        $items = $loader->LoadItemList($this->userCompanyId,$this->userCabangId,$this->isGlobalItems,1,"a.bnama");
         $company = new Company($this->userCompanyId);
         //load data cabang
         $loader = new Cabang();

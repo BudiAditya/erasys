@@ -1,30 +1,30 @@
 <?php
 /** @var $invoice Invoice */ /** @var $sales Karyawan[] */
 $userName = AclManager::GetInstance()->GetCurrentUser()->RealName;
-$fontFamily = "helvetica";
+$fontFamily = "tahoma";
 $widths = $pdf->GetWidths();
 $y = 0;
 $y1 = 94;
 $pdf->AddPage();
 $pdf->SetY($y);
-$pdf->SetFont("helvetica", "B", 11);
+$pdf->SetFont($fontFamily, "B", 11);
 $pdf->Cell(1,5,$invoice->CompanyName, 0, 0, "L");
-$pdf->SetFont("helvetica", "", 11);
+$pdf->SetFont($fontFamily, "", 11);
 $pdf->Cell($pdf->GetPaperWidth(), 5, "DELIVERY ORDER", 0, 0, "C");
 $pdf->Ln(7);
-$pdf->SetFont("helvetica", "", 10);
+$pdf->SetFont($fontFamily, "", 10);
 $pdf->Cell(20, 5, "Reff No.", 0, 0, "L");
 $pdf->Cell(4, 5, ":", 0, 0, "L");
-//$pdf->SetFont("helvetica", "B", 10);
+//$pdf->SetFont($fontFamily, "B", 10);
 $pdf->Cell(4, 5, $invoice->InvoiceNo, 0, 0, "L");
 $pdf->SetX(-80,true);
-$pdf->SetFont("helvetica", "", 10);
+$pdf->SetFont($fontFamily, "", 10);
 $pdf->Cell(20, 5, "Customer", 0, 0, "L");
 $pdf->Cell(4, 5, ":", 0, 0, "L");
-//$pdf->SetFont("helvetica", "B", 10);
+//$pdf->SetFont($fontFamily, "B", 10);
 $pdf->Cell(4, 5, $invoice->CustomerName, 0, 0, "L");
 $pdf->Ln(5);
-$pdf->SetFont("helvetica", "", 10);
+$pdf->SetFont($fontFamily, "", 10);
 $pdf->Cell(20, 5, "Tanggal", 0, 0, "L");
 $pdf->Cell(4, 5, ":", 0, 0, "L");
 $pdf->Cell(4, 5, $invoice->FormatInvoiceDate(JS_DATE), 0, 0, "L");
@@ -68,15 +68,15 @@ $y = $pdf->GetY();
 //detail barang
 $pdf->SetX(16);
 $pdf->SetY($y);
-$pdf->SetFont("helvetica", "", 9);
+$pdf->SetFont($fontFamily, "", 9);
 $qJenis = 0;
 $qTotal = 0;
 foreach($invoice->Details as $idx => $detail) {
 	$pdf->Ln(5);
     if (right($detail->Qty,3) == '.00') {
-        $pdf->Cell(22, 5, number_format($detail->Qty,0) . ' ' . strtolower($detail->SatBesar) . ' ', 0, 0, "R");
+        $pdf->Cell(22, 5, number_format($detail->Qty,0) . ' ' . strtolower($detail->SatJual) . ' ', 0, 0, "R");
     }else{
-        $pdf->Cell(22,5,number_format($detail->Qty,2) .' '.strtolower($detail->SatBesar).' ',0,0,"R");
+        $pdf->Cell(22,5,number_format($detail->Qty,2) .' '.strtolower($detail->SatJual).' ',0,0,"R");
     }
 	if (($detail->ItemNote == '')||($detail->ItemNote == null)) {
 		$pdf->Cell(100, 5, $detail->ItemCode . ' - ' . $detail->ItemDescs, 0, 0, "L");
@@ -87,7 +87,7 @@ foreach($invoice->Details as $idx => $detail) {
 	$qTotal+= $detail->Qty;
 }
 $pdf->SetXY(6,$y1);
-$pdf->SetFont("helvetica", "", 9);
+$pdf->SetFont($fontFamily, "", 9);
 $pdf->Cell(5,5,'Total: '.$qTotal.' satuan *'.$qJenis.' macam*',0,0,"L");
 $pdf->SetX(10);
 $pdf->Write(20,'Diterima oleh,');
@@ -107,7 +107,7 @@ $pdf->Write(20,'_________________');
 $pdf->SetX(160);
 $pdf->Write(20,'_________________');
 $pdf->Ln(5);
-$pdf->SetFont("helvetica", "", 8);
+$pdf->SetFont($fontFamily, "", 8);
 $pdf->SetX(10);
 $pdf->Write(20,'Customer');
 $pdf->SetX(60);
@@ -117,5 +117,5 @@ $pdf->Write(20,'Ka. Gudang');
 $pdf->SetX(160);
 $pdf->Write(20,'Sales/Toko');
 $pdf->Ln(13);
-$pdf->SetFont("helvetica", "i", 7);
+$pdf->SetFont($fontFamily, "i", 7);
 $pdf->Cell(5,5,'Admin: '.$invoice->AdminName.' - Printed by: '.$userName.'  - Time: '.date('d-m-Y h:i:s'),0,0,"L");

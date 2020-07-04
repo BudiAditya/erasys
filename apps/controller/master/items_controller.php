@@ -5,6 +5,7 @@ class ItemsController extends AppController {
     private $userCompanyId;
     private $userCabangId;
     private $userLevel;
+    private $isGlobalItems;
 
 	protected function Initialize() {
 		require_once(MODEL . "master/items.php");
@@ -13,6 +14,7 @@ class ItemsController extends AppController {
         $this->userCompanyId = $this->persistence->LoadState("entity_id");
         $this->userCabangId = $this->persistence->LoadState("cabang_id");
         $this->userLevel = $this->persistence->LoadState("user_lvl");
+        $this->isGlobalItems = $this->persistence->LoadState("is_global_items");
 	}
 
 	public function index() {
@@ -83,7 +85,11 @@ class ItemsController extends AppController {
 			$settings["from"] = "vw_m_barang AS a";
             if ($_GET["query"] == "") {
                 $_GET["query"] = null;
-                $settings["where"] = "a.is_deleted = 0 AND a.bisaktif = 1 And Not (a.item_level = 1 And a.entity_id <>".$this->userCompanyId.") And Not (a.item_level = 2 And a.def_cabang_id <>".$this->userCabangId.")";
+                if ($this->isGlobalItems == 0) {
+                    $settings["where"] = "a.is_deleted = 0 AND a.bisaktif = 1 And (a.item_level > 0 And a.entity_id = " . $this->userCompanyId . ")";
+                }else{
+                    $settings["where"] = "a.is_deleted = 0 AND a.bisaktif = 1 And Not (a.item_level = 1 And a.entity_id <>" . $this->userCompanyId . ") And Not (a.item_level = 2 And a.def_cabang_id <>" . $this->userCabangId . ")";
+                }
             } else {
                 //$settings["where"] = "a.is_deleted = 0 And Not (a.item_level = 1 And a.entity_id <>".$this->userCompanyId.") And Not (a.item_level = 2 And a.def_cabang_id <>".$this->userCabangId.")";
                 $settings["where"] = "a.is_deleted = 0";
@@ -294,7 +300,7 @@ class ItemsController extends AppController {
     public function getjson_items(){
         $filter = isset($_POST['q']) ? strval($_POST['q']) : '';
         $items = new Items();
-        $itemlists = $items->GetJSonItems($this->userCompanyId,$this->userCabangId,$filter);
+        $itemlists = $items->GetJSonItems($this->userCompanyId,$this->userCabangId,$this->isGlobalItems,$filter);
         echo json_encode($itemlists);
     }
 
@@ -305,7 +311,7 @@ class ItemsController extends AppController {
             $items = new Items();
             $items = $items->FindByKode($bkode);
             if ($items != null){
-                $ret = "OK|".$items->Bid.'|'.$items->Bnama.'|'.$items->Bsatbesar.'|'.$items->Bqtystock.'|'.$items->Bhargabeli.'|'.$items->Bhargajual;
+                $ret = "OK|".$items->Bid.'|'.$items->Bnama.'|'.$items->Bsatbesar.'|'.$items->Bqtystock.'|'.$items->Bhargabeli.'|'.$items->Bhargajual.'|'.$items->Bsatkecil;
             }
         }
         print $ret;
@@ -317,7 +323,7 @@ class ItemsController extends AppController {
         $company = $company->LoadById($this->userCompanyId);
         $compname = $company->CompanyName;
         $items = new Items();
-        $items = $items->LoadItemList($this->userCompanyId,$this->userCabangId,$status);
+        $items = $items->LoadItemList($this->userCompanyId,$this->userCabangId,$this->isGlobalItems,$status);
         $this->Set("items", $items);
         $this->Set("output", $output);
         $this->Set("company_name", $compname);

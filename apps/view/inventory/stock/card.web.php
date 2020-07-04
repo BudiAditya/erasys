@@ -41,7 +41,7 @@
                 <td align="right">Kode :</td>
                 <td class="bold"><?php print($stock->ItemCode); ?></td>
                 <td>Satuan :</td>
-                <td class="bold"><?php print($stock->SatBesar); ?></td>
+                <td class="bold"><?php print($stock->SatKecil); ?></td>
             </tr>
             <tr>
                 <td>Dari Tgl :</td>
@@ -105,5 +105,5 @@
         </table>
     </form>
 </fieldset>
-</body>
+<!-- </body> -->
 </html>

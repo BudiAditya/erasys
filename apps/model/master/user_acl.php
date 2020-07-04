@@ -117,10 +117,7 @@ ORDER BY a.resource_id";
     }
 
     public function Delete($uid,$cbi = 0){
-        $sql = "Delete From sys_user_rights WHERE user_uid = ?uid";
-        //if ($cbi > 0){
-            $sql.= " And cabang_id = ?cbi";
-       // }
+        $sql = "Delete From sys_user_rights WHERE user_uid = ?uid And cabang_id = ?cbi";
         $this->connector->CommandText = $sql;
 		$this->connector->AddParameter("?uid", $uid);
         $this->connector->AddParameter("?cbi", $cbi);

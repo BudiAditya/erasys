@@ -170,8 +170,8 @@ class ArReturn extends EntityBase {
 		$this->connector->AddParameter("?rj_date", $this->RjDate);
         $this->connector->AddParameter("?customer_id", $this->CustomerId);
 		$this->connector->AddParameter("?rj_descs", $this->RjDescs);
-        $this->connector->AddParameter("?rj_amount", $this->RjAmount);
-        $this->connector->AddParameter("?rj_allocate", $this->RjAllocate);
+        $this->connector->AddParameter("?rj_amount", $this->RjAmount == null ? 0 : $this->RjAmount);
+        $this->connector->AddParameter("?rj_allocate", $this->RjAllocate == null ? 0 : $this->RjAllocate);
         $this->connector->AddParameter("?rj_status", $this->RjStatus);
         $this->connector->AddParameter("?createby_id", $this->CreatebyId);
 		$rs = $this->connector->ExecuteNonQuery();
@@ -201,8 +201,8 @@ WHERE id = ?id";
         $this->connector->AddParameter("?rj_date", $this->RjDate);
         $this->connector->AddParameter("?customer_id", $this->CustomerId);
         $this->connector->AddParameter("?rj_descs", $this->RjDescs);
-        $this->connector->AddParameter("?rj_amount", $this->RjAmount);
-        $this->connector->AddParameter("?rj_allocate", $this->RjAllocate);
+        $this->connector->AddParameter("?rj_amount", $this->RjAmount == null ? 0 : $this->RjAmount);
+        $this->connector->AddParameter("?rj_allocate", $this->RjAllocate == null ? 0 : $this->RjAllocate);
         $this->connector->AddParameter("?rj_status", $this->RjStatus);
         $this->connector->AddParameter("?updateby_id", $this->UpdatebyId);
 		$this->connector->AddParameter("?id", $id);
@@ -356,7 +356,7 @@ WHERE id = ?id";
         $this->connector->AddParameter("?returnId", $returnId);
         $rs = $this->connector->ExecuteNonQuery();
         $sql = 'Update t_ar_return_master a
-Join (Select c.rj_id, sum(c.sub_total) As sumReturn From t_ar_return_detail c Group By c.rj_id) b
+Join (Select c.rj_id, coalesce(sum(c.sub_total),0) As sumReturn From t_ar_return_detail c Group By c.rj_id) b
 On a.id = b.rj_id Set a.rj_amount = b.sumReturn Where a.id = ?returnId;';
         $this->connector->CommandText = $sql;
         $this->connector->AddParameter("?returnId", $returnId);

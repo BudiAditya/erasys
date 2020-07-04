@@ -29,7 +29,9 @@ class PaymentController extends AppController {
         $settings["columns"][] = array("name" => "a.payment_descs", "display" => "Keterangan", "width" => 160);
         $settings["columns"][] = array("name" => "if(a.payment_mode = 0,'Cash','Bank')", "display" => "Cara Bayar", "width" => 80);
         $settings["columns"][] = array("name" => "a.bank_name", "display" => "Kas/Bank", "width" => 80);
-        $settings["columns"][] = array("name" => "format(a.payment_amount,0)", "display" => "Pembayaran", "width" => 90, "align" => "right");
+        $settings["columns"][] = array("name" => "format(a.payment_amount,0)", "display" => "Pembayaran", "width" => 80, "align" => "right");
+        $settings["columns"][] = array("name" => "format(a.allocate_amount,0)", "display" => "Alokasi", "width" => 80, "align" => "right");
+        $settings["columns"][] = array("name" => "format(a.payment_amount - a.allocate_amount,0)", "display" => "Sisa", "width" => 80, "align" => "right");
         $settings["columns"][] = array("name" => "a.admin_name", "display" => "Admin", "width" => 80);
         $settings["columns"][] = array("name" => "a.status_desc", "display" => "Status", "width" => 50);
 
@@ -362,13 +364,19 @@ class PaymentController extends AppController {
         $payment = new Payment();
         $payment = $payment->FindById($paymentId);
         if($payment == null){
-            $this->Set("error", "Maaf Data Payment dimaksud tidak ada pada database. Mungkin sudah dihapus!");
+            $this->persistence->SaveState("error", "Maaf Data Payment dimaksud tidak ada pada database. Mungkin sudah dihapus!");
             redirect_url("ap.payment");
         }
         if($payment->PaymentStatus == 3){
-            $this->Set("error", "Maaf, Data Payment sudah berstatus -VOID-!");
+            $this->persistence->SaveState("error", "Maaf, Data Payment sudah berstatus -VOID-!");
             redirect_url("ap.payment");
         }
+
+        if($payment->AllocateAmount > 0){
+            $this->persistence->SaveState("error", "Maaf, Hapus dulu detail paymentnya!");
+            redirect_url("ap.payment");
+        }
+
         /** @var $payment Payment */
         if ($payment->Void($paymentId) > 0) {
             $log = $log->UserActivityWriter($this->userCabangId,'ap.payment','Delete Payment',$payment->PaymentNo,'Sucess');
@@ -639,9 +647,9 @@ class PaymentController extends AppController {
         redirect_url("ap.payment");
     }
 
-    public function updatecarabayar($id,$wti,$wbi){
+    public function updatecarabayar($id,$wti,$wbi,$ket){
         $payment = new Payment();
-        if ($payment->UpdateCaraBayar($id,$wti,$wbi)){
+        if ($payment->UpdateCaraBayar($id,$wti,$wbi,$ket)){
             print 1;
         }else{
             print 0;

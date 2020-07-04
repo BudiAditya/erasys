@@ -120,13 +120,13 @@
 	<div class="text1" align="center">IP Address Anda :
 		<b><?php echo "<span class=\"text2\">" . getenv("REMOTE_ADDR") . "</span>"; ?></b></div>
 	<div class="text1" align="center">** Untuk alasan keamanan, kami mencatat seluruh aktifitas Anda pada system **</div>
-	<div class="text1" align="center">Permintaan bantuan hubungi : 0431 724 2544, 0812 4413 8229, 0811 431 9858 atau support@eraditya.com</div>
-	<div class="text2" align="center">Copyright &copy; 2016 - 2018  CV. Erasystem Infotama</div>
+	<div class="text1" align="center">Helpdesk & Support : 0812 4413 8229, 0811 431 9858 atau mgm@rekasys.com</div>
+	<div class="text2" align="center">Copyright &copy; 2016 - 2020  <a href='http://rekasys.com'><b>Rekasys Inc</b></a></div>
 	<?php if (isset($error)) { ?>
 	<script type="text/javascript">
 		alert("<?php print($error);?>");
 	</script>
 	<?php } ?>
 </div>
-</body>
+<!-- </body> -->
 </html>

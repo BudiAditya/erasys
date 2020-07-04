@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html xmlns="http://www.w3.org/1999/html">
+<html>
 <?php
 /** @var $purchase Purchase */
 ?>
@@ -45,13 +45,13 @@
 
         $("#bTambah").click(function(){
             if (confirm('Buat GRN baru?')){
-                location.href="<?php print($helper->site_url("ap.purchase/add")); ?>";
+                location.href="<?php print($helper->site_url("ap.purchase/add/0")); ?>";
             }
         });
 
         $("#bEdit").click(function(){
             if (confirm('Anda yakin akan mengubah GRN ini?')){
-                location.href="<?php print($helper->site_url("ap.purchase/edit/").$purchase->Id); ?>";
+                location.href="<?php print($helper->site_url("ap.purchase/add/").$purchase->Id); ?>";
             }
         });
 
@@ -276,7 +276,7 @@ $bpdf = base_url('public/images/button/').'pdf.png';
     </table>
 </div>
 <div id="ft" style="padding:5px; text-align: center; font-family: verdana; font-size: 9px" >
-    Copyright &copy; 2016 - 2018  CV. Erasystem Infotama
+    Copyright &copy; 2016 - 2020  <a href='http://rekasys.com'><b>Rekasys Inc</b></a>
 </div>
-</body>
+<!-- </body> -->
 </html>

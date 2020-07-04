@@ -559,6 +559,70 @@ On a.id = b.grn_id Set a.base_amount = b.sumPrice, a.disc1_amount = if(a.disc1_p
         }
         return $rs;
     }
+
+    public function GetPurchaseSumByYear($tahun, $cabId){
+        $query = "SELECT COALESCE(SUM(CASE WHEN month(a.grn_date) = 1 THEN a.total_amount ELSE 0 END), 0) January
+				,COALESCE(SUM(CASE WHEN month(a.grn_date) = 2 THEN a.total_amount ELSE 0 END), 0) February
+				,COALESCE(SUM(CASE WHEN month(a.grn_date) = 3 THEN a.total_amount ELSE 0 END), 0) March
+				,COALESCE(SUM(CASE WHEN month(a.grn_date) = 4 THEN a.total_amount ELSE 0 END), 0) April
+				,COALESCE(SUM(CASE WHEN month(a.grn_date) = 5 THEN a.total_amount ELSE 0 END), 0) May
+				,COALESCE(SUM(CASE WHEN month(a.grn_date) = 6 THEN a.total_amount ELSE 0 END), 0) June
+				,COALESCE(SUM(CASE WHEN month(a.grn_date) = 7 THEN a.total_amount ELSE 0 END), 0) July
+				,COALESCE(SUM(CASE WHEN month(a.grn_date) = 8 THEN a.total_amount ELSE 0 END), 0) August
+				,COALESCE(SUM(CASE WHEN month(a.grn_date) = 9 THEN a.total_amount ELSE 0 END), 0) September
+				,COALESCE(SUM(CASE WHEN month(a.grn_date) = 10 THEN a.total_amount ELSE 0 END), 0) October
+				,COALESCE(SUM(CASE WHEN month(a.grn_date) = 11 THEN a.total_amount ELSE 0 END), 0) November
+				,COALESCE(SUM(CASE WHEN month(a.grn_date) = 12 THEN a.total_amount ELSE 0 END), 0) December
+			    FROM vw_ap_purchase_master a Where year(a.grn_date) = $tahun And a.cabang_id = $cabId And a.grn_status <> 3 And a.is_deleted = 0";
+        $this->connector->CommandText = $query;
+        $rs = $this->connector->ExecuteQuery();
+        $row = $rs->FetchAssoc();
+        $data = $row["January"];
+        $data.= ",".$row["February"];
+        $data.= ",".$row["March"];
+        $data.= ",".$row["April"];
+        $data.= ",".$row["May"];
+        $data.= ",".$row["June"];
+        $data.= ",".$row["July"];
+        $data.= ",".$row["August"];
+        $data.= ",".$row["September"];
+        $data.= ",".$row["October"];
+        $data.= ",".$row["November"];
+        $data.= ",".$row["December"];
+        return $data;
+    }
+
+    public function GetPaymentSumByYear($tahun, $cabId){
+        $query = "SELECT COALESCE(SUM(CASE WHEN month(a.payment_date) = 1 THEN a.payment_amount ELSE 0 END), 0) January
+				,COALESCE(SUM(CASE WHEN month(a.payment_date) = 2 THEN a.payment_amount ELSE 0 END), 0) February
+				,COALESCE(SUM(CASE WHEN month(a.payment_date) = 3 THEN a.payment_amount ELSE 0 END), 0) March
+				,COALESCE(SUM(CASE WHEN month(a.payment_date) = 4 THEN a.payment_amount ELSE 0 END), 0) April
+				,COALESCE(SUM(CASE WHEN month(a.payment_date) = 5 THEN a.payment_amount ELSE 0 END), 0) May
+				,COALESCE(SUM(CASE WHEN month(a.payment_date) = 6 THEN a.payment_amount ELSE 0 END), 0) June
+				,COALESCE(SUM(CASE WHEN month(a.payment_date) = 7 THEN a.payment_amount ELSE 0 END), 0) July
+				,COALESCE(SUM(CASE WHEN month(a.payment_date) = 8 THEN a.payment_amount ELSE 0 END), 0) August
+				,COALESCE(SUM(CASE WHEN month(a.payment_date) = 9 THEN a.payment_amount ELSE 0 END), 0) September
+				,COALESCE(SUM(CASE WHEN month(a.payment_date) = 10 THEN a.payment_amount ELSE 0 END), 0) October
+				,COALESCE(SUM(CASE WHEN month(a.payment_date) = 11 THEN a.payment_amount ELSE 0 END), 0) November
+				,COALESCE(SUM(CASE WHEN month(a.payment_date) = 12 THEN a.payment_amount ELSE 0 END), 0) December
+			    FROM vw_ap_payment_master a Where year(a.payment_date) = $tahun And a.cabang_id = $cabId And a.payment_status <> 3 And a.is_deleted = 0";
+        $this->connector->CommandText = $query;
+        $rs = $this->connector->ExecuteQuery();
+        $row = $rs->FetchAssoc();
+        $data = $row["January"];
+        $data.= ",".$row["February"];
+        $data.= ",".$row["March"];
+        $data.= ",".$row["April"];
+        $data.= ",".$row["May"];
+        $data.= ",".$row["June"];
+        $data.= ",".$row["July"];
+        $data.= ",".$row["August"];
+        $data.= ",".$row["September"];
+        $data.= ",".$row["October"];
+        $data.= ",".$row["November"];
+        $data.= ",".$row["December"];
+        return $data;
+    }
 }
 
 

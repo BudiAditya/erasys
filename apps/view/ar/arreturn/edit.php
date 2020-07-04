@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html xmlns="http://www.w3.org/1999/html">
+<html>
 <?php
 /** @var $arreturn ArReturn */ ?>
 <head>
@@ -322,7 +322,7 @@ $baddnew = base_url('public/images/button/').'create_new.png';
                             printf('<td>%s</td>', $detail->ItemDescs);
                             printf('<td class="right">%s</td>', number_format($detail->QtyJual,0));
                             printf('<td class="right">%s</td>', number_format($detail->QtyRetur,0));
-                            printf('<td>%s</td>', $detail->SatBesar);
+                            printf('<td>%s</td>', $detail->SatRetur);
                             printf('<td class="right">%s</td>', number_format($detail->Price,0));
                             printf('<td class="right">%s</td>', number_format($detail->SubTotal,0));
                             print("<td class='center'>");
@@ -364,13 +364,13 @@ $baddnew = base_url('public/images/button/').'create_new.png';
     </form>
 </div>
 <div id="ft" style="padding:5px; text-align: center; font-family: verdana; font-size: 9px" >
-    Copyright &copy; 2016 - 2018  CV. Erasystem Infotama
+    Copyright &copy; 2016 - 2020  <a href='http://rekasys.com'><b>Rekasys Inc</b></a>
 </div>
 <!-- Form Add ArRreturn Detail -->
-<div id="dlg" class="easyui-dialog" style="width:1050px;height:150px;padding:5px 5px"
+<div id="dlg" class="easyui-dialog" style="width:1100px;height:150px;padding:5px 5px"
      closed="true" buttons="#dlg-buttons">
     <form id="fm" method="post" novalidate>
-        <table cellpadding="0" cellspacing="0" class="tablePadding tableBorder" style="font-size: 12px;font-family: tahoma">
+        <table cellpadding="0" cellspacing="0" class="tablePadding tableBorder" style="font-size: 12px;font-family: tahoma;width: 100%">
             <tr>
                 <th>Ex. Invoice No.</th>
                 <th>Kode Barang</th>
@@ -403,7 +403,7 @@ $baddnew = base_url('public/images/button/').'create_new.png';
                     <input class="right" type="text" id="aQtyRetur" name="aQtyRetur" size="5" value="0"/>
                 </td>
                 <td>
-                    <input type="text" id="aSatuan" name="aSatuan" size="5" value="" disabled/>
+                    <input type="text" id="aSatuan" name="aSatuan" size="5" value="" readonly/>
                 </td>
                 <td>
                     <input class="right" type="text" id="aPrice" name="aPrice" size="10" value="0" readonly/>
@@ -420,5 +420,5 @@ $baddnew = base_url('public/images/button/').'create_new.png';
     <a href="javascript:void(0)" class="easyui-linkbutton c6" iconCls="icon-ok" onclick="saveDetail()" style="width:90px">Simpan</a>
     <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:$('#dlg').dialog('close')" style="width:90px">Batal</a>
 </div>
-</body>
+<!-- </body> -->
 </html>

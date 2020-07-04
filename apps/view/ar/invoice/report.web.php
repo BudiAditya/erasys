@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html xmlns="http://www.w3.org/1999/html">
+<html>
 <?php /** @var $customers Contacts[] */ /** @var $sales Karyawan[] */ ?>
 <head>
 	<title>ERASYS - Rekapitulasi Nota/Invoice/Piutang</title>
@@ -177,12 +177,12 @@
                         print("<tr valign='Top'>");
                         printf("<td>%s</td>", $nmr);
                         printf("<td nowrap='nowrap'>%s</td>", $row["cabang_code"]);
-                        printf("<td>%s</td>", date('d-m-Y', strtotime($row["invoice_date"])));
+                        printf("<td nowrap='nowrap'>%s</td>", date('d-m-Y', strtotime($row["invoice_date"])));
                         printf("<td><a href= '%s' target='_blank'>%s</a></td>", $url, $row["invoice_no"]);
                         printf("<td nowrap='nowrap'>%s</td>", $row["customer_name"]);
                         printf("<td nowrap='nowrap'>%s</td>", $row["invoice_descs"]);
                         printf("<td nowrap='nowrap'>%s</td>", $row["sales_name"]);
-                        printf("<td>%s</td>", date('d-m-Y', strtotime($row["due_date"])));
+                        printf("<td nowrap='nowrap'>%s</td>", date('d-m-Y', strtotime($row["due_date"])));
                         printf("<td align='right'>%s</td>", number_format($row["total_amount"], 0));
                         printf("<td align='right'>%s</td>", number_format($row["paid_amount"], 0));
                         printf("<td align='right'>%s</td>", number_format($row["balance_amount"], 0));
@@ -262,5 +262,5 @@
         </table>
 <!-- end web report -->
 <?php }} ?>
-</body>
+<!-- </body> -->
 </html>

@@ -19,6 +19,8 @@ class Cabang extends EntityBase {
 	public $UpdatebyId;
 	public $CabType;
 	public $AllowMinus = 0;
+	public $IsAutoUpdateSalePrice = 0;
+	public $IsUseGlobalItems = 1;
 
 	public function __construct($id = null) {
 		parent::__construct();
@@ -47,6 +49,8 @@ class Cabang extends EntityBase {
 		$this->UpdatebyId = $row["updateby_id"];
 		$this->CabType = $row["cab_type"];
 		$this->AllowMinus = $row["allow_minus"];
+		$this->IsAutoUpdateSalePrice = $row["is_autoupdate_sale_price"];
+		$this->IsUseGlobalItems = $row["is_useglobal_items"];
 	}
 
 	/**
@@ -219,9 +223,10 @@ ORDER BY $orderBy";
     }
 
 	public function Insert() {
-		$this->connector->CommandText =
-        'INSERT INTO m_cabang(allow_minus,cab_type,entity_id,area_id,kode,cabang,alamat,pic,flogo,nama_outlet,raw_print_mode,raw_printer_name,createby_id,create_time) VALUES(?allow_minus,?cab_type,?entity_id,?area_id,?kode,?cabang,?alamat,?pic,?flogo,?nama_outlet,?raw_print_mode,?raw_printer_name,?createby_id,now())';
-		$this->connector->AddParameter("?allow_minus", $this->AllowMinus);
+		$this->connector->CommandText = 'INSERT INTO m_cabang(is_useglobal_items,is_autoupdate_sale_price,allow_minus,cab_type,entity_id,area_id,kode,cabang,alamat,pic,flogo,nama_outlet,raw_print_mode,raw_printer_name,createby_id,create_time) VALUES(?is_useglobal_items,?is_autoupdate_sale_price,?allow_minus,?cab_type,?entity_id,?area_id,?kode,?cabang,?alamat,?pic,?flogo,?nama_outlet,?raw_print_mode,?raw_printer_name,?createby_id,now())';
+		$this->connector->AddParameter("?is_useglobal_items", $this->IsUseGlobalItems);
+        $this->connector->AddParameter("?is_autoupdate_sale_price", $this->IsAutoUpdateSalePrice);
+        $this->connector->AddParameter("?allow_minus", $this->AllowMinus);
 		$this->connector->AddParameter("?cab_type", $this->CabType);
 		$this->connector->AddParameter("?entity_id", $this->EntityId);
         $this->connector->AddParameter("?area_id", $this->AreaId);
@@ -239,11 +244,13 @@ ORDER BY $orderBy";
 
 	public function Update($id) {
         if ($this->FLogo == null){
-            $sql = 'UPDATE m_cabang SET allow_minus = ?allow_minus, cab_type = ?cab_type, entity_id = ?entity_id, area_id = ?area_id,	kode = ?kode, cabang = ?cabang,	alamat = ?alamat, pic = ?pic, nama_outlet = ?nama_outlet, raw_print_mode = ?raw_print_mode, raw_printer_name = ?raw_printer_name, updateby_id = ?updateby_id WHERE id = ?id';
+            $sql = 'UPDATE m_cabang SET is_autoupdate_sale_price = ?is_autoupdate_sale_price,is_useglobal_items = ?is_useglobal_items, allow_minus = ?allow_minus, cab_type = ?cab_type, entity_id = ?entity_id, area_id = ?area_id,	kode = ?kode, cabang = ?cabang,	alamat = ?alamat, pic = ?pic, nama_outlet = ?nama_outlet, raw_print_mode = ?raw_print_mode, raw_printer_name = ?raw_printer_name, updateby_id = ?updateby_id WHERE id = ?id';
         }else{
-            $sql = 'UPDATE m_cabang SET allow_minus = ?allow_minus, cab_type = ?cab_type, entity_id = ?entity_id,	area_id = ?area_id,	kode = ?kode, cabang = ?cabang,	alamat = ?alamat, pic = ?pic, flogo = ?flogo, nama_outlet = ?nama_outlet, raw_print_mode = ?raw_print_mode, raw_printer_name = ?raw_printer_name, updateby_id = ?updateby_id WHERE id = ?id';
+            $sql = 'UPDATE m_cabang SET is_autoupdate_sale_price = ?is_autoupdate_sale_price,is_useglobal_items = ?is_useglobal_items, allow_minus = ?allow_minus, cab_type = ?cab_type, entity_id = ?entity_id,	area_id = ?area_id,	kode = ?kode, cabang = ?cabang,	alamat = ?alamat, pic = ?pic, flogo = ?flogo, nama_outlet = ?nama_outlet, raw_print_mode = ?raw_print_mode, raw_printer_name = ?raw_printer_name, updateby_id = ?updateby_id WHERE id = ?id';
         }
 		$this->connector->CommandText = $sql;
+        $this->connector->AddParameter("?is_useglobal_items", $this->IsUseGlobalItems);
+        $this->connector->AddParameter("?is_autoupdate_sale_price", $this->IsAutoUpdateSalePrice);
 		$this->connector->AddParameter("?allow_minus", $this->AllowMinus);
 		$this->connector->AddParameter("?cab_type", $this->CabType);
 		$this->connector->AddParameter("?entity_id", $this->EntityId);

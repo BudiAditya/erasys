@@ -86,6 +86,8 @@ class CabangController extends AppController {
 			$cabang->RawPrinterName = $this->GetPostValue("RawPrinterName");
 			$cabang->CabType = $this->GetPostValue("CabType");
 			$cabang->AllowMinus = $this->GetPostValue("AllowMinus");
+            $cabang->IsAutoUpdateSalePrice = $this->GetPostValue("IsAutoUpdateSalePrice");
+            $cabang->IsUseGlobalItems = $this->GetPostValue("IsUseGlobalItems");
 			$cabang->FLogo = null;
 			if (!empty($_FILES['FileName']['tmp_name'])){
 				$fpath = 'public/upload/images/';
@@ -162,6 +164,8 @@ class CabangController extends AppController {
 			$cabang->RawPrinterName = $this->GetPostValue("RawPrinterName");
 			$cabang->CabType = $this->GetPostValue("CabType");
 			$cabang->AllowMinus = $this->GetPostValue("AllowMinus");
+            $cabang->IsAutoUpdateSalePrice = $this->GetPostValue("IsAutoUpdateSalePrice");
+            $cabang->IsUseGlobalItems = $this->GetPostValue("IsUseGlobalItems");
             $cabang->Pic = $this->GetPostValue("Pic");
 			$cabang->UpdatebyId = AclManager::GetInstance()->GetCurrentUser()->Id;
             if (!empty($_FILES['FileName']['tmp_name'])){

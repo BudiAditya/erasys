@@ -2,7 +2,7 @@
 	You can change this template to fulfill your requirement.
 	DON'T DELETE THIS TEMPLATE BECAUSE REQUIRED AS CORE PART OF THE FRAMEWORK
 -->
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE HTML>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
@@ -34,5 +34,5 @@
 		You see this error message because your connector setting for DebugMode is equal to 'true'.<br />
 		If you want to suppress this error message please disable DebugMode in your connector settings
 	</div>
-</body>
+<!-- </body> -->
 </html>

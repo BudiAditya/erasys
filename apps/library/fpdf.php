@@ -113,7 +113,7 @@ class FPDF
 		else
 			$this->fontpath = '';
 		// Core fonts
-		$this->CoreFonts = array('courier', 'helvetica', 'times', 'symbol', 'zapfdingbats');
+		$this->CoreFonts = array('courier', 'helvetica', 'times', 'symbol', 'zapfdingbats', 'tahoma');
 		// Scale factor
 		if($unit=='pt')
 			$this->k = 1;

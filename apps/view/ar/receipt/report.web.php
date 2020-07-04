@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html xmlns="http://www.w3.org/1999/html">
+<html>
 <?php /** @var $customers Contacts[] */ /** @var $banks Bank[] */ ?>
 <head>
 	<title>ERASYS - Rekapitulasi Penerimaan Piutang</title>
@@ -176,5 +176,5 @@
     </table>
 <!-- end web report -->
 <?php } ?>
-</body>
+<!-- </body> -->
 </html>

@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html xmlns="http://www.w3.org/1999/html">
+<html>
 <?php
 /** @var $order Order */
 ?>
@@ -245,5 +245,5 @@ $baddnew = base_url('public/images/button/').'create_new.png';
 <div id="ft" style="padding:5px; text-align: center; font-family: verdana; font-size: 9px" >
     Copyright &copy; 2016 - 2018  PT. Rekasystem Technology
 </div>
-</body>
+<!-- </body> -->
 </html>

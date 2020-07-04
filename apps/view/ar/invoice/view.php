@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html xmlns="http://www.w3.org/1999/html">
+<html>
 <?php
 /** @var $invoice Invoice */ /** @var $sales Karyawan[] */
 ?>
@@ -20,17 +20,15 @@
 <script type="text/javascript" src="<?php print($helper->path("public/js/auto-numeric.js")); ?>"></script>
 
 <script type="text/javascript" src="<?php print($helper->path("public/js/jquery.easyui.min.js")); ?>"></script>
-
-<script type="text/javascript" src="<?php print($helper->path("public/js/qz/dependencies/rsvp-3.1.0.min.js")); ?>"></script>
-<script type="text/javascript" src="<?php print($helper->path("public/js/qz/dependencies/sha-256.min.js")); ?>"></script>
-<script type="text/javascript" src="<?php print($helper->path("public/js/qz/qz-tray.js")); ?>"></script>
-
+<!-- direct printing -->
+<script src="<?php print($helper->path("public/js/recta.js"));?>"></script>
 <style scoped>
     .f1{
         width:200px;
     }
 </style>
 <script type="text/javascript">
+    var printer = new Recta('1122334455', '1811');
     $( function() {
         $('#CustomerId').combogrid({
             panelWidth:600,
@@ -68,19 +66,24 @@
         $("#bCetak").click(function(){
             var uip = '<?php print($userIpAdd);?>';
             var ptp = <?php print($userCabRpm);?>;
+            var urp = '<?php print($helper->site_url("ar.invoice/printdirect/").$invoice->Id."/".$userCabRpm."/".$userCabRpn); ?>';
             var printCnt = <?php print($invoice->PrintCount);?>;
-            if (printCnt > 0){
+            if (printCnt > 1){
                 alert('ER - Invoice/Struk sudah pernah di-print!');
             }else {
                 if ((uip.substr(0, 3) == '127') || (uip.substr(0, 3) == '::1') && (ptp == 1 || ptp == 4)) {
                     if (confirm('Cetak Struk Invoice ini?')) {
-                        $.get('<?php print($helper->site_url("ar.invoice/printdirect/").$invoice->Id."/".$userCabRpm."/".$userCabRpn); ?>', function (e) {
+                        rectaPrint();
+                        /*
+                        $.get(urp, function (e) {
                             alert('OK - Send Data to Printer');
                         });
+                        */
                     }
                 } else {
-                    if (confirm('Cetak invoice ini?')) {
-                        printDirect()
+                    if (confirm('Cetak Invoice ini?')) {
+                        //printDirect();
+                        rectaPrint();
                     }
                 }
             }
@@ -105,26 +108,64 @@
         thisWindow.close();
     }
 
-    function printDirect() {
-        qz.websocket.connect().then(function () {
-            //alert("Not Connected!");
-        });
-        $.get('<?php print($helper->site_url("ar.invoice/printdirect/").$invoice->Id."/".$userCabRpm); ?>', function (ajson, status) {
-            var config = qz.configs.create("<?php print($userCabRpn);?>");
-            var data = JSON.parse(ajson);
-            //var datx = ['\x1B' + '\x40','\x1B' + '\x67','\x1B' + '\x47'];  //cetak double-strike
-            //var datx = ['\x1B' + '\x40','\x1B' + '\x67','\x1B' + '\x43' + '\x1E']; //cetak biasa 15 cpi 30 lines
-            var datx = ['\x1B' + '\x40', '\x1B' + '\x67']; //cetak biasa 15 cpi
-            for (var i = 0; i < data.length; i++) {
-                datx.push(data[i] + '\n');
-            }
-            //datx.push('\x0C'); // form feed
-            qz.print(config, datx).catch(function (e) {
-                console.error(e);
+    function rectaPrint() {
+        var urx = "<?php print($helper->site_url("ar/invoice/getStrukData"));?>";
+        var ivi = "<?php print($invoice->Id);?>";
+        var dvalue = {ivid: ivi};
+        $.ajax(
+            {
+                url : urx,
+                type: "POST",
+                data : dvalue,
+                success: function(data, textStatus, jqXHR)
+                {
+                    printer.open().then(function () {
+                        $.each(JSON.parse(data), function () {
+                            $.each(this, function (name, value) {
+                                //console.log(name + '=' + value);
+                                if (name == 'format'){
+                                    switch(value) {
+                                        case "AC":
+                                            printer.align('center');
+                                            break;
+                                        case "AL":
+                                            printer.align('left');
+                                            break;
+                                        case "AR":
+                                            printer.align('right');
+                                            break;
+                                        case "B1":
+                                            printer.bold(true);
+                                            break;
+                                        case "B0":
+                                            printer.bold(false);
+                                            break;
+                                        case "U1":
+                                            printer.underline(true);
+                                            break;
+                                        case "U0":
+                                            printer.underline(false);
+                                            break;
+                                        default:
+                                            printer.align('left');
+                                            break;
+                                    }
+                                }else {
+                                    printer.text(value);
+                                }
+                            });
+                        });
+                        printer.feed(7);
+                        printer.cut();
+                        printer.print();
+                    })
+                },
+                error: function(jqXHR, textStatus, errorThrown)
+                {
+                    alert(textStatus);
+                }
             });
-        });
     }
-
 </script>
 <style type="text/css">
     #fd{
@@ -273,7 +314,7 @@ $bpdf = base_url('public/images/button/').'pdf.png';
                         printf('<td>%s</td>', $detail->ItemDescs);
                         printf('<td>%s</td>', $detail->ItemNote);
                         printf('<td class="right">%s</td>', number_format($detail->Qty,0));
-                        printf('<td>%s</td>', $detail->SatBesar);
+                        printf('<td>%s</td>', $detail->SatJual);
                         printf('<td class="right">%s</td>', number_format($detail->Price,0));
                         printf('<td class="right">%s</td>', $detail->DiscFormula);
                         printf('<td class="right">%s</td>', number_format($detail->DiscAmount,0));
@@ -349,5 +390,5 @@ $bpdf = base_url('public/images/button/').'pdf.png';
 <div id="ft" style="padding:5px; text-align: center; font-family: verdana; font-size: 9px" >
     Copyright &copy; 2016 - 2018  PT. Rekasystem Technology
 </div>
-</body>
+<!-- </body> -->
 </html>

@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html xmlns="http://www.w3.org/1999/html">
+<html>
 <head>
 	<title>REKASYS | Profit Penjualan</title>
 	<meta http-equiv="Content-type" content="text/html;charset=UTF-8"/>
@@ -68,6 +68,7 @@
             <td>
                 <select id="Output" name="Output" required>
                     <option value="0" <?php print($Output == 0 ? 'selected="selected"' : '');?>>0 - Web Html</option>
+                    <option value="1" <?php print($Output == 1 ? 'selected="selected"' : '');?>>1 - Excel</option>
                 </select>
             </td>
             <td><button type="submit" formaction="<?php print($helper->site_url("ar.invoice/profit")); ?>"><b>Proses</b></button></td>
@@ -288,5 +289,5 @@
         </table>
 <!-- end web report -->
 <?php }} ?>
-</body>
+<!-- </body> -->
 </html>

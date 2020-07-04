@@ -37,7 +37,7 @@
                 columns:[[
                     {field:'bkode',title:'Kode',width:50,sortable:true},
                     {field:'bnama',title:'Nama Barang',sortable:true,width:150},
-                    {field:'bsatbesar',title:'Satuan',width:40}
+                    {field:'bsatkecil',title:'Satuan',width:40}
                 ]],
                 onSelect: function(index,row){
                     var bid = row.bid;
@@ -46,7 +46,7 @@
                     console.log(bkode);
                     var bnama = row.bnama;
                     console.log(bnama);
-                    var satuan = row.bsatbesar;
+                    var satuan = row.bsatkecil;
                     console.log(satuan);
                     $('#aItemId').val(bid);
                     $('#aItemCode').val(bkode);
@@ -173,7 +173,7 @@
 $crDate = date(JS_DATE, strtotime(date('Y-m-d')));
 ?>
 <div align="left">
-    <table id="dg" title="Stock Awal Barang" class="easyui-datagrid" style="width:800px;height:500px"
+    <table id="dg" title="Stock Awal Barang" class="easyui-datagrid" style="width:100%;height:500px"
            toolbar="#toolbar"
            pagination="true"
            rownumbers="true"
@@ -189,7 +189,7 @@ $crDate = date(JS_DATE, strtotime(date('Y-m-d')));
             <th field="op_date" width="20">Tanggal</th>
             <th field="item_code" width="30" sortable="true">Kode Barang</th>
             <th field="bnama" width="55" sortable="true">Nama Barang</th>
-            <th field="bsatbesar" width="15">Satuan</th>
+            <th field="bsatkecil" width="15">Satuan</th>
             <th field="op_qty" width="20" sortable="true" align="right">Qty</th>
         </tr>
         </thead>
@@ -253,5 +253,5 @@ $crDate = date(JS_DATE, strtotime(date('Y-m-d')));
     <a href="javascript:void(0)" class="easyui-linkbutton c6" iconCls="icon-ok" onclick="saveOpBal()" style="width:90px">Simpan</a>
     <a href="javascript:void(0)" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:$('#dlg').dialog('close')" style="width:90px">Batal</a>
 </div>
-</body>
+<!-- </body> -->
 </html>

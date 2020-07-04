@@ -23,7 +23,7 @@ class PriceListsController extends AppController {
 		//$settings["columns"][] = array("name" => "a.cabang_code", "display" => "Cabang", "width" => 80);
         $settings["columns"][] = array("name" => "a.item_code", "display" => "Kode Barang", "width" => 100);
         $settings["columns"][] = array("name" => "a.item_name", "display" => "Nama Barang", "width" => 350);
-        $settings["columns"][] = array("name" => "a.satuan", "display" => "Satuan", "width" => 40);
+        $settings["columns"][] = array("name" => "a.bsatbesar", "display" => "Satuan", "width" => 40);
 		if ($this->userLevel > 1) {
 			$settings["columns"][] = array("name" => "format(a.hrg_beli,0)", "display" => "Harga Beli", "width" => 60, "align" => "right");
 			$settings["columns"][] = array("name" => "format(a.hrg_jual1,0)", "display" => "Harga Jual1", "width" => 60, "align" => "right");
@@ -91,7 +91,7 @@ class PriceListsController extends AppController {
 		$loader = null;
 		if (count($this->postData) > 0) {
 			$setprices->Id = $this->GetPostValue("Id");
-			$setprices->CabangId = $this->GetPostValue("CabangId");
+			$setprices->CabangId = $this->userCabangId;
 			$setprices->PriceDate = $this->GetPostValue("PriceDate");
 			$setprices->ItemId = $this->GetPostValue("ItemId");
 			$setprices->ItemCode = $this->GetPostValue("ItemCode");
@@ -109,7 +109,13 @@ class PriceListsController extends AppController {
 			$setprices->Markup4 = $this->GetPostValue("Markup4");
 			$setprices->Markup5 = $this->GetPostValue("Markup5");
 			$setprices->Markup6 = $this->GetPostValue("Markup6");
-			$setprices->Satuan = $this->GetPostValue("Satuan");
+			$setprices->Satuan = $this->GetPostValue("SatBesar");
+            $setprices->HrgJual1k = $this->GetPostValue("HrgJual1k");
+            $setprices->HrgJual2k = $this->GetPostValue("HrgJual2k");
+            $setprices->HrgJual3k = $this->GetPostValue("HrgJual3k");
+            $setprices->HrgJual4k = $this->GetPostValue("HrgJual4k");
+            $setprices->HrgJual5k = $this->GetPostValue("HrgJual5k");
+            $setprices->HrgJual6k = $this->GetPostValue("HrgJual6k");
 			if ($this->ValidateData($setprices)) {
 				$setprices->CreatebyId = $this->userUid;
 				$setprices->UpdatebyId = $this->userUid;

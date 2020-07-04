@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<html>
 <?php
 /** @var $start int */ /** @var $end int */ /** @var $docTypes DocType[] */ /** @var $showNo bool */ /** @var $showCol bool */ /** @var $docIds int[] */ /** @var $vocTypes VoucherType[] */
 /** @var $report ReaderBase */ /** @var $output string */ /** @var $company Company */ /** @var $orientation string */ /** @var $status int */ /** @var $cabangId int */ /** @var $cabangList Cabang[] */
@@ -298,5 +298,5 @@ if ($report != null) {
 <!-- END REGION: LAPORAN-->
 
 
-</body>
+<!-- </body> -->
 </html>

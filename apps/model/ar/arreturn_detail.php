@@ -17,6 +17,8 @@ class ArReturnDetail extends EntityBase {
     public $SubTotal;
     public $SatBesar;
     public $SatKecil;
+    public $SatRetur;
+    public $IsiKecil = 1;
 
 	public function FillProperties(array $row) {
 		$this->Id = $row["id"];        
@@ -35,10 +37,12 @@ class ArReturnDetail extends EntityBase {
         $this->SubTotal = $row["sub_total"];
         $this->SatBesar = $row["bsatbesar"];
         $this->SatKecil = $row["bsatkecil"];
+        $this->SatRetur = $row["satretur"];
+        $this->IsiKecil = $row["bisisatkecil"];
 	}
 
 	public function LoadById($id) {
-		$this->connector->CommandText = "SELECT a.*,b.bsatbesar,b.bsatkecil FROM t_ar_return_detail AS a Join m_barang AS b On a.item_code = b.bkode WHERE a.id = ?id";
+		$this->connector->CommandText = "SELECT a.*,b.bsatbesar,b.bsatkecil,b.bisisatkecil FROM t_ar_return_detail AS a Join m_barang AS b On a.item_code = b.bkode WHERE a.id = ?id";
 		$this->connector->AddParameter("?id", $id);
 		$rs = $this->connector->ExecuteQuery();
 		if ($rs == null || $rs->GetNumRows() == 0) {
@@ -49,7 +53,7 @@ class ArReturnDetail extends EntityBase {
 	}
 
     public function FindById($id) {
-        $this->connector->CommandText = "SELECT a.*,b.bsatbesar,b.bsatkecil FROM t_ar_return_detail AS a Join m_barang AS b On a.item_code = b.bkode WHERE a.id = ?id";
+        $this->connector->CommandText = "SELECT a.*,b.bsatbesar,b.bsatkecil,b.bisisatkecil FROM t_ar_return_detail AS a Join m_barang AS b On a.item_code = b.bkode WHERE a.id = ?id";
         $this->connector->AddParameter("?id", $id);
         $rs = $this->connector->ExecuteQuery();
         if ($rs == null || $rs->GetNumRows() == 0) {
@@ -60,7 +64,7 @@ class ArReturnDetail extends EntityBase {
     }
 
 	public function LoadByRjId($rjId, $orderBy = "a.id") {
-		$this->connector->CommandText = "SELECT a.*,b.bsatbesar,b.bsatkecil FROM t_ar_return_detail AS a Join m_barang AS b On a.item_code = b.bkode WHERE a.rj_id = ?rjId ORDER BY $orderBy";
+		$this->connector->CommandText = "SELECT a.*,b.bsatbesar,b.bsatkecil,b.bisisatkecil FROM t_ar_return_detail AS a Join m_barang AS b On a.item_code = b.bkode WHERE a.rj_id = ?rjId ORDER BY $orderBy";
 		$this->connector->AddParameter("?rjId", $rjId);
 		$result = array();
 		$rs = $this->connector->ExecuteQuery();
@@ -91,8 +95,8 @@ class ArReturnDetail extends EntityBase {
 
 	public function Insert() {
 		$this->connector->CommandText =
-"INSERT INTO t_ar_return_detail(rj_id, cabang_id, rj_no, item_id, item_code, item_descs, ex_invoice_id, ex_invoice_no, qty_jual, qty_retur, price, sub_total, ex_invdetail_id)
-VALUES(?rj_id, ?cabang_id, ?rj_no, ?item_id, ?item_code, ?item_descs, ?ex_invoice_id, ?ex_invoice_no, ?qty_jual, ?qty_retur, ?price, ?sub_total, ?ex_invdetail_id)";
+"INSERT INTO t_ar_return_detail(satretur,rj_id, cabang_id, rj_no, item_id, item_code, item_descs, ex_invoice_id, ex_invoice_no, qty_jual, qty_retur, price, sub_total, ex_invdetail_id)
+VALUES(?satretur,?rj_id, ?cabang_id, ?rj_no, ?item_id, ?item_code, ?item_descs, ?ex_invoice_id, ?ex_invoice_no, ?qty_jual, ?qty_retur, ?price, ?sub_total, ?ex_invdetail_id)";
 		$this->connector->AddParameter("?rj_id", $this->RjId);
         $this->connector->AddParameter("?cabang_id", $this->CabangId);
         $this->connector->AddParameter("?rj_no", $this->RjNo);
@@ -105,6 +109,7 @@ VALUES(?rj_id, ?cabang_id, ?rj_no, ?item_id, ?item_code, ?item_descs, ?ex_invoic
 		$this->connector->AddParameter("?qty_retur", $this->QtyRetur);
 		$this->connector->AddParameter("?price", $this->Price);
         $this->connector->AddParameter("?sub_total", $this->SubTotal);
+        $this->connector->AddParameter("?satretur", $this->SatRetur);
         $this->connector->AddParameter("?ex_invdetail_id", $this->ExInvDetailId);
 		$rs = $this->connector->ExecuteNonQuery();
         $rsx = null;

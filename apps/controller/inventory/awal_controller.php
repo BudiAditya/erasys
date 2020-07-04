@@ -5,6 +5,7 @@ class AwalController extends AppController {
     private $userCompanyId;
     private $userCabangId;
     private $userLevel;
+    private $isGlobalItems;
 
 	protected function Initialize() {
 		require_once(MODEL . "inventory/awal.php");
@@ -13,6 +14,7 @@ class AwalController extends AppController {
         $this->userCompanyId = $this->persistence->LoadState("entity_id");
         $this->userCabangId = $this->persistence->LoadState("cabang_id");
         $this->userLevel = $this->persistence->LoadState("user_lvl");
+        $this->isGlobalItems = $this->persistence->LoadState("is_global_items");
 	}
 
 	public function index() {
@@ -28,16 +30,16 @@ class AwalController extends AppController {
 
 	public function get_data(){
         /*Default request pager params dari jeasyUI*/
-        if ($this->userLevel == 1){
-            $entityId = 0;
+        //if ($this->userLevel == 1){
+        //    $entityId = 0;
             $cabangId = $this->userCabangId;
-        }elseif ($this->userLevel > 1 && $this->userLevel < 4){
+        //}elseif ($this->userLevel > 1 && $this->userLevel < 4){
             $entityId = $this->userCompanyId;
-            $cabangId = 0;
-        }else{
-            $cabangId = 0;
-            $entityId = 0;
-        }
+        //    $cabangId = 0;
+        //}else{
+        //    $cabangId = 0;
+        //    $entityId = 0;
+        //}
         $awal = new Awal();
         $offset = isset($_POST['page']) ? intval($_POST['page']) : 1;
         $limit  = isset($_POST['rows']) ? intval($_POST['rows']) : 15;
@@ -102,7 +104,7 @@ class AwalController extends AppController {
         require_once(MODEL . "master/items.php");
         $filter = isset($_POST['q']) ? strval($_POST['q']) : '';
         $items = new Items();
-        $itemlists = $items->GetJSonItems($this->userCompanyId,$this->userCabangId,$filter);
+        $itemlists = $items->GetJSonItems($this->userCompanyId,$this->userCabangId,$this->isGlobalItems,$filter);
         echo json_encode($itemlists);
     }
 
@@ -114,7 +116,7 @@ class AwalController extends AppController {
             $items = new Items();
             $items = $items->FindByKode($bkode);
             if ($items != null){
-                $ret = "OK|".$items->Bid.'|'.$items->Bnama.'|'.$items->Bsatbesar.'|'.$items->Bqtystock.'|'.$items->Bhargabeli.'|'.$items->Bhargajual;
+                $ret = "OK|".$items->Bid.'|'.$items->Bnama.'|'.$items->Bsatkecil.'|'.$items->Bqtystock.'|'.$items->Bhargabeli.'|'.$items->Bhargajual;
             }
         }
         print $ret;

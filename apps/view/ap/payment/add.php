@@ -1,5 +1,5 @@
 <!DOCTYPE HTML>
-<html xmlns="http://www.w3.org/1999/html">
+<html>
 <?php
 /** @var $payment Payment */ /** @var $banks Bank[] */
 ?>
@@ -164,8 +164,6 @@
                 <td><input type="text" class="right bold" style="width: 120px" id="PaymentAmount" name="PaymentAmount" value="<?php print($payment->PaymentAmount != null ? $payment->PaymentAmount : 0); ?>"/></td>
                 <td>Alokasi</td>
                 <td><input type="text" class="right bold" style="width: 120px" id="AllocateAmount" name="AllocateAmount" value="<?php print($payment->AllocateAmount != null ? $payment->AllocateAmount : 0); ?>" readonly/></td>
-                <td>Sisa</td>
-                <td><input type="text" class="right bold" style="width: 120px" id="BalanceAmount" name="BalanceAmount" value="<?php print($payment->BalanceAmount != null ? $payment->BalanceAmount : 0); ?>" readonly/></td>
             </tr>
             <tr>
                 <td>Keterangan</td>
@@ -177,7 +175,11 @@
                         <option value="2" <?php print($payment->PaymentStatus == 2 ? 'selected="selected"' : '');?>>2 - Batal</option>
                     </select>
                 </td>
-                <td colspan="2" align="right">
+                <td>Sisa</td>
+                <td><input type="text" class="right bold" style="width: 120px" id="BalanceAmount" name="BalanceAmount" value="<?php print($payment->BalanceAmount != null ? $payment->BalanceAmount : 0); ?>" readonly/></td>
+            </tr>
+            <tr>
+                <td colspan="8" align="right">
                     <a id="btKembali" href="<?php print($helper->site_url("ap.payment")); ?>" class="button">Kembali</a>
                     <button id="btSubmit" type="submit">Berikutnya &gt;</button>
                 </td>
@@ -187,7 +189,7 @@
 </div>
 
 <div id="ft" style="padding:5px; text-align: center; font-family: verdana; font-size: 9px" >
-    Copyright &copy; 2016 - 2018  CV. Erasystem Infotama
+    Copyright &copy; 2016 - 2020  <a href='http://rekasys.com'><b>Rekasys Inc</b></a>
 </div>
-</body>
+<!-- </body> -->
 </html>
