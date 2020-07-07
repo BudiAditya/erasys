@@ -606,10 +606,10 @@ class OrderController extends AppController {
         print $ret;
     }
 
-    public function getjson_solists($cabangId,$customerId){
+    public function getjson_solists($cabangId = 0,$customerId = 0){
         $filter = isset($_POST['q']) ? strval($_POST['q']) : '';
         $order = new Order();
-        $solists = $order->GetActiveSoList($cabangId,$customerId,$filter);
+        $solists = $order->GetActiveSoList($cabangId,$customerId);
         echo json_encode($solists);
     }
 }

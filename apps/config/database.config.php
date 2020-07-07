@@ -2,13 +2,10 @@
 // Connector Settings / Database Settings
 $settings = new ConnectorSettings();
 $settings->DriverType = "mysqli";
-//$settings->Username = "stk_user";
 $settings->Username = "root";
-//$settings->Password = "57kP4ssw0rd";
 $settings->Password = "";
 $settings->Host = "127.0.0.1";
-//$settings->Port = 3386;
-$settings->Port = 3308;
+$settings->Port = 3307;
 $settings->DatabaseName = "db_erasys_stk";
 // These settings will affect error reporting and will set to true for development debugging. Please change to false to production
 $settings->SuppressPhpError = true;

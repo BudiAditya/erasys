@@ -849,7 +849,7 @@ $bpdf = base_url('public/images/button/').'pdf.png';
         var kPrice = 0;
         var iHpp = 0;
         var url = "<?php print($helper->site_url("ar.invoice/getItemPrice/"));?>"+itemCode+"/"+custLevel;
-        alert(url);
+        //alert(url);
         $.get(url, function(data, status) {
             var dtz = data.split('|');
             iHpp   = Number(dtz[0]);
