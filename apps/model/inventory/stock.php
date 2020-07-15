@@ -146,11 +146,11 @@ class Stock extends EntityBase {
                 `trx_url`  varchar(50) NOT NULL ,
                 `relasi`  varchar(150) NOT NULL ,
                 `price`  int(11) NOT NULL DEFAULT 0,
-                `awal`  decimal(11,2) NOT NULL DEFAULT 0,
-                `masuk`  decimal(11,2) NOT NULL DEFAULT 0,
-                `keluar`  decimal(11,2) NOT NULL DEFAULT 0,
-                `koreksi`  decimal(11,2) NOT NULL DEFAULT 0,
-                `saldo`  decimal(11,2) NOT NULL DEFAULT 0,
+                `awal`  decimal(15,2) NOT NULL DEFAULT 0,
+                `masuk`  decimal(15,2) NOT NULL DEFAULT 0,
+                `keluar`  decimal(15,2) NOT NULL DEFAULT 0,
+                `koreksi`  decimal(15,2) NOT NULL DEFAULT 0,
+                `saldo`  decimal(15,2) NOT NULL DEFAULT 0,
                 `notes` varchar(250))';
         $this->connector->CommandText = $sqx;
         $rs = $this->connector->ExecuteNonQuery();
@@ -287,31 +287,31 @@ class Stock extends EntityBase {
         // create previous mutasi temp table
         $sqx = 'CREATE TEMPORARY TABLE `tmp_prev` (
                 `item_code`  varchar(50) NOT NULL ,
-                `awal`  decimal(11,2) NOT NULL DEFAULT 0,
-                `beli`  decimal(11,2) NOT NULL DEFAULT 0,
-                `xin`  decimal(11,2) NOT NULL DEFAULT 0,
-                `rjual`  decimal(11,2) NOT NULL DEFAULT 0,
-                `asyin`  decimal(11,2) NOT NULL DEFAULT 0,
-                `jual`  decimal(11,2) NOT NULL DEFAULT 0,
-                `xout`  decimal(11,2) NOT NULL DEFAULT 0,
-                `rbeli`  decimal(11,2) NOT NULL DEFAULT 0,
-                `asyout`  decimal(11,2) NOT NULL DEFAULT 0,
-                `koreksi`  decimal(11,2) NOT NULL DEFAULT 0)';
+                `awal`  decimal(15,2) NOT NULL DEFAULT 0,
+                `beli`  decimal(15,2) NOT NULL DEFAULT 0,
+                `xin`  decimal(15,2) NOT NULL DEFAULT 0,
+                `rjual`  decimal(15,2) NOT NULL DEFAULT 0,
+                `asyin`  decimal(15,2) NOT NULL DEFAULT 0,
+                `jual`  decimal(15,2) NOT NULL DEFAULT 0,
+                `xout`  decimal(15,2) NOT NULL DEFAULT 0,
+                `rbeli`  decimal(15,2) NOT NULL DEFAULT 0,
+                `asyout`  decimal(15,2) NOT NULL DEFAULT 0,
+                `koreksi`  decimal(15,2) NOT NULL DEFAULT 0)';
         $this->connector->CommandText = $sqx;
         $rs = $this->connector->ExecuteNonQuery();
         // create request mutasi temp table
         $sqx = 'CREATE TEMPORARY TABLE `tmp_mutasi` (
                 `item_code`  varchar(50) NOT NULL ,
-                `awal`  decimal(11,2) NOT NULL DEFAULT 0,
-                `beli`  decimal(11,2) NOT NULL DEFAULT 0,
-                `xin`  decimal(11,2) NOT NULL DEFAULT 0,
-                `rjual`  decimal(11,2) NOT NULL DEFAULT 0,
-                `asyin`  decimal(11,2) NOT NULL DEFAULT 0,
-                `jual`  decimal(11,2) NOT NULL DEFAULT 0,
-                `xout`  decimal(11,2) NOT NULL DEFAULT 0,
-                `rbeli`  decimal(11,2) NOT NULL DEFAULT 0,
-                `asyout`  decimal(11,2) NOT NULL DEFAULT 0,
-                `koreksi`  decimal(11,2) NOT NULL DEFAULT 0)';
+                `awal`  decimal(15,2) NOT NULL DEFAULT 0,
+                `beli`  decimal(15,2) NOT NULL DEFAULT 0,
+                `xin`  decimal(15,2) NOT NULL DEFAULT 0,
+                `rjual`  decimal(15,2) NOT NULL DEFAULT 0,
+                `asyin`  decimal(15,2) NOT NULL DEFAULT 0,
+                `jual`  decimal(15,2) NOT NULL DEFAULT 0,
+                `xout`  decimal(15,2) NOT NULL DEFAULT 0,
+                `rbeli`  decimal(15,2) NOT NULL DEFAULT 0,
+                `asyout`  decimal(15,2) NOT NULL DEFAULT 0,
+                `koreksi`  decimal(15,2) NOT NULL DEFAULT 0)';
         $this->connector->CommandText = $sqx;
         $rs = $this->connector->ExecuteNonQuery();
         // get saldo awal
@@ -514,51 +514,51 @@ class Stock extends EntityBase {
         // create previous mutasi temp table
         $sqx = 'CREATE TEMPORARY TABLE `tmp_prev` (
                 `item_code`  varchar(50) NOT NULL ,
-                `awal`  decimal(11,2) NOT NULL DEFAULT 0,
-                `hawal`  decimal(11,2) NOT NULL DEFAULT 0,
-                `beli`  decimal(11,2) NOT NULL DEFAULT 0,
-                `hbeli`  decimal(11,2) NOT NULL DEFAULT 0,
-                `xin`  decimal(11,2) NOT NULL DEFAULT 0,
-                `hxin`  decimal(11,2) NOT NULL DEFAULT 0,
-                `rjual`  decimal(11,2) NOT NULL DEFAULT 0,
-                `hrjual`  decimal(11,2) NOT NULL DEFAULT 0,
-                `asyin`  decimal(11,2) NOT NULL DEFAULT 0,
-                `hasyin`  decimal(11,2) NOT NULL DEFAULT 0,
-                `jual`  decimal(11,2) NOT NULL DEFAULT 0,
-                `hjual`  decimal(11,2) NOT NULL DEFAULT 0,
-                `xout`  decimal(11,2) NOT NULL DEFAULT 0,
-                `hxout`  decimal(11,2) NOT NULL DEFAULT 0,
-                `rbeli`  decimal(11,2) NOT NULL DEFAULT 0,
-                `hrbeli`  decimal(11,2) NOT NULL DEFAULT 0,
-                `asyout`  decimal(11,2) NOT NULL DEFAULT 0,
-                `hasyout`  decimal(11,2) NOT NULL DEFAULT 0,
-                `koreksi`  decimal(11,2) NOT NULL DEFAULT 0,
-                `hkoreksi`  decimal(11,2) NOT NULL DEFAULT 0)';
+                `awal`  decimal(15,2) NOT NULL DEFAULT 0,
+                `hawal`  decimal(15,2) NOT NULL DEFAULT 0,
+                `beli`  decimal(15,2) NOT NULL DEFAULT 0,
+                `hbeli`  decimal(15,2) NOT NULL DEFAULT 0,
+                `xin`  decimal(15,2) NOT NULL DEFAULT 0,
+                `hxin`  decimal(15,2) NOT NULL DEFAULT 0,
+                `rjual`  decimal(15,2) NOT NULL DEFAULT 0,
+                `hrjual`  decimal(15,2) NOT NULL DEFAULT 0,
+                `asyin`  decimal(15,2) NOT NULL DEFAULT 0,
+                `hasyin`  decimal(15,2) NOT NULL DEFAULT 0,
+                `jual`  decimal(15,2) NOT NULL DEFAULT 0,
+                `hjual`  decimal(15,2) NOT NULL DEFAULT 0,
+                `xout`  decimal(15,2) NOT NULL DEFAULT 0,
+                `hxout`  decimal(15,2) NOT NULL DEFAULT 0,
+                `rbeli`  decimal(15,2) NOT NULL DEFAULT 0,
+                `hrbeli`  decimal(15,2) NOT NULL DEFAULT 0,
+                `asyout`  decimal(15,2) NOT NULL DEFAULT 0,
+                `hasyout`  decimal(15,2) NOT NULL DEFAULT 0,
+                `koreksi`  decimal(15,2) NOT NULL DEFAULT 0,
+                `hkoreksi`  decimal(15,2) NOT NULL DEFAULT 0)';
         $this->connector->CommandText = $sqx;
         $rs = $this->connector->ExecuteNonQuery();
         // create request mutasi temp table
         $sqx = 'CREATE TEMPORARY TABLE `tmp_mutasi` (
                 `item_code`  varchar(50) NOT NULL ,
-                `awal`  decimal(11,2) NOT NULL DEFAULT 0,
-                `hawal`  decimal(11,2) NOT NULL DEFAULT 0,
-                `beli`  decimal(11,2) NOT NULL DEFAULT 0,
-                `hbeli`  decimal(11,2) NOT NULL DEFAULT 0,
-                `xin`  decimal(11,2) NOT NULL DEFAULT 0,
-                `hxin`  decimal(11,2) NOT NULL DEFAULT 0,
-                `rjual`  decimal(11,2) NOT NULL DEFAULT 0,
-                `hrjual`  decimal(11,2) NOT NULL DEFAULT 0,
-                `asyin`  decimal(11,2) NOT NULL DEFAULT 0,
-                `hasyin`  decimal(11,2) NOT NULL DEFAULT 0,
-                `jual`  decimal(11,2) NOT NULL DEFAULT 0,
-                `hjual`  decimal(11,2) NOT NULL DEFAULT 0,
-                `xout`  decimal(11,2) NOT NULL DEFAULT 0,
-                `hxout`  decimal(11,2) NOT NULL DEFAULT 0,
-                `rbeli`  decimal(11,2) NOT NULL DEFAULT 0,
-                `hrbeli`  decimal(11,2) NOT NULL DEFAULT 0,
-                `asyout`  decimal(11,2) NOT NULL DEFAULT 0,
-                `hasyout`  decimal(11,2) NOT NULL DEFAULT 0,
-                `koreksi`  decimal(11,2) NOT NULL DEFAULT 0,
-                `hkoreksi`  decimal(11,2) NOT NULL DEFAULT 0)';
+                `awal`  decimal(15,2) NOT NULL DEFAULT 0,
+                `hawal`  decimal(15,2) NOT NULL DEFAULT 0,
+                `beli`  decimal(15,2) NOT NULL DEFAULT 0,
+                `hbeli`  decimal(15,2) NOT NULL DEFAULT 0,
+                `xin`  decimal(15,2) NOT NULL DEFAULT 0,
+                `hxin`  decimal(15,2) NOT NULL DEFAULT 0,
+                `rjual`  decimal(15,2) NOT NULL DEFAULT 0,
+                `hrjual`  decimal(15,2) NOT NULL DEFAULT 0,
+                `asyin`  decimal(15,2) NOT NULL DEFAULT 0,
+                `hasyin`  decimal(15,2) NOT NULL DEFAULT 0,
+                `jual`  decimal(15,2) NOT NULL DEFAULT 0,
+                `hjual`  decimal(15,2) NOT NULL DEFAULT 0,
+                `xout`  decimal(15,2) NOT NULL DEFAULT 0,
+                `hxout`  decimal(15,2) NOT NULL DEFAULT 0,
+                `rbeli`  decimal(15,2) NOT NULL DEFAULT 0,
+                `hrbeli`  decimal(15,2) NOT NULL DEFAULT 0,
+                `asyout`  decimal(15,2) NOT NULL DEFAULT 0,
+                `hasyout`  decimal(15,2) NOT NULL DEFAULT 0,
+                `koreksi`  decimal(15,2) NOT NULL DEFAULT 0,
+                `hkoreksi`  decimal(15,2) NOT NULL DEFAULT 0)';
         $this->connector->CommandText = $sqx;
         $rs = $this->connector->ExecuteNonQuery();
         // get saldo awal

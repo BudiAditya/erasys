@@ -230,19 +230,39 @@
                     <th rowspan="3" nowrap>Nama Barang</th>
                     <th rowspan="3">Satuan</th>
                     <th rowspan="2" colspan="3">Stock Awal</th>
-                    <th colspan="9">Barang Masuk</th>
-                    <th colspan="9">Barang Keluar</th>
+                    <th colspan="15">Barang Masuk</th>
+                    <th colspan="15">Barang Keluar</th>
+                    <th rowspan="2" colspan="3">Adjustment</th>
                     <th rowspan="2" colspan="3">Stock Akhir</th>
                 </tr>
                 <tr valign="middle" class="bold">
                     <th colspan="3">Pembelian</th>
+                    <th colspan="3">Produksi</th>
+                    <th colspan="3">Transfer</th>
                     <th colspan="3">Retur</th>
                     <th colspan="3">Saldo</th>
                     <th colspan="3">Penjualan</th>
+                    <th colspan="3">Produksi</th>
+                    <th colspan="3">Transfer</th>
                     <th colspan="3">Retur</th>
                     <th colspan="3">Saldo</th>
                 </tr>
                 <tr valign="middle" class="bold">
+                    <th>Qty</th>
+                    <th>Harga</th>
+                    <th>Jumlah</th>
+                    <th>Qty</th>
+                    <th>Harga</th>
+                    <th>Jumlah</th>
+                    <th>Qty</th>
+                    <th>Harga</th>
+                    <th>Jumlah</th>
+                    <th>Qty</th>
+                    <th>Harga</th>
+                    <th>Jumlah</th>
+                    <th>Qty</th>
+                    <th>Harga</th>
+                    <th>Jumlah</th>
                     <th>Qty</th>
                     <th>Harga</th>
                     <th>Jumlah</th>
@@ -286,6 +306,8 @@
                     $tqt = 0;
                     $nsb = 0;
                     $nsj = 0;
+                    $qsa = 0;
+                    $nsa = 0;
                     while ($row = $mstock->FetchAssoc()) {
                         $tqt = ($row["sAwal"] + $row["sBeli"] + $row["sAsyin"] + $row["sXin"] + $row["sRjual"]) + ($row["sJual"] + $row["sAsyout"] + $row["sXout"] + $row["sRbeli"]) + $row["sKoreksi"];
                         if ($tqt <> 0) {
@@ -306,6 +328,20 @@
                                 printf('<td class="right">%s</td>', number_format($row["sBeli"], 2));
                                 printf('<td class="right">%s</td>', number_format(round($row["nsBeli"] / $row["sBeli"], 2), 2));
                                 printf('<td class="right">%s</td>', number_format($row["nsBeli"], 2));
+                            } else {
+                                print('<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>');
+                            }
+                            if ($row["sAsyin"] <> 0) {
+                                printf('<td class="right">%s</td>', number_format($row["sAsyin"], 2));
+                                printf('<td class="right">%s</td>', number_format(round($row["nsAsyin"] / $row["sAsyin"], 2), 2));
+                                printf('<td class="right">%s</td>', number_format($row["nsAsyin"], 2));
+                            } else {
+                                print('<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>');
+                            }
+                            if ($row["sXin"] <> 0) {
+                                printf('<td class="right">%s</td>', number_format($row["sXin"], 2));
+                                printf('<td class="right">%s</td>', number_format(round($row["nsXin"] / $row["sXin"], 2), 2));
+                                printf('<td class="right">%s</td>', number_format($row["nsXin"], 2));
                             } else {
                                 print('<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>');
                             }
@@ -330,6 +366,20 @@
                             } else {
                                 print('<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>');
                             }
+                            if ($row["sAsyout"] <> 0) {
+                                printf('<td class="right">%s</td>', number_format($row["sAsyout"], 2));
+                                printf('<td class="right">%s</td>', number_format(round($row["nsAsyout"] / $row["sAsyout"], 2), 2));
+                                printf('<td class="right">%s</td>', number_format($row["nsAsyout"], 2));
+                            } else {
+                                print('<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>');
+                            }
+                            if ($row["sXout"] <> 0) {
+                                printf('<td class="right">%s</td>', number_format($row["sXout"], 2));
+                                printf('<td class="right">%s</td>', number_format(round($row["nsXout"] / $row["sXout"], 2), 2));
+                                printf('<td class="right">%s</td>', number_format($row["nsXout"], 2));
+                            } else {
+                                print('<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>');
+                            }
                             if ($row["sRjual"] <> 0) {
                                 printf('<td class="right">%s</td>', number_format($row["sRjual"], 2));
                                 printf('<td class="right">%s</td>', number_format(round($row["nsRjual"] / $row["sRjual"], 2), 2));
@@ -344,6 +394,22 @@
                             } else {
                                 print('<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>');
                             }
+                            if ($row["sKoreksi"] <> 0) {
+                                printf('<td class="right">%s</td>', number_format($row["sKoreksi"], 2));
+                                printf('<td class="right">%s</td>', number_format(round($row["nsKoreksi"] / $row["sKoreksi"], 2), 2));
+                                printf('<td class="right">%s</td>', number_format($row["nsKoreksi"], 2));
+                            } else {
+                                print('<td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>');
+                            }
+                            $qsa = ($row["sAwal"]+$row["sBeli"]+$row["sAsyin"]+$row["sXin"]-$row["sRbeli"])-($row["sJual"]+$row["sXout"]+$row["sAsyout"]-$row["sRjual"])+$row["sKoreksi"];
+                            $nsa = ($row["nsAwal"]+$row["nsBeli"]+$row["nsAsyin"]+$row["nsXin"]-$row["nsRbeli"])-($row["nsJual"]+$row["nsXout"]+$row["nsAsyout"]-$row["nsRjual"])+$row["nsKoreksi"];
+                            printf('<td class="right">%s</td>', number_format($qsa, 2));
+                            if ($nsa <> 0 && $qsa <> 0) {
+                                printf('<td class="right">%s</td>', number_format(round($nsa / $qsa, 2), 2));
+                            }else{
+                                print('<td class="right">0.00</td>');
+                            }
+                            printf('<td class="right">%s</td>', number_format($nsa, 2));
                             print('</tr>');
                         }
                     }

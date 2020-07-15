@@ -9,7 +9,7 @@ $writer = new PHPExcel_Writer_Excel5($phpExcel);
 // Excel MetaData
 $phpExcel->getProperties()->setCreator("Erasystem Infotama Inc (c) Budi Aditya")->setTitle("Print Laporan")->setCompany("Erasystem Infotama Inc");
 $sheet = $phpExcel->getActiveSheet();
-$sheet->setTitle("Stock Barang Per Periode");
+$sheet->setTitle("Mutasi Stock Barang Per Periode");
 //helper for styling
 $center = array("alignment" => array("horizontal" => PHPExcel_Style_Alignment::HORIZONTAL_CENTER));
 $right = array("alignment" => array("horizontal" => PHPExcel_Style_Alignment::HORIZONTAL_RIGHT));
