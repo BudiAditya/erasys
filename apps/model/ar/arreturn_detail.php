@@ -11,10 +11,11 @@ class ArReturnDetail extends EntityBase {
     public $ExInvoiceId;
     public $ExInvoiceNo;
     public $ExInvDetailId;
-    public $QtyJual;
-	public $QtyRetur;
-	public $Price;
-    public $SubTotal;
+    public $QtyJual = 0;
+	public $QtyRetur = 0;
+	public $Price = 0;
+	public $Hpp = 0;
+    public $SubTotal = 0;
     public $SatBesar;
     public $SatKecil;
     public $SatRetur;
@@ -34,6 +35,7 @@ class ArReturnDetail extends EntityBase {
         $this->QtyJual = $row["qty_jual"];
 		$this->QtyRetur = $row["qty_retur"];
 		$this->Price = $row["price"];
+        $this->Hpp = $row["hpp"];
         $this->SubTotal = $row["sub_total"];
         $this->SatBesar = $row["bsatbesar"];
         $this->SatKecil = $row["bsatkecil"];
@@ -95,8 +97,8 @@ class ArReturnDetail extends EntityBase {
 
 	public function Insert() {
 		$this->connector->CommandText =
-"INSERT INTO t_ar_return_detail(satretur,rj_id, cabang_id, rj_no, item_id, item_code, item_descs, ex_invoice_id, ex_invoice_no, qty_jual, qty_retur, price, sub_total, ex_invdetail_id)
-VALUES(?satretur,?rj_id, ?cabang_id, ?rj_no, ?item_id, ?item_code, ?item_descs, ?ex_invoice_id, ?ex_invoice_no, ?qty_jual, ?qty_retur, ?price, ?sub_total, ?ex_invdetail_id)";
+"INSERT INTO t_ar_return_detail(hpp,satretur,rj_id, cabang_id, rj_no, item_id, item_code, item_descs, ex_invoice_id, ex_invoice_no, qty_jual, qty_retur, price, sub_total, ex_invdetail_id)
+VALUES(?hpp,?satretur,?rj_id, ?cabang_id, ?rj_no, ?item_id, ?item_code, ?item_descs, ?ex_invoice_id, ?ex_invoice_no, ?qty_jual, ?qty_retur, ?price, ?sub_total, ?ex_invdetail_id)";
 		$this->connector->AddParameter("?rj_id", $this->RjId);
         $this->connector->AddParameter("?cabang_id", $this->CabangId);
         $this->connector->AddParameter("?rj_no", $this->RjNo);
@@ -108,6 +110,7 @@ VALUES(?satretur,?rj_id, ?cabang_id, ?rj_no, ?item_id, ?item_code, ?item_descs, 
         $this->connector->AddParameter("?qty_jual", $this->QtyJual);
 		$this->connector->AddParameter("?qty_retur", $this->QtyRetur);
 		$this->connector->AddParameter("?price", $this->Price);
+        $this->connector->AddParameter("?hpp", $this->Hpp);
         $this->connector->AddParameter("?sub_total", $this->SubTotal);
         $this->connector->AddParameter("?satretur", $this->SatRetur);
         $this->connector->AddParameter("?ex_invdetail_id", $this->ExInvDetailId);

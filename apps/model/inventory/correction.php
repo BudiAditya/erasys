@@ -6,11 +6,12 @@ class Correction extends EntityBase {
 	public $ItemId;
     public $ItemCode;
     public $CorrDate;   
-    public $CorrQty;
+    public $CorrQty = 0;
     public $CorrReason;
     public $CorrStatus;
-    public $SysQty;
-    public $WhsQty;
+    public $SysQty = 0;
+    public $WhsQty = 0;
+    public $Hpp = 0;
     public $CreatebyId;
     public $UpdatebyId;
 
@@ -32,6 +33,7 @@ class Correction extends EntityBase {
         $this->SysQty = $row["sys_qty"];
         $this->WhsQty = $row["whs_qty"];
         $this->CorrQty = $row["corr_qty"];
+        $this->Hpp = $row["hpp"];
         $this->CorrStatus = $row["corr_status"];
         $this->CreatebyId = $row["createby_id"];
         $this->UpdatebyId = $row["updateby_id"];
@@ -99,8 +101,8 @@ class Correction extends EntityBase {
 	}
 
 	public function Insert() {
-        $sql = 'INSERT INTO t_ic_stockcorrection (cabang_id,corr_no,corr_date,item_id,item_code,corr_reason,sys_qty,whs_qty,corr_qty,corr_status,createby_id,create_time)';
-        $sql.= ' VALUES(?cabang_id,?corr_no,?corr_date,?item_id,?item_code,?corr_reason,?sys_qty,?whs_qty,?corr_qty,?corr_status,?createby_id,now())';
+        $sql = 'INSERT INTO t_ic_stockcorrection (cabang_id,corr_no,corr_date,item_id,item_code,corr_reason,sys_qty,whs_qty,corr_qty,hpp,corr_status,createby_id,create_time)';
+        $sql.= ' VALUES(?cabang_id,?corr_no,?corr_date,?item_id,?item_code,?corr_reason,?sys_qty,?whs_qty,?corr_qty,?hpp,?corr_status,?createby_id,now())';
 		$this->connector->CommandText = $sql;
 		$this->connector->AddParameter("?cabang_id", $this->CabangId);
         $this->connector->AddParameter("?corr_no", $this->CorrNo,"char");
@@ -111,6 +113,7 @@ class Correction extends EntityBase {
         $this->connector->AddParameter("?sys_qty", $this->SysQty);
         $this->connector->AddParameter("?whs_qty", $this->WhsQty);
         $this->connector->AddParameter("?corr_qty", $this->CorrQty);
+        $this->connector->AddParameter("?hpp", $this->Hpp);
         $this->connector->AddParameter("?corr_status", $this->CorrStatus);
         $this->connector->AddParameter("?createby_id", $this->CreatebyId);
         $rs = $this->connector->ExecuteNonQuery();
@@ -175,6 +178,7 @@ class Correction extends EntityBase {
                 $rows[$i]['sys_qty'] = $row['sys_qty'];
                 $rows[$i]['whs_qty'] = $row['whs_qty'];
                 $rows[$i]['corr_qty'] = $row['corr_qty'];
+                $rows[$i]['hpp'] = $row['hpp'];
                 $rows[$i]['bnama'] = $row['bnama'];
                 $rows[$i]['bsatbesar'] = $row['bsatbesar'];
                 $rows[$i]['bsatkecil'] = $row['bsatkecil'];

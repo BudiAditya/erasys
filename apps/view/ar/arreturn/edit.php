@@ -96,6 +96,8 @@
                     console.log(sat);
                     var prc = row.price;
                     console.log(prc);
+                    var hpp = row.hpp;
+                    console.log(hpp);
                     $('#aExInvDetailId').val(idi);
                     $('#aItemId').val(iti);
                     $('#aItemCode').val(itc);
@@ -105,7 +107,7 @@
                     $('#aQtyJual').val(qtj);
                     $('#aQtyRetur').val('0');
                     $('#aSubTotal').val(0);
-
+                    $('#aHpp').val(hpp);
                 }
             });
 
@@ -120,6 +122,7 @@
                 $('#aQtyReturn').val('0');
                 $('#aExInvoiceNo').val(0);
                 $('#aSubTotal').val(0);
+                $('#aHpp').val(0);
                 newItem();
             });                        
 
@@ -392,6 +395,7 @@ $baddnew = base_url('public/images/button/').'create_new.png';
                     <input id="aItemSearch" name="aItemSearch" style="width: 20px"/>
                     <input type="hidden" id="aItemId" name="aItemId" value="0"/>
                     <input type="hidden" id="aId" name="aId" value="0"/>
+                    <input type="hidden" id="aHpp" name="aHpp" value="0"/>
                 </td>
                 <td>
                     <input type="text" id="aItemDescs" name="aItemDescs" size="38" value="" readonly/>

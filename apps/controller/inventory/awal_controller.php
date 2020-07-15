@@ -65,6 +65,7 @@ class AwalController extends AppController {
             $awal->CabangId = $this->userCabangId;
             $awal->OpDate = $this->GetPostValue("op_date");
             $awal->OpQty = $this->GetPostValue("op_qty");
+            $awal->OpHpp = $this->GetPostValue("op_hpp");
             if ($this->ValidateData($awal)) {
                 $awal->CreatebyId = AclManager::GetInstance()->GetCurrentUser()->Id;
                 $rs = $awal->Insert();

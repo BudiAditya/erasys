@@ -109,7 +109,7 @@ class StockController extends AppController {
                 redirect_url("inventory.stock");
             }
             $mstock = new Stock();
-            $mstock = $mstock->GetMutasiStock($cabangId,$startDate,$endDate);
+            $mstock = $mstock->GetMutasiStockNew($cabangId,$startDate,$endDate);
         }else{
             $cabangId = $this->userCabangId;
             $startDate = mktime(0, 0, 0, $month, 1, $year);
@@ -157,7 +157,7 @@ class StockController extends AppController {
             $stock = new Stock();
             $stock = $stock->FindByKode($cbi,$bkode);
             if ($stock != null){
-                $ret = "OK|".$stock->ItemId.'|'.$stock->ItemName.'|'.$stock->SatBesar.'|'.$stock->QtyStock;
+                $ret = "OK|".$stock->ItemId.'|'.$stock->ItemName.'|'.$stock->SatBesar.'|'.$stock->QtyStock.'|'.$stock->Hpp;
             }
         }
         print $ret;

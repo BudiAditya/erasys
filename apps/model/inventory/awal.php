@@ -5,7 +5,8 @@ class Awal extends EntityBase {
 	public $ItemId;
     public $ItemCode;
     public $OpDate;   
-    public $OpQty;
+    public $OpQty = 0;
+    public $OpHpp = 0;
     public $CreatebyId;
     public $UpdatebyId;
 
@@ -23,6 +24,7 @@ class Awal extends EntityBase {
         $this->ItemCode = $row["item_code"];
         $this->OpDate = strtotime($row["op_date"]);        
         $this->OpQty = $row["op_qty"];
+        $this->OpHpp = $row["op_hpp"];
         $this->CreatebyId = $row["createby_id"];
         $this->UpdatebyId = $row["updateby_id"];
 	}
@@ -89,14 +91,15 @@ class Awal extends EntityBase {
 	}
 
 	public function Insert() {
-        $sql = 'INSERT INTO t_ic_saldoawal (cabang_id,item_id,item_code,op_date,op_qty,createby_id,create_time)';
-        $sql.= ' VALUES(?cabang_id,?item_id,?item_code,?op_date,?op_qty,?createby_id,now())';
+        $sql = 'INSERT INTO t_ic_saldoawal (cabang_id,item_id,item_code,op_date,op_qty,op_hpp,createby_id,create_time)';
+        $sql.= ' VALUES(?cabang_id,?item_id,?item_code,?op_date,?op_qty,?op_hpp,?createby_id,now())';
 		$this->connector->CommandText = $sql;
 		$this->connector->AddParameter("?cabang_id", $this->CabangId);
         $this->connector->AddParameter("?item_id", $this->ItemId);
         $this->connector->AddParameter("?item_code", $this->ItemCode,"char");
         $this->connector->AddParameter("?op_date", $this->OpDate);
         $this->connector->AddParameter("?op_qty", $this->OpQty);
+        $this->connector->AddParameter("?op_hpp", $this->OpHpp);
         $this->connector->AddParameter("?createby_id", $this->CreatebyId);
         $rs = $this->connector->ExecuteNonQuery();
         $ret = 0;
@@ -149,6 +152,7 @@ class Awal extends EntityBase {
                 $rows[$i]['item_code'] = $row['item_code'];
                 $rows[$i]['op_date'] = $row['op_date'];
                 $rows[$i]['op_qty'] = $row['op_qty'];
+                $rows[$i]['op_hpp'] = $row['op_hpp'];
                 $rows[$i]['bnama'] = $row['bnama'];
                 $rows[$i]['bsatbesar'] = $row['bsatbesar'];
                 $rows[$i]['bsatkecil'] = $row['bsatkecil'];

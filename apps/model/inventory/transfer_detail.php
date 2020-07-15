@@ -8,11 +8,12 @@ class TransferDetail extends EntityBase {
 	public $ItemDescs;
     public $ItemCode;
     public $ItemId;
-    public $Lqty;
-    public $Sqty;
-	public $Qty;    
+    public $Lqty = 0;
+    public $Sqty = 0;
+	public $Qty = 0;
     public $SatBesar;
     public $SatKecil;
+    public $Hpp = 0;
 
 	// Helper Variable;
 	public $MarkedForDeletion = false;
@@ -29,6 +30,7 @@ class TransferDetail extends EntityBase {
         $this->Lqty = $row["l_qty"];
         $this->Sqty = $row["s_qty"];
 		$this->Qty = $row["qty"];
+        $this->Hpp = $row["hpp"];
         $this->SatBesar = $row["bsatbesar"];
         $this->SatKecil = $row["bsatkecil"];
 	}
@@ -87,7 +89,7 @@ class TransferDetail extends EntityBase {
 
 	public function Insert() {
 		$this->connector->CommandText =
-"INSERT INTO t_ic_transfer_detail(npb_id, cabang_id, npb_no, item_id, item_code, item_descs, l_qty, s_qty, qty) VALUES(?npb_id, ?cabang_id, ?npb_no, ?item_id, ?item_code, ?item_descs, ?l_qty, ?s_qty, ?qty)";
+"INSERT INTO t_ic_transfer_detail(npb_id, cabang_id, npb_no, item_id, item_code, item_descs, l_qty, s_qty, qty,hpp) VALUES(?npb_id, ?cabang_id, ?npb_no, ?item_id, ?item_code, ?item_descs, ?l_qty, ?s_qty, ?qty, ?hpp)";
 		$this->connector->AddParameter("?npb_id", $this->NpbId);
         $this->connector->AddParameter("?cabang_id", $this->CabangId);
         $this->connector->AddParameter("?npb_no", $this->NpbNo);
@@ -97,6 +99,7 @@ class TransferDetail extends EntityBase {
         $this->connector->AddParameter("?l_qty", $this->Lqty);
         $this->connector->AddParameter("?s_qty", $this->Sqty);
 		$this->connector->AddParameter("?qty", $this->Qty);
+        $this->connector->AddParameter("?hpp", $this->Hpp);
 		$rs = $this->connector->ExecuteNonQuery();
         $rsx = null;
         $did = 0;
@@ -127,6 +130,7 @@ class TransferDetail extends EntityBase {
 	, item_id = ?item_id
 	, l_qty = ?l_qty
 	, s_qty = ?s_qty
+	, hpp = ?hpp
 WHERE id = ?id";
         $this->connector->AddParameter("?npb_id", $this->NpbId);
         $this->connector->AddParameter("?cabang_id", $this->CabangId);
@@ -137,6 +141,7 @@ WHERE id = ?id";
         $this->connector->AddParameter("?l_qty", $this->Lqty);
         $this->connector->AddParameter("?s_qty", $this->Sqty);
         $this->connector->AddParameter("?qty", $this->Qty);
+        $this->connector->AddParameter("?hpp", $this->Hpp);
         $this->connector->AddParameter("?id", $id);
         $rs = $this->connector->ExecuteNonQuery();
         if ($rs == 1) {

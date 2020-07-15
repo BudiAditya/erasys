@@ -254,6 +254,7 @@ class TransferController extends AppController {
         if (count($this->postData) > 0) {
             $transferdetail->ItemId = $this->GetPostValue("aItemId");
             $transferdetail->Qty = $this->GetPostValue("aQty");
+            $transferdetail->Hpp = $this->GetPostValue("aHpp");
             $items = new Items($transferdetail->ItemId);
             if ($items != null){
                 $transferdetail->ItemCode = $items->Bkode;
@@ -288,6 +289,7 @@ class TransferController extends AppController {
             $transferdetail->Id = $this->GetPostValue("aId");
             $transferdetail->ItemId = $this->GetPostValue("aItemId");
             $transferdetail->Qty = $this->GetPostValue("aQty");
+            $transferdetail->Hpp = $this->GetPostValue("aHpp");
             $items = new Items($transferdetail->ItemId);
             if ($items != null){
                 $transferdetail->ItemCode = $items->Bkode;

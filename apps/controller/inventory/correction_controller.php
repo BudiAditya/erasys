@@ -69,6 +69,7 @@ class CorrectionController extends AppController {
             $koreksi->CabangId = $this->GetPostValue("aCabangId");
             $koreksi->CorrDate = $this->GetPostValue("aCorrDate");
             $koreksi->CorrQty = $this->GetPostValue("aCorrQty");
+            $koreksi->Hpp = $this->GetPostValue("aHpp");
             $koreksi->SysQty = 0;
             $koreksi->WhsQty = 0;
             $koreksi->CorrStatus = 1;

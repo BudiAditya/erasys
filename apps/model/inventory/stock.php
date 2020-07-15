@@ -13,6 +13,7 @@ class Stock extends EntityBase {
     public $IsiSat;
     public $CreatebyId;
     public $UpdatebyId;
+    public $Hpp = 0;
 
     public function __construct($id = null) {
         parent::__construct();
@@ -33,6 +34,7 @@ class Stock extends EntityBase {
         $this->SatBesar = $row["bsatbesar"];
         $this->SatKecil = $row["bsatkecil"];
         $this->IsiSat = $row["bisisatkecil"];
+        $this->Hpp = $row["hrg_beli"];
     }
 
     public function LoadAll($orderBy = "a.item_code") {
@@ -261,8 +263,8 @@ class Stock extends EntityBase {
     }
 
     public function GetJSonItemStock($cabangId = 0,$filter,$sort = 'b.bnama',$order = 'ASC') {
-        $sql = "SELECT a.id,a.cabang_id,a.item_id,a.item_code,a.qty_stock,b.bnama AS item_name,b.bsatbesar AS sat_besar,b.bsatkecil AS sat_kecil,b.bisisatkecil AS isisat_kecil";
-        $sql.= " FROM t_ic_stockcenter AS a INNER JOIN m_barang AS b ON a.item_code = b.bkode";
+        $sql = "SELECT a.id,a.cabang_id,a.item_id,a.item_code,a.qty_stock,b.bnama AS item_name,b.bsatbesar AS sat_besar,b.bsatkecil AS sat_kecil,b.bisisatkecil AS isisat_kecil,coalesce(c.hrg_beli,0) as hpp";
+        $sql.= " FROM t_ic_stockcenter AS a JOIN m_barang AS b ON a.item_code = b.bkode Left Join m_set_price c ON a.cabang_id = c.cabang_id And a.item_code = c.item_code";
         $sql.= " Where a.cabang_id = $cabangId";
         if ($filter != null){
             $sql.= " And (a.item_code Like '%$filter%' Or a.bnama Like '%$filter%')";
@@ -498,6 +500,253 @@ class Stock extends EntityBase {
         //$sqx = "Select a.item_code, b.bnama as item_name, b.bsatbesar as satuan, sum(a.awal) as sAwal, sum(a.beli) as sBeli, sum(a.asyin) as sAsyin, sum(a.xin) as sXin, sum(a.rjual) as sRjual, sum(a.asyout) as sAsyout, sum(a.jual) as sJual, sum(a.xout) as sXout, sum(a.rbeli) as sRbeli, sum(a.koreksi) as sKoreksi ";
         //$sqx.= " From tmp_mutasi as a Join m_barang as b On a.item_code = b.bkode Group By a.item_code Order By a.item_code,b.bnama,b.bsatbesar";
         $sqx = "Select a.item_code, c.bnama as item_name, c.bsatkecil as satuan, coalesce(b.hrg_beli,0) as hrg_beli, coalesce(b.hrg_jual1,0) as hrg_jual, sum(a.awal) as sAwal, sum(a.beli) as sBeli, sum(a.asyin) as sAsyin, sum(a.xin) as sXin, sum(a.rjual) as sRjual, sum(a.asyout) as sAsyout, sum(a.jual) as sJual, sum(a.xout) as sXout, sum(a.rbeli) as sRbeli, sum(a.koreksi) as sKoreksi ";
+        $sqx.= " From tmp_mutasi as a Left Join vw_m_itemprice as b On a.item_code = b.item_code And b.cabang_id = ?cabangId";
+        $sqx.= " Left Join m_barang c ON a.item_code = c.bkode";
+        $sqx.= " Group By a.item_code, c.bnama, c.bsatkecil, b.hrg_beli, b.hrg_jual1 Order By a.item_code, c.bnama, c.bsatkecil";
+        $this->connector->CommandText = $sqx;
+        $this->connector->AddParameter("?cabangId", $cabangId);
+        $rs = $this->connector->ExecuteQuery();
+        return $rs;
+    }
+
+    public function GetMutasiStockNew($cabangId = null, $startDate = null, $endDate = null){
+        $sqx = null;
+        // create previous mutasi temp table
+        $sqx = 'CREATE TEMPORARY TABLE `tmp_prev` (
+                `item_code`  varchar(50) NOT NULL ,
+                `awal`  decimal(11,2) NOT NULL DEFAULT 0,
+                `hawal`  decimal(11,2) NOT NULL DEFAULT 0,
+                `beli`  decimal(11,2) NOT NULL DEFAULT 0,
+                `hbeli`  decimal(11,2) NOT NULL DEFAULT 0,
+                `xin`  decimal(11,2) NOT NULL DEFAULT 0,
+                `hxin`  decimal(11,2) NOT NULL DEFAULT 0,
+                `rjual`  decimal(11,2) NOT NULL DEFAULT 0,
+                `hrjual`  decimal(11,2) NOT NULL DEFAULT 0,
+                `asyin`  decimal(11,2) NOT NULL DEFAULT 0,
+                `hasyin`  decimal(11,2) NOT NULL DEFAULT 0,
+                `jual`  decimal(11,2) NOT NULL DEFAULT 0,
+                `hjual`  decimal(11,2) NOT NULL DEFAULT 0,
+                `xout`  decimal(11,2) NOT NULL DEFAULT 0,
+                `hxout`  decimal(11,2) NOT NULL DEFAULT 0,
+                `rbeli`  decimal(11,2) NOT NULL DEFAULT 0,
+                `hrbeli`  decimal(11,2) NOT NULL DEFAULT 0,
+                `asyout`  decimal(11,2) NOT NULL DEFAULT 0,
+                `hasyout`  decimal(11,2) NOT NULL DEFAULT 0,
+                `koreksi`  decimal(11,2) NOT NULL DEFAULT 0,
+                `hkoreksi`  decimal(11,2) NOT NULL DEFAULT 0)';
+        $this->connector->CommandText = $sqx;
+        $rs = $this->connector->ExecuteNonQuery();
+        // create request mutasi temp table
+        $sqx = 'CREATE TEMPORARY TABLE `tmp_mutasi` (
+                `item_code`  varchar(50) NOT NULL ,
+                `awal`  decimal(11,2) NOT NULL DEFAULT 0,
+                `hawal`  decimal(11,2) NOT NULL DEFAULT 0,
+                `beli`  decimal(11,2) NOT NULL DEFAULT 0,
+                `hbeli`  decimal(11,2) NOT NULL DEFAULT 0,
+                `xin`  decimal(11,2) NOT NULL DEFAULT 0,
+                `hxin`  decimal(11,2) NOT NULL DEFAULT 0,
+                `rjual`  decimal(11,2) NOT NULL DEFAULT 0,
+                `hrjual`  decimal(11,2) NOT NULL DEFAULT 0,
+                `asyin`  decimal(11,2) NOT NULL DEFAULT 0,
+                `hasyin`  decimal(11,2) NOT NULL DEFAULT 0,
+                `jual`  decimal(11,2) NOT NULL DEFAULT 0,
+                `hjual`  decimal(11,2) NOT NULL DEFAULT 0,
+                `xout`  decimal(11,2) NOT NULL DEFAULT 0,
+                `hxout`  decimal(11,2) NOT NULL DEFAULT 0,
+                `rbeli`  decimal(11,2) NOT NULL DEFAULT 0,
+                `hrbeli`  decimal(11,2) NOT NULL DEFAULT 0,
+                `asyout`  decimal(11,2) NOT NULL DEFAULT 0,
+                `hasyout`  decimal(11,2) NOT NULL DEFAULT 0,
+                `koreksi`  decimal(11,2) NOT NULL DEFAULT 0,
+                `hkoreksi`  decimal(11,2) NOT NULL DEFAULT 0)';
+        $this->connector->CommandText = $sqx;
+        $rs = $this->connector->ExecuteNonQuery();
+        // get saldo awal
+        $sqx = "Insert Into `tmp_prev` (item_code,awal,hawal) Select a.item_code,sum(a.op_qty),sum(a.op_qty * a.op_hpp) From t_ic_saldoawal as a";
+        $sqx.= " Where a.op_date < ?startDate and a.cabang_id = ?cabangId Group By a.item_code";
+        $this->connector->CommandText = $sqx;
+        $this->connector->AddParameter("?startDate", date('Y-m-d', $startDate));
+        $this->connector->AddParameter("?cabangId", $cabangId);
+        $rs = $this->connector->ExecuteNonQuery();
+
+        // get pembelian lalu
+        $sqx = "Insert Into `tmp_prev` (item_code,beli,hbeli) Select a.item_code,sum(a.purchase_qty),sum(a.purchase_qty * a.price) From t_ap_purchase_detail as a";
+        $sqx.= " Join t_ap_purchase_master as b On a.cabang_id = b.cabang_id And a.grn_no = b.grn_no";
+        $sqx.= " Where b.grn_status <> 3 And b.grn_date < ?startDate and b.gudang_id = ?cabangId Group By a.item_code";
+        $this->connector->CommandText = $sqx;
+        $this->connector->AddParameter("?startDate", date('Y-m-d', $startDate));
+        $this->connector->AddParameter("?cabangId", $cabangId);
+        $rs = $this->connector->ExecuteNonQuery();
+
+        // get transfer masuk lalu
+        $sqx = "Insert Into `tmp_prev` (item_code,xin,hxin) Select a.item_code,sum(a.qty),sum(a.qty * a.hpp) From t_ic_transfer_detail as a";
+        $sqx.= " Join t_ic_transfer_master as b On a.cabang_id = b.cabang_id And a.npb_no = b.npb_no";
+        $sqx.= " Where b.npb_status <> 3 and b.npb_date < ?startDate and b.to_cabang_id = ?cabangId Group By a.item_code";
+        $this->connector->CommandText = $sqx;
+        $this->connector->AddParameter("?startDate", date('Y-m-d', $startDate));
+        $this->connector->AddParameter("?cabangId", $cabangId);
+        $rs = $this->connector->ExecuteNonQuery();
+
+        // get return ex penjualan lalu
+        $sqx = "Insert Into `tmp_prev` (item_code,rjual,hrjual) Select a.item_code,sum(a.qty_retur),sum(a.qty_retur * a.hpp) From t_ar_return_detail as a";
+        $sqx.= " Join t_ar_return_master as b On a.cabang_id = b.cabang_id And a.rj_no = b.rj_no";
+        $sqx.= " Where b.rj_status <> 3 and b.rj_date < ?startDate and a.cabang_id = ?cabangId And b.is_deleted = 0 Group By a.item_code";
+        $this->connector->CommandText = $sqx;
+        $this->connector->AddParameter("?startDate", date('Y-m-d', $startDate));
+        $this->connector->AddParameter("?cabangId", $cabangId);
+        $rs = $this->connector->ExecuteNonQuery();
+
+        // get stock in ex production/assemby lalu
+        $sqx = "Insert Into `tmp_prev` (item_code,asyin,hasyin) Select a.item_code,sum(a.qty),sum(a.qty * a.price) From t_ic_assembly_master as a";
+        $sqx.= " Where (a.assembly_date < ?startDate) and a.cabang_id = ?cabangId And a.is_deleted = 0 and a.assembly_status <>3 Group By a.item_code";
+        $this->connector->CommandText = $sqx;
+        $this->connector->AddParameter("?startDate", date('Y-m-d', $startDate));
+        $this->connector->AddParameter("?cabangId", $cabangId);
+        $rs = $this->connector->ExecuteNonQuery();
+
+        // get stock out ex production/assemby lalu
+        $sqx = "Insert Into `tmp_prev` (item_code,asyout,hasyout) Select a.item_code,sum(a.qty),sum(a.qty * a.price) From t_ic_assembly_detail as a";
+        $sqx.= " Join t_ic_assembly_master as b On a.cabang_id = b.cabang_id And a.assembly_no = b.assembly_no";
+        $sqx.= " Where (b.assembly_date < ?startDate) and a.cabang_id = ?cabangId And b.is_deleted = 0 and b.assembly_status <> 3 Group By a.item_code";
+        $this->connector->CommandText = $sqx;
+        $this->connector->AddParameter("?startDate", date('Y-m-d', $startDate));
+        $this->connector->AddParameter("?cabangId", $cabangId);
+        $rs = $this->connector->ExecuteNonQuery();
+
+        // get penjualan lalu
+        $sqx = "Insert Into `tmp_prev` (item_code,jual,hjual) Select a.item_code,sum(a.qty),sum(a.qty * a.item_hpp) From t_ar_invoice_detail as a";
+        $sqx.= " Join t_ar_invoice_master as b On a.cabang_id = b.cabang_id And a.invoice_no = b.invoice_no";
+        $sqx.= " Where b.invoice_date < ?startDate and b.gudang_id = ?cabangId And b.is_deleted = 0 and b.invoice_status <>3 Group By a.item_code";
+        $this->connector->CommandText = $sqx;
+        $this->connector->AddParameter("?startDate", date('Y-m-d', $startDate));
+        $this->connector->AddParameter("?cabangId", $cabangId);
+        $rs = $this->connector->ExecuteNonQuery();
+
+        // get transfer keluar lalu
+        $sqx = "Insert Into `tmp_prev` (item_code,xout,hxout) Select a.item_code,sum(a.qty),sum(a.qty * a.hpp) From t_ic_transfer_detail as a";
+        $sqx.= " Join t_ic_transfer_master as b On a.cabang_id = b.cabang_id And a.npb_no = b.npb_no";
+        $sqx.= " Where b.npb_date < ?startDate and b.cabang_id = ?cabangId and b.npb_status <> 3 Group By a.item_code";
+        $this->connector->CommandText = $sqx;
+        $this->connector->AddParameter("?startDate", date('Y-m-d', $startDate));
+        $this->connector->AddParameter("?cabangId", $cabangId);
+        $rs = $this->connector->ExecuteNonQuery();
+
+        // get return ex pembelian lalu
+        $sqx = "Insert Into `tmp_prev` (item_code,rbeli,hrbeli) Select a.item_code,sum(a.qty_retur),sum(a.qty_retur * a.price) From t_ap_return_detail as a";
+        $sqx.= " Join t_ap_return_master as b On a.cabang_id = b.cabang_id And a.rb_no = b.rb_no";
+        $sqx.= " Where b.rb_date < ?startDate and a.cabang_id = ?cabangId And b.is_deleted = 0 and b.rb_status <> 3 Group By a.item_code";
+        $this->connector->CommandText = $sqx;
+        $this->connector->AddParameter("?startDate", date('Y-m-d', $startDate));
+        $this->connector->AddParameter("?cabangId", $cabangId);
+        $rs = $this->connector->ExecuteNonQuery();
+
+        // get koreksi lalu
+        $sqx = "Insert Into `tmp_prev` (item_code,koreksi,hkoreksi) Select a.item_code,sum(a.corr_qty),sum(a.corr_qty * a.hpp) From t_ic_stockcorrection as a";
+        $sqx.= " Where a.corr_date < ?startDate and a.cabang_id = ?cabangId and a.corr_status = 1 Group By a.item_code";
+        $this->connector->CommandText = $sqx;
+        $this->connector->AddParameter("?startDate", date('Y-m-d', $startDate));
+        $this->connector->AddParameter("?cabangId", $cabangId);
+        $rs = $this->connector->ExecuteNonQuery();
+
+        // get saldo awal dari transaksi sebelumnya
+        $sqx = "Insert Into `tmp_mutasi` (item_code,awal,hawal) Select a.item_code,sum((a.awal+a.beli+a.xin+a.rjual+a.asyin)-(a.jual+a.xout+a.rbeli+a.asyout)+a.koreksi),sum((a.hawal+a.hbeli+a.hxin+a.hrjual+a.hasyin)-(a.hjual+a.hxout+a.hrbeli+a.hasyout)+a.hkoreksi) From tmp_prev as a Group By a.item_code";
+        $this->connector->CommandText = $sqx;
+        $rs = $this->connector->ExecuteNonQuery();
+
+        // get pembelian
+        $sqx = "Insert Into `tmp_mutasi` (item_code,beli,hbeli) Select a.item_code,sum(a.purchase_qty),sum(a.purchase_qty * a.price) From t_ap_purchase_detail as a";
+        $sqx.= " Join t_ap_purchase_master as b On a.cabang_id = b.cabang_id And a.grn_no = b.grn_no";
+        $sqx.= " Where b.grn_date BETWEEN ?startDate and ?endDate and b.gudang_id = ?cabangId and b.grn_status <> 3 Group By a.item_code";
+        $this->connector->CommandText = $sqx;
+        $this->connector->AddParameter("?startDate", date('Y-m-d', $startDate));
+        $this->connector->AddParameter("?endDate", date('Y-m-d', $endDate));
+        $this->connector->AddParameter("?cabangId", $cabangId);
+        $rs = $this->connector->ExecuteNonQuery();
+
+        // get transfer masuk
+        $sqx = "Insert Into `tmp_mutasi` (item_code,xin,hxin) Select a.item_code,sum(a.qty),sum(a.qty * a.hpp) From t_ic_transfer_detail as a";
+        $sqx.= " Join t_ic_transfer_master as b On a.cabang_id = b.cabang_id And a.npb_no = b.npb_no";
+        $sqx.= " Where b.npb_date BETWEEN ?startDate and ?endDate and b.to_cabang_id = ?cabangId and b.npb_status <> 3 Group By a.item_code";
+        $this->connector->CommandText = $sqx;
+        $this->connector->AddParameter("?startDate", date('Y-m-d', $startDate));
+        $this->connector->AddParameter("?endDate", date('Y-m-d', $endDate));
+        $this->connector->AddParameter("?cabangId", $cabangId);
+        $rs = $this->connector->ExecuteNonQuery();
+
+        // get return ex penjualan
+        $sqx = "Insert Into `tmp_mutasi` (item_code,rjual,hrjual) Select a.item_code,sum(a.qty_retur),sum(a.qty_retur * a.hpp) From t_ar_return_detail as a";
+        $sqx.= " Join t_ar_return_master as b On a.cabang_id = b.cabang_id And a.rj_no = b.rj_no";
+        $sqx.= " Where b.rj_date BETWEEN ?startDate and ?endDate and a.cabang_id = ?cabangId And b.is_deleted = 0 And b.rj_status <> 3 Group By a.item_code";
+        $this->connector->CommandText = $sqx;
+        $this->connector->AddParameter("?startDate", date('Y-m-d', $startDate));
+        $this->connector->AddParameter("?endDate", date('Y-m-d', $endDate));
+        $this->connector->AddParameter("?cabangId", $cabangId);
+        $rs = $this->connector->ExecuteNonQuery();
+
+        // get stock in ex production/assemby
+        $sqx = "Insert Into `tmp_mutasi` (item_code,asyin,hasyin) Select a.item_code,sum(a.qty),sum(a.qty * a.price) From t_ic_assembly_master as a";
+        $sqx.= " Where (a.assembly_date BETWEEN ?startDate and ?endDate) and a.cabang_id = ?cabangId And a.is_deleted = 0 And a.assembly_status <> 3 Group By a.item_code";
+        $this->connector->CommandText = $sqx;
+        $this->connector->AddParameter("?startDate", date('Y-m-d', $startDate));
+        $this->connector->AddParameter("?endDate", date('Y-m-d', $endDate));
+        $this->connector->AddParameter("?cabangId", $cabangId);
+        $rs = $this->connector->ExecuteNonQuery();
+
+        // get stock out ex production/assemby
+        $sqx = "Insert Into `tmp_mutasi` (item_code,asyout,hasyout) Select a.item_code,sum(a.qty),sum(a.qty * a.price) From t_ic_assembly_detail as a";
+        $sqx.= " Join t_ic_assembly_master as b On a.cabang_id = b.cabang_id And a.assembly_no = b.assembly_no";
+        $sqx.= " Where (b.assembly_date BETWEEN ?startDate and ?endDate) and a.cabang_id = ?cabangId And b.is_deleted = 0 And b.assembly_status <> 3 Group By a.item_code";
+        $this->connector->CommandText = $sqx;
+        $this->connector->AddParameter("?startDate", date('Y-m-d', $startDate));
+        $this->connector->AddParameter("?endDate", date('Y-m-d', $endDate));
+        $this->connector->AddParameter("?cabangId", $cabangId);
+        $rs = $this->connector->ExecuteNonQuery();
+
+        // get penjualan
+        $sqx = "Insert Into `tmp_mutasi` (item_code,jual,hjual) Select a.item_code,sum(a.qty),sum(a.qty * a.item_hpp) From t_ar_invoice_detail as a";
+        $sqx.= " Join t_ar_invoice_master as b On a.cabang_id = b.cabang_id And a.invoice_no = b.invoice_no";
+        $sqx.= " Where b.invoice_date BETWEEN ?startDate and ?endDate and b.gudang_id = ?cabangId And b.is_deleted = 0 And b.invoice_status <> 3 Group By a.item_code";
+        $this->connector->CommandText = $sqx;
+        $this->connector->AddParameter("?startDate", date('Y-m-d', $startDate));
+        $this->connector->AddParameter("?endDate", date('Y-m-d', $endDate));
+        $this->connector->AddParameter("?cabangId", $cabangId);
+        $rs = $this->connector->ExecuteNonQuery();
+
+        // get transfer keluar
+        $sqx = "Insert Into `tmp_mutasi` (item_code,xout,hxout) Select a.item_code,sum(a.qty),sum(a.qty * a.hpp) From t_ic_transfer_detail as a";
+        $sqx.= " Join t_ic_transfer_master as b On a.cabang_id = b.cabang_id And a.npb_no = b.npb_no";
+        $sqx.= " Where b.npb_date BETWEEN ?startDate and ?endDate and b.cabang_id = ?cabangId and b.npb_status <> 3 Group By a.item_code";
+        $this->connector->CommandText = $sqx;
+        $this->connector->AddParameter("?startDate", date('Y-m-d', $startDate));
+        $this->connector->AddParameter("?endDate", date('Y-m-d', $endDate));
+        $this->connector->AddParameter("?cabangId", $cabangId);
+        $rs = $this->connector->ExecuteNonQuery();
+
+        // get return ex pembelian
+        $sqx = "Insert Into `tmp_mutasi` (item_code,rbeli,hrbeli) Select a.item_code,sum(a.qty_retur),sum(a.qty_retur * a.price) From t_ap_return_detail as a";
+        $sqx.= " Join t_ap_return_master as b On a.cabang_id = b.cabang_id And a.rb_no = b.rb_no";
+        $sqx.= " Where b.rb_date BETWEEN ?startDate and ?endDate and a.cabang_id = ?cabangId And b.is_deleted = 0 And b.rb_status <> 3 Group By a.item_code";
+        $this->connector->CommandText = $sqx;
+        $this->connector->AddParameter("?startDate", date('Y-m-d', $startDate));
+        $this->connector->AddParameter("?endDate", date('Y-m-d', $endDate));
+        $this->connector->AddParameter("?cabangId", $cabangId);
+        $rs = $this->connector->ExecuteNonQuery();
+
+        // get koreksi
+        $sqx = "Insert Into `tmp_mutasi` (item_code,koreksi,hkoreksi) Select a.item_code,sum(a.corr_qty),sum(a.corr_qty * a.hpp) From t_ic_stockcorrection as a";
+        $sqx.= " Where a.corr_date BETWEEN ?startDate and ?endDate and a.cabang_id = ?cabangId and a.corr_status = 1 Group By a.item_code";
+        $this->connector->CommandText = $sqx;
+        $this->connector->AddParameter("?startDate", date('Y-m-d', $startDate));
+        $this->connector->AddParameter("?endDate", date('Y-m-d', $endDate));
+        $this->connector->AddParameter("?cabangId", $cabangId);
+        $rs = $this->connector->ExecuteNonQuery();
+
+        // try get all tmp card data
+        //$sqx = "Select a.item_code, b.bnama as item_name, b.bsatbesar as satuan, sum(a.awal) as sAwal, sum(a.beli) as sBeli, sum(a.asyin) as sAsyin, sum(a.xin) as sXin, sum(a.rjual) as sRjual, sum(a.asyout) as sAsyout, sum(a.jual) as sJual, sum(a.xout) as sXout, sum(a.rbeli) as sRbeli, sum(a.koreksi) as sKoreksi ";
+        //$sqx.= " From tmp_mutasi as a Join m_barang as b On a.item_code = b.bkode Group By a.item_code Order By a.item_code,b.bnama,b.bsatbesar";
+        $sqx = "Select a.item_code, c.bnama as item_name, c.bsatkecil as satuan, coalesce(b.hrg_beli,0) as hrg_beli, coalesce(b.hrg_jual1,0) as hrg_jual,";
+        $sqx.= " sum(a.awal) as sAwal, sum(a.beli) as sBeli, sum(a.asyin) as sAsyin, sum(a.xin) as sXin, sum(a.rjual) as sRjual, sum(a.asyout) as sAsyout, sum(a.jual) as sJual, sum(a.xout) as sXout, sum(a.rbeli) as sRbeli, sum(a.koreksi) as sKoreksi,";
+        $sqx.= " sum(a.hawal) as nsAwal, sum(a.hbeli) as nsBeli, sum(a.hasyin) as nsAsyin, sum(a.hxin) as nsXin, sum(a.hrjual) as nsRjual, sum(a.hasyout) as nsAsyout, sum(a.hjual) as nsJual, sum(a.hxout) as nsXout, sum(a.hrbeli) as nsRbeli, sum(a.hkoreksi) as nsKoreksi";
         $sqx.= " From tmp_mutasi as a Left Join vw_m_itemprice as b On a.item_code = b.item_code And b.cabang_id = ?cabangId";
         $sqx.= " Left Join m_barang c ON a.item_code = c.bkode";
         $sqx.= " Group By a.item_code, c.bnama, c.bsatkecil, b.hrg_beli, b.hrg_jual1 Order By a.item_code, c.bnama, c.bsatkecil";

@@ -59,11 +59,14 @@
                     console.log(satuan);
                     var stock = row.qty_stock;
                     console.log(stock);
+                    var hpp = row.hpp;
+                    console.log(hpp);
                     $('#aQtyStock').val(stock);
                     $('#aItemId').val(bid);
                     $('#aItemCode').val(bkode);
                     $('#aItemDescs').val(bnama);
                     $('#aSatuan').val(satuan);
+                    $('#aHpp').val(hpp);
                     if(stock > 0){
                        $('#aQty').val(1);
                     }else{
@@ -96,6 +99,7 @@
                                 $('#aItemId').val(dtx[1]);
                                 $('#aItemDescs').val(dtx[2]);
                                 $('#aSatuan').val(dtx[3]);
+                                $('#aHpp').val(dtx[5]);
                                 if (Number(dtx[4])>0){
                                     $('#aQtyStock').val(dtx[4]);
                                     $('#aQty').val(1);
@@ -323,7 +327,7 @@ $baddnew = base_url('public/images/button/').'create_new.png';
                 <td colspan="7">
                     <table cellpadding="0" cellspacing="0" class="tablePadding tableBorder" align="left" style="font-size: 12px;font-family: tahoma">
                         <tr>
-                            <th colspan="5">DETAIL BARANG YANG DIKIRIM</th>
+                            <th colspan="6">DETAIL BARANG YANG DIKIRIM</th>
                             <th rowspan="2">Action</th>
                         </tr>
                         <tr>
@@ -331,7 +335,8 @@ $baddnew = base_url('public/images/button/').'create_new.png';
                             <th>Kode</th>
                             <th>Nama Barang</th>
                             <th>Qty</th>
-                            <th>Satuan</th>
+                            <th>UOM</th>
+                            <th>HPP</th>
                         </tr>
                         <?php
                         $counter = 0;
@@ -346,10 +351,11 @@ $baddnew = base_url('public/images/button/').'create_new.png';
                             printf('<td>%s</td>', $detail->ItemDescs);
                             printf('<td class="right">%s</td>', number_format($detail->Qty,0));
                             printf('<td>%s</td>', $detail->SatBesar);
+                            printf('<td class="right">%s</td>', number_format($detail->Hpp,0));
                             print("<td class='center'>");
                             $dta = addslashes($detail->Id.'|'.$detail->ItemCode.'|'.str_replace('"',' in',$detail->ItemDescs));
                             $dtx = $detail->Id.'|'.$detail->ItemCode.'|'.str_replace('"',' in',$detail->ItemDescs).'|'.$detail->ItemId.'|'.$detail->Qty;
-                            printf('&nbsp<img src="%s" alt="Edit barang" title="Edit barang" style="cursor: pointer" onclick="return feditdetail(%s);"/>',$bedit,"'".$dtx."'");
+                            //printf('&nbsp<img src="%s" alt="Edit barang" title="Edit barang" style="cursor: pointer" onclick="return feditdetail(%s);"/>',$bedit,"'".$dtx."'");
                             printf('&nbsp<img src="%s" alt="Hapus barang" title="Hapus barang" style="cursor: pointer" onclick="return fdeldetail(%s);"/>',$bclose,"'".$dta."'");
                             print("</td>");
                             print("</tr>");
@@ -360,10 +366,11 @@ $baddnew = base_url('public/images/button/').'create_new.png';
                             <td colspan="3" align="right">Total :</td>
                             <td class="right bold"><?php print(number_format($tqy,0));?></td>
                             <td>item(s)</td>
+                            <td>&nbsp;</td>
                             <td class='center'><?php printf('<img src="%s" alt="Tambah Barang" title="Tambah barang" id="bAdDetail" style="cursor: pointer;"/>',$badd);?></td>
                         </tr>
                         <tr>
-                            <td colspan="6" align="right">
+                            <td colspan="7" align="right">
                                 <?php printf('<img src="%s" alt="Simpan Data" title="Simpan data master" id="bUpdate" style="cursor: pointer;"/>',$bsubmit);?>
                                 &nbsp&nbsp
                                 <?php printf('<img src="%s" alt="Npb Baru" title="Buat NPB baru" id="bTambah" style="cursor: pointer;"/>',$baddnew);?>
@@ -392,13 +399,14 @@ $baddnew = base_url('public/images/button/').'create_new.png';
         <table cellpadding="0" cellspacing="0" class="tablePadding tableBorder" style="font-size: 12px;font-family: tahoma">
             <tr>
                 <td>Cari Data:</td>
-                <td colspan="3"><input id="aItemSearch" name="aItemSearch" style="width: 350px"/></td>
+                <td colspan="4"><input id="aItemSearch" name="aItemSearch" style="width: 350px"/></td>
             </tr>
             <tr>
                 <th>Kode</th>
                 <th>Nama Barang</th>
                 <th>Qty</th>
-                <th>Satuan</th>
+                <th>UOM</th>
+                <th>HPP</th>
             </tr>
             <tr>
                 <td>
@@ -415,6 +423,9 @@ $baddnew = base_url('public/images/button/').'create_new.png';
                 </td>
                 <td>
                     <input type="text" id="aSatuan" name="aSatuan" size="5" value="" disabled/>
+                </td>
+                <td>
+                    <input class="right" type="text" id="aHpp" name="aHpp" size="10" value="0" readonly/>
                 </td>
             </tr>
         </table>

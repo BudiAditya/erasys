@@ -191,6 +191,7 @@ $crDate = date(JS_DATE, strtotime(date('Y-m-d')));
             <th field="bnama" width="55" sortable="true">Nama Barang</th>
             <th field="bsatkecil" width="15">Satuan</th>
             <th field="op_qty" width="20" sortable="true" align="right">Qty</th>
+            <th field="op_hpp" width="20" sortable="true" align="right">HPP</th>
         </tr>
         </thead>
     </table>
@@ -245,6 +246,8 @@ $crDate = date(JS_DATE, strtotime(date('Y-m-d')));
             <tr>
                 <td class="bold right">Qty</td>
                 <td><input class="bold right" type="text" id="aOpQty" name="op_qty" size="5" value="0"/></td>
+                <td class="bold right">HPP</td>
+                <td><input class="bold right" type="text" id="aOpHpp" name="op_hpp" size="12" value="0"/></td>
             </tr>
         </table>
     </form>

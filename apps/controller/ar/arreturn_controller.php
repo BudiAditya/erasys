@@ -326,6 +326,7 @@ class ArReturnController extends AppController {
             $retdetail->QtyJual = $this->GetPostValue("aQtyJual");
             $retdetail->QtyRetur = $this->GetPostValue("aQtyRetur");
             $retdetail->Price = $this->GetPostValue("aPrice");
+            $retdetail->Hpp = $this->GetPostValue("aHpp");
             $retdetail->SubTotal = $this->GetPostValue("aSubTotal");
             $retdetail->SatRetur = $this->GetPostValue("aSatuan");
             // insert ke table

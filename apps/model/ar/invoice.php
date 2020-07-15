@@ -558,7 +558,7 @@ On a.id = b.invoice_id Set a.base_amount = b.sumPrice, a.disc1_amount = if(a.dis
     }
 
     public function GetJSonInvoiceItems($invoiceId = 0) {
-        $sql = "SELECT a.id,a.item_id,a.item_code,a.item_descs,a.qty - a.qty_return as qty_jual,coalesce(a.satjual,b.bsatbesar) as satuan,round(a.sub_total/a.qty,0) as price FROM t_ar_invoice_detail AS a";
+        $sql = "SELECT a.id,a.item_id,a.item_code,a.item_descs,a.qty - a.qty_return as qty_jual,coalesce(a.satjual,b.bsatbesar) as satuan,round(a.sub_total/a.qty,0) as price,a.item_hpp as hpp FROM t_ar_invoice_detail AS a";
         $sql.= " INNER JOIN m_barang AS b ON a.item_code = b.bkode Where (a.qty - a.qty_return) > 0 And a.invoice_id = ".$invoiceId;
         $this->connector->CommandText = $sql;
         $data['count'] = $this->connector->ExecuteQuery()->GetNumRows();

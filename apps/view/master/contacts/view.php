@@ -152,14 +152,14 @@
                     <option value="3" <?php print($contacts->Status == "3" ? 'selected="selected"' : ''); ?>>Prioritas</option>
                 </select>
             </td>
-            <td align="right">Level Diskon :</td>
+            <td align="right">Level Harga :</td>
             <td><select name="ContactLevel" id="ContactLevel" disabled>
-                    <option value="0" <?php print($contacts->ContactLevel == "0" ? 'selected="selected"' : ''); ?>>0 - Umum</option>
-                    <option value="1" <?php print($contacts->ContactLevel == "1" ? 'selected="selected"' : ''); ?>>1 - Silver</option>
-                    <option value="2" <?php print($contacts->ContactLevel == "2" ? 'selected="selected"' : ''); ?>>2 - Gold</option>
-                    <option value="3" <?php print($contacts->ContactLevel == "3" ? 'selected="selected"' : ''); ?>>3 - Platinum</option>
-                    <option value="4" <?php print($contacts->ContactLevel == "4" ? 'selected="selected"' : ''); ?>>4 - Karyawan</option>
-                    <option value="5" <?php print($contacts->ContactLevel == "5" ? 'selected="selected"' : ''); ?>>5 - Khusus</option>
+                    <option value="0" <?php print($contacts->ContactLevel == "0" ? 'selected="selected"' : ''); ?>>1 - Umum</option>
+                    <option value="1" <?php print($contacts->ContactLevel == "1" ? 'selected="selected"' : ''); ?>>2 - Silver</option>
+                    <option value="2" <?php print($contacts->ContactLevel == "2" ? 'selected="selected"' : ''); ?>>3 - Gold</option>
+                    <option value="3" <?php print($contacts->ContactLevel == "3" ? 'selected="selected"' : ''); ?>>4 - Platinum</option>
+                    <option value="4" <?php print($contacts->ContactLevel == "4" ? 'selected="selected"' : ''); ?>>5 - Karyawan</option>
+                    <option value="5" <?php print($contacts->ContactLevel == "5" ? 'selected="selected"' : ''); ?>>6 - Khusus</option>
                 </select>
             </td>
         </tr>
