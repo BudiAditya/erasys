@@ -1,11 +1,7 @@
 <?php
 if ($outPut == "1") {
-    if ($rType < 5) {
-        require_once(LIBRARY . "PHPExcel.php");
-        include("stkdetail_xls.php");
-    }else{
-        include("stkdetail5_xls.php");
-    }
+    require_once(LIBRARY . "PHPExcel.php");
+    include("stkdetail_xls.php");
 } elseif ($outPut == 2){
     require_once(LIBRARY . "tabular_pdf.php");
     include("stkdetail.pdf.php");
