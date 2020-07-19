@@ -67,6 +67,8 @@ class Invoice extends EntityBase {
     public $AdminName;
     public $PrintCount = 0;
     public $InvoiceType = 1;
+    public $DeliveryType = 1;
+    public $ExpeditionId = 0;
 
 	/** @var InvoiceDetail[] */
 	public $Details = array();
@@ -127,6 +129,8 @@ class Invoice extends EntityBase {
         $this->PrintCount = $row["print_count"];
         $this->OutletName = $row["nama_outlet"];
         $this->InvoiceType = $row["invoice_type"];
+        $this->DeliveryType = $row["delivery_type"];
+        $this->ExpeditionId = $row["expedition_id"];
 	}
 
 	public function FormatInvoiceDate($format = HUMAN_DATE) {
@@ -337,8 +341,8 @@ class Invoice extends EntityBase {
     }
 
 	public function Insert() {
-        $sql = "INSERT INTO t_ar_invoice_master (invoice_type,gudang_id, cabang_id, invoice_no, invoice_date, customer_id, sales_id, invoice_descs, ex_so_no, base_amount, disc1_pct, disc1_amount, disc2_pct, disc2_amount, tax_pct, tax_amount, other_costs, other_costs_amount, paid_amount, payment_type, credit_terms, invoice_status, createby_id, create_time, cust_level)";
-        $sql.= "VALUES(?invoice_type, ?gudang_id, ?cabang_id, ?invoice_no, ?invoice_date, ?customer_id, ?sales_id, ?invoice_descs, ?ex_so_no, ?base_amount, ?disc1_pct, ?disc1_amount, ?disc2_pct, ?disc2_amount, ?tax_pct, ?tax_amount, ?other_costs, ?other_costs_amount, ?paid_amount, ?payment_type, ?credit_terms, ?invoice_status, ?createby_id, now(), ?cust_level)";
+        $sql = "INSERT INTO t_ar_invoice_master (delivery_type,expedition_id,invoice_type,gudang_id, cabang_id, invoice_no, invoice_date, customer_id, sales_id, invoice_descs, ex_so_no, base_amount, disc1_pct, disc1_amount, disc2_pct, disc2_amount, tax_pct, tax_amount, other_costs, other_costs_amount, paid_amount, payment_type, credit_terms, invoice_status, createby_id, create_time, cust_level)";
+        $sql.= "VALUES(?delivery_type,?expedition_id,?invoice_type, ?gudang_id, ?cabang_id, ?invoice_no, ?invoice_date, ?customer_id, ?sales_id, ?invoice_descs, ?ex_so_no, ?base_amount, ?disc1_pct, ?disc1_amount, ?disc2_pct, ?disc2_amount, ?tax_pct, ?tax_amount, ?other_costs, ?other_costs_amount, ?paid_amount, ?payment_type, ?credit_terms, ?invoice_status, ?createby_id, now(), ?cust_level)";
 		$this->connector->CommandText = $sql;
         $this->connector->AddParameter("?gudang_id", $this->GudangId);
         $this->connector->AddParameter("?cabang_id", $this->CabangId);
@@ -364,6 +368,8 @@ class Invoice extends EntityBase {
         $this->connector->AddParameter("?createby_id", $this->CreatebyId);
         $this->connector->AddParameter("?cust_level", $this->CustLevel);
         $this->connector->AddParameter("?invoice_type", $this->InvoiceType);
+        $this->connector->AddParameter("?delivery_type", $this->DeliveryType);
+        $this->connector->AddParameter("?expedition_id", $this->ExpeditionId);
 		$rs = $this->connector->ExecuteNonQuery();
 		if ($rs == 1) {
 			$this->connector->CommandText = "SELECT LAST_INSERT_ID();";
@@ -400,6 +406,8 @@ class Invoice extends EntityBase {
 	, update_time = NOW()
 	, cust_level = ?cust_level
 	, invoice_type = ?invoice_type
+	, delivery_type = ?delivery_type
+	, expedition_id = ?expedition_id
 WHERE id = ?id";
         $this->connector->AddParameter("?cabang_id", $this->CabangId);
         $this->connector->AddParameter("?gudang_id", $this->GudangId);
@@ -425,6 +433,8 @@ WHERE id = ?id";
         $this->connector->AddParameter("?updateby_id", $this->UpdatebyId);
         $this->connector->AddParameter("?cust_level", $this->CustLevel);
         $this->connector->AddParameter("?invoice_type", $this->InvoiceType);
+        $this->connector->AddParameter("?delivery_type", $this->DeliveryType);
+        $this->connector->AddParameter("?expedition_id", $this->ExpeditionId);
 		$this->connector->AddParameter("?id", $id);
 		$rs = $this->connector->ExecuteNonQuery();
         if ($rs == 1){

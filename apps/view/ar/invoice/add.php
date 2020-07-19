@@ -86,7 +86,7 @@ $bpdf = base_url('public/images/button/').'pdf.png';
             <td>No. Invoice</td>
             <td><input type="text" class="f1 easyui-textbox" maxlength="20" style="width: 150px" id="InvoiceNo" name="InvoiceNo" value="<?php print($invoice->InvoiceNo != null ? $invoice->InvoiceNo : '-'); ?>" readonly/></td>
             <td>Status</td>
-            <td><select class="easyui-combobox" id="InvoiceStatus" name="InvoiceStatus" style="width: 100px">
+            <td><select class="easyui-combobox" id="InvoiceStatus" name="InvoiceStatus" style="width: 130px">
                     <option value="0" <?php print($invoice->InvoiceStatus == 0 ? 'selected="selected"' : '');?>>0 - Draft</option>
                     <option value="1" <?php print($invoice->InvoiceStatus == 1 ? 'selected="selected"' : '');?>>1 - Posted</option>
                     <option value="2" <?php print($invoice->InvoiceStatus == 2 ? 'selected="selected"' : '');?>>2 - Approved</option>
@@ -122,7 +122,7 @@ $bpdf = base_url('public/images/button/').'pdf.png';
                 <input type="hidden" id="SoNilai" name="SoNilai"/>
             </td>
             <td>Jenis</td>
-            <td><select class="easyui-combobox" id="InvoiceType" name="InvoiceType" style="width: 100px">
+            <td><select class="easyui-combobox" id="InvoiceType" name="InvoiceType" style="width: 130px">
                     <option value="1" <?php print($invoice->InvoiceType == 1 ? 'selected="selected"' : '');?>>1 - Barang</option>
                     <option value="2" <?php print($invoice->InvoiceType == 2 ? 'selected="selected"' : '');?>>2 - Jasa</option>
                 </select>
@@ -166,7 +166,14 @@ $bpdf = base_url('public/images/button/').'pdf.png';
                 </select>
                 &nbsp
                 Kredit
-                <input type="text" id="CreditTerms" name="CreditTerms" size="2" maxlength="5" value="<?php print($invoice->CreditTerms != null ? $invoice->CreditTerms : 0); ?>" style="text-align: right" required/>&nbsphari</td>
+                <input type="text" id="CreditTerms" name="CreditTerms" size="2" maxlength="5" value="<?php print($invoice->CreditTerms != null ? $invoice->CreditTerms : 0); ?>" style="text-align: right" required/>&nbsp;hr
+            </td>
+            <td>Pengiriman</td>
+            <td><select class="easyui-combobox" id="DeliveryType" name="DeliveryType" style="width: 130px">
+                    <option value="1" <?php print($invoice->DeliveryType == 1 ? 'selected="selected"' : '');?>>1 - Sekaligus</option>
+                    <option value="2" <?php print($invoice->DeliveryType == 2 ? 'selected="selected"' : '');?>>2 - D/O Bertahap</option>
+                </select>
+            </td>
         </tr>
         <tr>
             <td colspan="9">
@@ -368,23 +375,20 @@ $bpdf = base_url('public/images/button/').'pdf.png';
 
 <script type="text/javascript">
     var printer = new Recta('1122334455', '1811');
+    var userCabId,custId,custLevel,salesId,invoiceId,userCompId,userLevel,allowMinus;
+    userCabId = "<?php print($invoice->CabangId > 0 ? $invoice->CabangId : $userCabId);?>";
+    custId = "<?php print($invoice->CustomerId);?>";
+    custLevel = "<?php print($invoice->CustLevel > 0 ? $invoice->CustLevel : 0);?>";
+    salesId = "<?php print($invoice->SalesId);?>";
+    gudangId = "<?php print($invoice->GudangId > 0 ? $invoice->GudangId : $userCabId);?>";
+    invoiceId = "<?php print($invoice->Id);?>";
+    userCompId = "<?php print($invoice->EntityId > 0 ? $invoice->EntityId : $userCompId);?>";
+    userLevel = "<?php print($userLevel);?>";
+    allowMinus = "<?php print($userCabAlMin);?>";
+    var satBesar, satKecil, isiKecil, itemPrice, itemHpp, itemCode;
+    var delType = "<?php print($invoice->DeliveryType == null ? 1 : $invoice->DeliveryType );?>";
+    isiKecil = 1;
     $( function() {
-        var userCabId,custId,custLevel,salesId,invoiceId,userCompId,userLevel,allowMinus;
-        userCabId = "<?php print($invoice->CabangId > 0 ? $invoice->CabangId : $userCabId);?>";
-        custId = "<?php print($invoice->CustomerId);?>";
-        custLevel = "<?php print($invoice->CustLevel > 0 ? $invoice->CustLevel : 0);?>";
-        salesId = "<?php print($invoice->SalesId);?>";
-        gudangId = "<?php print($invoice->GudangId > 0 ? $invoice->GudangId : $userCabId);?>";
-        invoiceId = "<?php print($invoice->Id);?>";
-        userCompId = "<?php print($invoice->EntityId > 0 ? $invoice->EntityId : $userCompId);?>";
-        userLevel = "<?php print($userLevel);?>";
-        allowMinus = "<?php print($userCabAlMin);?>";
-        //var addetail = ["aItemSearch", "aItemCode", "aQty","aPrice", "aDiscFormula", "aDiscAmount", "aSubTotal", "bSaveDetail"];
-        //BatchFocusRegister(addetail);
-        //var addmaster = ["CabangId", "InvoiceDate","CustomerId", "SalesId", "InvoiceDescs", "PaymentType","CreditTerms","BaseAmount","Disc1Pct","Disc1Amount","TaxPct","TaxAmount","OtherCosts","OtherCostsAmount","TotalAmount","bUpdate","bKembali"];
-        //BatchFocusRegister(addmaster);
-        var satBesar, satKecil, isiKecil, itemPrice, itemHpp, itemCode;
-        isiKecil = 1;
         $("#InvoiceDate").customDatePicker({ showOn: "focus" });
         $('#GudangId').combobox({
             onChange: function(data){
@@ -726,6 +730,7 @@ $bpdf = base_url('public/images/button/').'pdf.png';
             salesId = $("#SalesId").combobox('getValue');
             gudangId = $("#GudangId").combobox('getValue');
             ivcType = $("#InvoiceType").combobox('getValue');
+            delType = $("#DeliveryType").combobox('getValue');
             if (userCabId > 0 && custId > 0 && salesId > 0){
                 if (confirm('Update data invoice ini?')) {
                     var url = "<?php print($helper->site_url("ar.invoice/proses_master/")); ?>"+invoiceId;
@@ -749,7 +754,8 @@ $bpdf = base_url('public/images/button/').'pdf.png';
                         OtherCosts: $("#OtherCosts").val(),
                         OtherCostsAmount: $("#OtherCostsAmount").val(),
                         ExSoNo: $("#ExSoNo").val(),
-                        InvoiceType: ivcType
+                        InvoiceType: ivcType,
+                        DeliveryType: delType
                     }).done(function(data) {
                         var rst = data.split('|');
                         if (rst[0] == 'OK') {
@@ -930,6 +936,7 @@ $bpdf = base_url('public/images/button/').'pdf.png';
         gudangId = $("#GudangId").combobox('getValue');
         custId = $("#CustomerId").combobox('getValue');
         ivcType = $("#InvoiceType").combobox('getValue');
+        delType = $("#DeliveryType").combobox('getValue');
         var txm = Number($('#aMode').val());
         var aid = Number($('#aId').val());
         var aitd = Number($('#aItemId').val());
@@ -979,7 +986,8 @@ $bpdf = base_url('public/images/button/').'pdf.png';
                                 OtherCosts: $("#OtherCosts").val(),
                                 OtherCostsAmount: $("#OtherCostsAmount").val(),
                                 ExSoNo: $("#ExSoNo").val(),
-                                InvoiceType: ivcType
+                                InvoiceType: ivcType,
+                                DeliveryType: delType
                             }).done(function (data) {
                                 var rst = data.split('|');
                                 if (rst[0] == 'OK') {
@@ -1045,7 +1053,8 @@ $bpdf = base_url('public/images/button/').'pdf.png';
                         OtherCosts: $("#OtherCosts").val(),
                         OtherCostsAmount: $("#OtherCostsAmount").val(),
                         ExSoNo: $("#ExSoNo").val(),
-                        InvoiceType: ivcType
+                        InvoiceType: ivcType,
+                        DeliveryType: delType
                     }).done(function (data) {
                         var rst = data.split('|');
                         if (rst[0] == 'OK') {
@@ -1100,6 +1109,7 @@ $bpdf = base_url('public/images/button/').'pdf.png';
         gudangId = $("#GudangId").combobox('getValue');
         custId = $("#CustomerId").combobox('getValue');
         ivcType = $("#InvoiceType").combobox('getValue');
+        delType = $("#DeliveryType").combobox('getValue');
         var oke = true;
         var urx = null;
         var noOrder = $('#ExSoNo').val();
@@ -1138,7 +1148,8 @@ $bpdf = base_url('public/images/button/').'pdf.png';
                             OtherCosts: $("#OtherCosts").val(),
                             OtherCostsAmount: $("#OtherCostsAmount").val(),
                             ExSoNo: $("#ExSoNo").val(),
-                            InvoiceType: ivcType
+                            InvoiceType: ivcType,
+                            DeliveryType: delType
                         }).done(function (data) {
                             var rst = data.split('|');
                             if (rst[0] == 'OK') {
@@ -1175,7 +1186,8 @@ $bpdf = base_url('public/images/button/').'pdf.png';
                     OtherCosts: $("#OtherCosts").val(),
                     OtherCostsAmount: $("#OtherCostsAmount").val(),
                     ExSoNo: $("#ExSoNo").val(),
-                    InvoiceType: ivcType
+                    InvoiceType: ivcType,
+                    DeliveryType: delType
                 }).done(function (data) {
                     var rst = data.split('|');
                     if (rst[0] == 'OK') {

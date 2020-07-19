@@ -23,6 +23,8 @@ class InvoiceDetail extends EntityBase {
     public $IsFree;
     public $SatJual;
     public $IsiKecil = 0;
+    public $QtyReturn = 0;
+    public $QtyDelivered = 0;
 	// Helper Variable;
 	public $MarkedForDeletion = false;
 
@@ -50,6 +52,8 @@ class InvoiceDetail extends EntityBase {
         $this->IsFree = $row["is_free"];
         $this->SatJual = $row["satjual"];
         $this->IsiKecil = $row["bisisatkecil"];
+        $this->QtyReturn = $row["qty_return"];
+        $this->QtyDelivered = $row["qty_delivered"];
     }
 
 	public function LoadById($id) {
@@ -120,8 +124,8 @@ class InvoiceDetail extends EntityBase {
 
 	public function Insert() {
 		$this->connector->CommandText =
-"INSERT INTO t_ar_invoice_detail(satjual, ex_so_no,is_free,invoice_id, cabang_id, invoice_no, item_id, item_code, item_descs, l_qty, s_qty, qty, price, disc_formula, disc_amount, sub_total,item_hpp,item_note)
-VALUES(?satjual ,?ex_so_no,?is_free,?invoice_id, ?cabang_id, ?invoice_no, ?item_id, ?item_code, ?item_descs, ?l_qty, ?s_qty, ?qty, ?price, ?disc_formula, ?disc_amount, ?sub_total,?item_hpp,?item_note)";
+"INSERT INTO t_ar_invoice_detail(qty_return,qty_delivered,satjual, ex_so_no,is_free,invoice_id, cabang_id, invoice_no, item_id, item_code, item_descs, l_qty, s_qty, qty, price, disc_formula, disc_amount, sub_total,item_hpp,item_note)
+VALUES(?qty_return,?qty_delivered,?satjual,?ex_so_no,?is_free,?invoice_id, ?cabang_id, ?invoice_no, ?item_id, ?item_code, ?item_descs, ?l_qty, ?s_qty, ?qty, ?price, ?disc_formula, ?disc_amount, ?sub_total,?item_hpp,?item_note)";
 		$this->connector->AddParameter("?invoice_id", $this->InvoiceId);
         $this->connector->AddParameter("?cabang_id", $this->CabangId);
         $this->connector->AddParameter("?invoice_no", $this->InvoiceNo);
@@ -140,6 +144,8 @@ VALUES(?satjual ,?ex_so_no,?is_free,?invoice_id, ?cabang_id, ?invoice_no, ?item_
         $this->connector->AddParameter("?item_note", $this->ItemNote);
         $this->connector->AddParameter("?is_free", $this->IsFree);
         $this->connector->AddParameter("?satjual", $this->SatJual);
+        $this->connector->AddParameter("?qty_return", $this->QtyReturn);
+        $this->connector->AddParameter("?qty_delivered", $this->QtyDelivered);
 		$rs = $this->connector->ExecuteNonQuery();
         $rsx = null;
         $did = 0;
@@ -185,6 +191,8 @@ VALUES(?satjual ,?ex_so_no,?is_free,?invoice_id, ?cabang_id, ?invoice_no, ?item_
 	, item_note = ?item_note
 	, is_free = ?is_free
 	, satjual = ?satjual
+	, qty_return = ?qty_return
+	, qty_delivered = ?qty_delivered
 WHERE id = ?id";
         $this->connector->AddParameter("?invoice_id", $this->InvoiceId);
         $this->connector->AddParameter("?cabang_id", $this->CabangId);
@@ -204,6 +212,8 @@ WHERE id = ?id";
         $this->connector->AddParameter("?item_note", $this->ItemNote);
         $this->connector->AddParameter("?is_free", $this->IsFree);
         $this->connector->AddParameter("?satjual", $this->SatJual);
+        $this->connector->AddParameter("?qty_return", $this->QtyReturn);
+        $this->connector->AddParameter("?qty_delivered", $this->QtyDelivered);
         $this->connector->AddParameter("?id", $id);
         $rs = $this->connector->ExecuteNonQuery();
         if ($rs == 1) {

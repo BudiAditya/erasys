@@ -232,6 +232,8 @@ class InvoiceController extends AppController {
             $invoice->OtherCosts = $this->GetPostValue("OtherCosts") == null ? 0 : $this->GetPostValue("OtherCosts");
             $invoice->OtherCostsAmount = str_replace(",","",$this->GetPostValue("OtherCostsAmount") == null ? 0 : $this->GetPostValue("OtherCostsAmount"));
             $invoice->InvoiceType = $this->GetPostValue("InvoiceType");
+            $invoice->DeliveryType = $this->GetPostValue("DeliveryType");
+            $invoice->ExpeditionId = 0; //$this->GetPostValue("ExpeditionId");
             if ($invoice->Id == 0) {
                 $invoice->InvoiceNo = $invoice->GetInvoiceDocNo();
                 $rs = $invoice->Insert();
