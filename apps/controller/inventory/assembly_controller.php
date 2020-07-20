@@ -307,7 +307,7 @@ class AssemblyController extends AppController {
         require_once(MODEL . "master/setprice.php");
         $filter = isset($_POST['q']) ? strval($_POST['q']) : '';
         $setprice = new SetPrice();
-        $itemlists = $setprice->GetJSonItemPrice($this->userCompanyId,$this->userCabangId,$filter,$order);
+        $itemlists = $setprice->GetJSonItemPrice($this->userCompanyId,$this->userCabangId,1,$filter,$order);
         echo json_encode($itemlists);
     }
 
