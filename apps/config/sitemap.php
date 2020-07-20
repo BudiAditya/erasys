@@ -55,7 +55,7 @@ $menu = $root->AddNode("INVENTORY", null, "menu");
         $menu->AddNode("Stock Awal Gudang", "inventory.awal");
         $menu->AddNode("Produksi & Perakitan", "inventory.assembly");
         $menu->AddNode("Stock Transfer", "inventory.transfer");
-        $menu->AddNode("Delivery Order", "inventory.icdo");
+        $menu->AddNode("Proses D/O (Pengiriman)", "inventory.delivery");
         $menu->AddNode("Stock Opname/Koreksi", "inventory.correction");
     $menu->AddNode("Laporan Inventory", null, "title");
         //$menu->AddNode("Statistik Inventory", "inventory.ivtstats");

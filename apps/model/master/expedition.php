@@ -52,6 +52,20 @@ class Expedition extends EntityBase {
 		return $result;
 	}
 
+    public function LoadByCompany($compId = 0,$orderBy = "a.exp_code", $includeDeleted = false) {
+        $this->connector->CommandText = "SELECT a.* FROM m_expedition AS a Join m_cabang b ON a.cabang_id = b.id Where b.entity_id = $compId ORDER BY $orderBy";
+        $rs = $this->connector->ExecuteQuery();
+        $result = array();
+        if ($rs != null) {
+            while ($row = $rs->FetchAssoc()) {
+                $temp = new Expedition();
+                $temp->FillProperties($row);
+                $result[] = $temp;
+            }
+        }
+        return $result;
+    }
+
 	/**
 	 * @param int $id
 	 * @return Location

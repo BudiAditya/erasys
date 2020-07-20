@@ -818,6 +818,39 @@ On a.id = b.invoice_id Set a.base_amount = b.sumPrice, a.disc1_amount = if(a.dis
         }
         return $result;
     }
+
+    public function GetJSonDoInvoices($cabangId,$customerId) {
+        $sql = "SELECT a.id,a.invoice_no,a.invoice_date FROM t_ar_invoice_master as a";
+        $sql.= " Join (Select c.invoice_id, sum(c.qty - c.qty_delivered) as qty_sisa From t_ar_invoice_detail c Group By c.invoice_id) b ON a.id = b.invoice_id";
+        $sql.= " Where b.qty_sisa > 0 And a.delivery_type = 2 And a.invoice_status <> 3 And a.is_deleted = 0 And a.cabang_id = ".$cabangId." And a.customer_id = ".$customerId;
+        $this->connector->CommandText = $sql;
+        $data['count'] = $this->connector->ExecuteQuery()->GetNumRows();
+        $sql.= " Order By a.invoice_no Asc";
+        $this->connector->CommandText = $sql;
+        $rows = array();
+        $rs = $this->connector->ExecuteQuery();
+        while ($row = $rs->FetchAssoc()){
+            $rows[] = $row;
+        }
+        $result = array('total'=>$data['count'],'rows'=>$rows);
+        return $result;
+    }
+
+    public function GetJSonDoInvoiceItems($invoiceId = 0) {
+        $sql = "SELECT a.id,a.item_id,a.item_code,a.item_descs,a.qty - a.qty_delivered as qty_jual,coalesce(a.satjual,b.bsatbesar) as satuan FROM t_ar_invoice_detail AS a";
+        $sql.= " INNER JOIN m_barang AS b ON a.item_code = b.bkode Where (a.qty - a.qty_delivered) > 0 And a.invoice_id = ".$invoiceId;
+        $this->connector->CommandText = $sql;
+        $data['count'] = $this->connector->ExecuteQuery()->GetNumRows();
+        $sql.= " Order By a.invoice_no Asc";
+        $this->connector->CommandText = $sql;
+        $rows = array();
+        $rs = $this->connector->ExecuteQuery();
+        while ($row = $rs->FetchAssoc()){
+            $rows[] = $row;
+        }
+        $result = array('total'=>$data['count'],'rows'=>$rows);
+        return $result;
+    }
 }
 
 

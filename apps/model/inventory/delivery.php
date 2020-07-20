@@ -1,8 +1,8 @@
 <?php
 
-require_once("icdo_detail.php");
+require_once("delivery_detail.php");
 
-class IcDo extends EntityBase {
+class Delivery extends EntityBase {
 	private $editableDocId = array(1, 2, 3, 4);
 
 	public static $DoStatusCodes = array(
@@ -11,13 +11,6 @@ class IcDo extends EntityBase {
         2 => "CLOSED",
 		3 => "VOID"
 	);
-
-    public static $CollectStatusCodes = array(
-        0 => "ON HOLD",
-        1 => "ON PROCESS",
-        2 => "PAID",
-        3 => "VOID"
-    );
 
 	public $Id;
     public $IsDeleted = false;
@@ -42,8 +35,9 @@ class IcDo extends EntityBase {
 	public $CreateTime;
 	public $UpdatebyId;
 	public $UpdateTime;
+	public $AdminName;
 
-	/** @var IcDoDetail[] */
+	/** @var DeliveryDetail[] */
 	public $Details = array();
 
 	public function __construct($id = null) {
@@ -77,6 +71,7 @@ class IcDo extends EntityBase {
         $this->CreateTime = $row["create_time"];
         $this->UpdatebyId = $row["updateby_id"];
         $this->UpdateTime = $row["update_time"];
+        $this->AdminName = $row["admin_name"];
 	}
 
 	public function FormatDoDate($format = HUMAN_DATE) {
@@ -84,23 +79,23 @@ class IcDo extends EntityBase {
 	}
 
 	/**
-	 * @return IcDoDetail[]
+	 * @return DeliveryDetail[]
 	 */
 	public function LoadDetails() {
 		if ($this->Id == null) {
 			return $this->Details;
 		}
-		$detail = new IcDoDetail();
+		$detail = new DeliveryDetail();
 		$this->Details = $detail->LoadByDoId($this->Id);
 		return $this->Details;
 	}
 
 	/**
 	 * @param int $id
-	 * @return IcDo
+	 * @return Delivery
 	 */
 	public function LoadById($id) {
-		$this->connector->CommandText = "SELECT a.* FROM vw_ic_do_master AS a WHERE a.id = ?id";
+		$this->connector->CommandText = "SELECT a.* FROM vw_ic_delivery_master AS a WHERE a.id = ?id";
 		$this->connector->AddParameter("?id", $id);
 		$rs = $this->connector->ExecuteQuery();
 		if ($rs == null || $rs->GetNumRows() == 0) {
@@ -111,7 +106,7 @@ class IcDo extends EntityBase {
 	}
 
     public function FindById($id) {
-        $this->connector->CommandText = "SELECT a.* FROM vw_ic_do_master AS a WHERE a.id = ?id";
+        $this->connector->CommandText = "SELECT a.* FROM vw_ic_delivery_master AS a WHERE a.id = ?id";
         $this->connector->AddParameter("?id", $id);
         $rs = $this->connector->ExecuteQuery();
         if ($rs == null || $rs->GetNumRows() == 0) {
@@ -122,7 +117,7 @@ class IcDo extends EntityBase {
     }
 
 	public function LoadByDoNo($DoNo,$cabangId) {
-		$this->connector->CommandText = "SELECT a.* FROM vw_ic_do_master AS a WHERE a.do_no = ?DoNo And a.cabang_id = ?cabangId";
+		$this->connector->CommandText = "SELECT a.* FROM vw_ic_delivery_master AS a WHERE a.do_no = ?DoNo And a.cabang_id = ?cabangId";
 		$this->connector->AddParameter("?DoNo", $DoNo);
         $this->connector->AddParameter("?cabangId", $cabangId);
 		$rs = $this->connector->ExecuteQuery();
@@ -134,13 +129,13 @@ class IcDo extends EntityBase {
 	}
 
     public function LoadByEntityId($entityId) {
-        $this->connector->CommandText = "SELECT a.* FROM vw_ic_do_master AS a WHERE a.entity_id = ?entityId";
+        $this->connector->CommandText = "SELECT a.* FROM vw_ic_delivery_master AS a WHERE a.entity_id = ?entityId";
         $this->connector->AddParameter("?entityId", $entityId);
         $rs = $this->connector->ExecuteQuery();
         $result = array();
         if ($rs != null) {
             while ($row = $rs->FetchAssoc()) {
-                $temp = new IcDo();
+                $temp = new Delivery();
                 $temp->FillProperties($row);
                 $result[] = $temp;
             }
@@ -149,13 +144,13 @@ class IcDo extends EntityBase {
     }
 
     public function LoadByCabangId($cabangId) {
-        $this->connector->CommandText = "SELECT a.* FROM vw_ic_do_master AS a.cabang_id = ?cabangId";
+        $this->connector->CommandText = "SELECT a.* FROM vw_ic_delivery_master AS a.cabang_id = ?cabangId";
         $this->connector->AddParameter("?cabangId", $cabangId);
         $rs = $this->connector->ExecuteQuery();
         $result = array();
         if ($rs != null) {
             while ($row = $rs->FetchAssoc()) {
-                $temp = new IcDo();
+                $temp = new Delivery();
                 $temp->FillProperties($row);
                 $result[] = $temp;
             }
@@ -164,7 +159,7 @@ class IcDo extends EntityBase {
     }
 
 	public function Insert() {
-        $sql = "INSERT INTO t_ic_do_master (cabang_id, do_no, do_date, customer_id, do_descs, expedition_id, driver_name, vehicle_number, do_status, createby_id, create_time)";
+        $sql = "INSERT INTO t_ic_delivery_master (cabang_id, do_no, do_date, customer_id, do_descs, expedition_id, driver_name, vehicle_number, do_status, createby_id, create_time)";
         $sql.= "VALUES(?cabang_id, ?do_no, ?do_date, ?customer_id, ?do_descs, ?expedition_id, ?driver_name, ?vehicle_number, ?do_status, ?createby_id, now())";
 		$this->connector->CommandText = $sql;
         $this->connector->AddParameter("?cabang_id", $this->CabangId);
@@ -187,7 +182,7 @@ class IcDo extends EntityBase {
 
 	public function Update($id) {
 		$this->connector->CommandText =
-"UPDATE t_ic_do_master SET
+"UPDATE t_ic_delivery_master SET
 	cabang_id = ?cabang_id
 	, do_no = ?do_no
 	, do_date = ?do_date
@@ -216,18 +211,28 @@ WHERE id = ?id";
 	}
 
 	public function Delete($id) {
-        $this->connector->CommandText = "Delete From t_ic_do_master WHERE id = ?id";
-        $this->connector->AddParameter("?id", $id);
-        return $this->connector->ExecuteNonQuery();
+	    $sql = "Update t_ar_invoice_detail a 
+Left Join (Select c.do_id,c.ex_invoice_id,c.ex_invdetail_id,sum(c.qty_delivered) as qty_del From t_ic_delivery_detail c Group By c.do_id,c.ex_invoice_id,c.ex_invdetail_id) b
+ON a.invoice_id = b.ex_invoice_id And a.id = b.ex_invdetail_id
+Set a.qty_delivered = a.qty_delivered - coalesce(b.qty_del,0)
+Where b.do_id = ". $id;
+        $this->connector->CommandText = $sql;
+        $rs =  $this->connector->ExecuteNonQuery();
+        if ($rs) {
+            $this->connector->CommandText = "Delete From t_ic_delivery_master WHERE id = ?id";
+            $this->connector->AddParameter("?id", $id);
+            $rs = $this->connector->ExecuteNonQuery();
+        }
+        return $rs;
 	}
 
     public function Void($id) {
-        $this->connector->CommandText = "Update t_ic_do_master a Set a.do_status = 3 WHERE a.id = ?id";
+        $this->connector->CommandText = "Update t_ic_delivery_master a Set a.do_status = 3 WHERE a.id = ?id";
         $this->connector->AddParameter("?id", $id);
         return $this->connector->ExecuteNonQuery();
     }
 
-    public function GetIcDoDocNo(){
+    public function GetDeliveryDocNo(){
         $sql = 'Select fc_sys_getdocno(?cbi,?txc,?txd) As valout;';
         $txc = 'DNO';
         $this->connector->CommandText = $sql;
@@ -244,18 +249,16 @@ WHERE id = ?id";
     }
 
     //$reports = $rj->Load4Reports($sCabangId,$sCustomerId,$sSalesId,$sStatus,$sPaymentStatus,$sStartDate,$sEndDate);
-    public function Load4Reports($entityId, $cabangId = 0, $customerId = 0, $DoStatus = -1, $startDate = null, $endDate = null) {
-        $sql = "SELECT a.* FROM vw_ic_do_master AS a";
+    public function Load4Reports($entityId, $cabangId = 0, $customerId = 0, $expeditionId = 0, $startDate = null, $endDate = null) {
+        $sql = "SELECT a.* FROM vw_ic_delivery_master AS a";
         $sql.= " WHERE a.is_deleted = 0 and a.do_date BETWEEN ?startdate and ?enddate";
         if ($cabangId > 0){
             $sql.= " and a.cabang_id = ".$cabangId;
         }else{
             $sql.= " and a.entity_id = ".$entityId;
         }
-        if ($DoStatus > -1){
-            $sql.= " and a.do_status = ".$DoStatus;
-        }else{
-            $sql.= " and a.do_status <> 3";
+        if ($expeditionId > 0){
+            $sql.= " and a.expedition_id = ".$expeditionId;
         }
         if ($customerId > 0){
             $sql.= " and a.customer_id = ".$customerId;
@@ -268,18 +271,17 @@ WHERE id = ?id";
         return $rs;
     }
 
-    public function Load4ReportsDetail($entityId, $cabangId = 0, $customerId = 0, $DoStatus = -1, $startDate = null, $endDate = null) {
-        $sql = "SELECT	a.*, b.item_code,b.ex_invoice_no,b.item_descs,b.qty_retur,b.price,b.sub_total FROM vw_ic_do_master AS a JOIN t_ic_do_detail b ON a.do_no = b.do_no";
+    public function Load4ReportsDetail($entityId, $cabangId = 0, $customerId = 0, $expeditionId = 0, $startDate = null, $endDate = null) {
+        $sql = "SELECT	a.*, b.item_code,b.ex_invoice_no,b.item_descs,b.qty_delivered,b.qty_order,c.satjual as satuan FROM vw_ic_delivery_master AS a JOIN t_ic_delivery_detail b ON a.do_no = b.do_no";
+        $sql.= " JOIN t_ar_invoice_detail c ON b.ex_invdetail_id = c.id";
         $sql.= " WHERE a.is_deleted = 0 and a.do_date BETWEEN ?startdate and ?enddate";
         if ($cabangId > 0){
             $sql.= " and a.cabang_id = ".$cabangId;
         }else{
             $sql.= " and a.entity_id = ".$entityId;
         }
-        if ($DoStatus > -1){
-            $sql.= " and a.do_status = ".$DoStatus;
-        }else{
-            $sql.= " and a.do_status <> 3";
+        if ($expeditionId > 0){
+            $sql.= " and a.expedition_id = ".$expeditionId;
         }
         if ($customerId > 0){
             $sql.= " and a.customer_id = ".$customerId;
@@ -292,44 +294,27 @@ WHERE id = ?id";
         return $rs;
     }
 
-    public function Load4ReportsRekapItem($entityId, $cabangId = 0, $customerId = 0, $DoStatus = -1, $startDate = null, $endDate = null) {
-        $sql = "SELECT b.item_code,b.item_descs,c.bsatkecil as satuan,coalesce(sum(b.qty_retur),0) as sum_qty,coalesce(sum(b.sub_total),0) as sum_total";
-        $sql.= " FROM vw_ic_do_master AS a Join t_ic_do_detail AS b On a.do_no = b.do_no Left Join m_barang AS c On b.item_code = c.bkode";
+    public function Load4ReportsRekapItem($entityId, $cabangId = 0, $customerId = 0, $expeditionId = 0, $startDate = null, $endDate = null) {
+        $sql = "SELECT b.item_code,b.item_descs,c.satjual as satuan,coalesce(sum(b.qty_delivered),0) as sum_qty";
+        $sql.= " FROM vw_ic_delivery_master AS a Join t_ic_delivery_detail AS b On a.do_no = b.do_no Left Join t_ar_invoice_detail AS c On b.ex_invdetail_id = c.id";
         $sql.= " WHERE a.is_deleted = 0 and a.do_date BETWEEN ?startdate and ?enddate";
         if ($cabangId > 0){
             $sql.= " and a.cabang_id = ".$cabangId;
         }else{
             $sql.= " and a.entity_id = ".$entityId;
         }
-        if ($DoStatus > -1){
-            $sql.= " and a.do_status = ".$DoStatus;
-        }else{
-            $sql.= " and a.do_status <> 3";
+        if ($expeditionId > 0){
+            $sql.= " and a.expedition_id = ".$expeditionId;
         }
         if ($customerId > 0){
             $sql.= " and a.customer_id = ".$customerId;
         }
-        $sql.= " Group By b.item_code,b.item_descs,c.bsatkecil Order By b.item_descs,b.item_code";
+        $sql.= " Group By b.item_code,b.item_descs,c.satjual Order By b.item_descs,b.item_code";
         $this->connector->CommandText = $sql;
         $this->connector->AddParameter("?startdate", date('Y-m-d', $startDate));
         $this->connector->AddParameter("?enddate", date('Y-m-d', $endDate));
         $rs = $this->connector->ExecuteQuery();
         return $rs;
-    }
-
-    public function GetJSonIcDos($cabangId,$customerId) {
-        $sql = "SELECT a.id,a.do_no,a.do_date,a.expedition_id - a.driver_name as do_balance FROM t_ic_do_master as a Where a.expedition_id > a.driver_name And a.is_deleted = 0 And a.cabang_id = ".$cabangId." And a.customer_id = ".$customerId;
-        $this->connector->CommandText = $sql;
-        $data['count'] = $this->connector->ExecuteQuery()->GetNumRows();
-        $sql.= " Order By a.do_no Asc";
-        $this->connector->CommandText = $sql;
-        $rows = array();
-        $rs = $this->connector->ExecuteQuery();
-        while ($row = $rs->FetchAssoc()){
-            $rows[] = $row;
-        }
-        $result = array('total'=>$data['count'],'rows'=>$rows);
-        return $result;
     }
 
 }

@@ -6,6 +6,8 @@ class AwalController extends AppController {
     private $userCabangId;
     private $userLevel;
     private $isGlobalItems;
+    private $trxMonth;
+    private $trxYear;
 
 	protected function Initialize() {
 		require_once(MODEL . "inventory/awal.php");
@@ -15,6 +17,8 @@ class AwalController extends AppController {
         $this->userCabangId = $this->persistence->LoadState("cabang_id");
         $this->userLevel = $this->persistence->LoadState("user_lvl");
         $this->isGlobalItems = $this->persistence->LoadState("is_global_items");
+        $this->trxMonth = $this->persistence->LoadState("acc_month");
+        $this->trxYear = $this->persistence->LoadState("acc_year");
 	}
 
 	public function index() {
@@ -48,7 +52,7 @@ class AwalController extends AppController {
         $sfield = isset($_POST['sfield']) ? strval($_POST['sfield']) : '';
         $scontent = isset($_POST['scontent']) ? strval($_POST['scontent']) : '';
         $offset = ($offset-1)*$limit;
-        $data   = $awal->GetData($entityId,$cabangId,$offset,$limit,$sfield,$scontent,$sort,$order);
+        $data   = $awal->GetData($this->trxYear,$entityId,$cabangId,$offset,$limit,$sfield,$scontent,$sort,$order);
         echo json_encode($data); //return nya json
     }
 

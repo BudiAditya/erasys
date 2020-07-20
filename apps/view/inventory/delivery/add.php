@@ -1,9 +1,9 @@
 <!DOCTYPE HTML>
 <html>
 <?php
-/** @var $arreturn ArReturn */ ?>
+/** @var $delivery Delivery */ ?>
 <head>
-	<title>ERASYS - Entry Return Penjualan</title>
+	<title>ERASYS - Entry Delivery Order (D/O)</title>
 	<meta http-equiv="Content-type" content="text/html;charset=UTF-8"/>
 	<link rel="stylesheet" type="text/css" href="<?php print($helper->path("public/css/common.css")); ?>"/>
 	<link rel="stylesheet" type="text/css" href="<?php print($helper->path("public/css/jquery-ui.css")); ?>"/>
@@ -29,10 +29,10 @@
 
         $(document).ready(function() {
 
-            var addmaster = ["CabangId", "RjDate","CustomerId", "RjDescs", "btSubmit", "btKembali"];
+            var addmaster = ["CabangId", "DoDate","CustomerId", "DoDescs", "btSubmit", "btKembali"];
             BatchFocusRegister(addmaster);
 
-            $("#RjDate").customDatePicker({ showOn: "focus" });
+            $("#DoDate").customDatePicker({ showOn: "focus" });
 
             $('#CustomerId').combogrid({
                 panelWidth:600,
@@ -83,35 +83,56 @@
 <?php if (isset($info)) { ?>
 <div class="ui-state-highlight subTitle center"><?php print($info); ?></div><?php } ?>
 <br />
-<div id="p" class="easyui-panel" title="Entry Return Penjualan" style="width:100%;height:100%;padding:10px;" data-options="footer:'#ft'">
-    <form id="frmMaster" action="<?php print($helper->site_url("ar.arreturn/add")); ?>" method="post">
+<div id="p" class="easyui-panel" title="Entry Delivery Order (D/O)" style="width:100%;height:100%;padding:10px;" data-options="footer:'#ft'">
+    <form id="frmMaster" action="<?php print($helper->site_url("inventory.delivery/add")); ?>" method="post">
         <table cellpadding="0" cellspacing="0" class="tablePadding" align="left" style="font-size: 13px;font-family: tahoma">
             <tr>
                 <td>Cabang</td>
-                <td><input type="text" class="f1 easyui-textbox" maxlength="20" style="width: 250px" id="CabangCode" name="CabangCode" value="<?php print($arreturn->CabangCode != null ? $arreturn->CabangCode : $userCabCode); ?>" disabled/>
-                    <input type="hidden" id="CabangId" name="CabangId" value="<?php print($arreturn->CabangId == null ? $userCabId : $arreturn->CabangId);?>"/>
+                <td><input type="text" class="easyui-textbox" maxlength="20" style="width: 250px" id="CabangCode" name="CabangCode" value="<?php print($delivery->CabangCode != null ? $delivery->CabangCode : $userCabCode); ?>" disabled/>
+                    <input type="hidden" id="CabangId" name="CabangId" value="<?php print($delivery->CabangId == null ? $userCabId : $delivery->CabangId);?>"/>
                 </td>
                 <td>Tanggal</td>
-                <td><input type="text" size="12" id="RjDate" name="RjDate" value="<?php print($arreturn->FormatRjDate(JS_DATE));?>" required/></td>
-                <td>No. Bukti</td>
-                <td><input type="text" class="f1 easyui-textbox" maxlength="20" style="width: 150px" id="RjNo" name="RjNo" value="<?php print($arreturn->RjNo != null ? $arreturn->RjNo : '-'); ?>" readonly/></td>
+                <td><input type="text" size="10" id="DoDate" name="DoDate" value="<?php print($delivery->FormatDoDate(JS_DATE));?>" required/></td>
+                <td>No. D/O</td>
+                <td><input type="text" class="easyui-textbox" maxlength="20" style="width: 150px" id="DoNo" name="DoNo" value="<?php print($delivery->DoNo != null ? $delivery->DoNo : '-'); ?>" readonly/></td>
             </tr>
             <tr>
                 <td>Customer</td>
                 <td><input class="easyui-combogrid" id="CustomerId" name="CustomerId" style="width: 250px"/></td>
+                <td>No Plat</td>
+                <td><input class="easyui-textbox" id="VehicleNumber" name="VehicleNumber" style="width: 100px"/></td>
+                <td>Sopir</td>
+                <td><input class="easyui-textbox" id="DriverName" name="DriverName" style="width: 150px"/></td>
                 <td>Status</td>
-                <td><select class="easyui-combobox" id="RjStatus" name="RjStatus" style="width: 150px">
-                        <option value="0" <?php print($arreturn->RjStatus == 0 ? 'selected="selected"' : '');?>>0 - Draft</option>
-                        <option value="1" <?php print($arreturn->RjStatus == 1 ? 'selected="selected"' : '');?>>1 - Posted</option>
-                        <option value="2" <?php print($arreturn->RjStatus == 2 ? 'selected="selected"' : '');?>>2 - Batal</option>
+                <td><select class="easyui-combobox" id="DoStatus1" name="DoStatus1" style="width: 100px" disabled>
+                        <option value="0" <?php print($delivery->DoStatus == 0 ? 'selected="selected"' : '');?>>0 - Draft</option>
+                        <option value="1" <?php print($delivery->DoStatus == 1 ? 'selected="selected"' : '');?>>1 - Posted</option>
+                        <option value="2" <?php print($delivery->DoStatus == 2 ? 'selected="selected"' : '');?>>2 - Closed</option>
+                        <option value="3" <?php print($delivery->DoStatus == 3 ? 'selected="selected"' : '');?>>3 - Void</option>
                     </select>
+                    <input type="hidden" id="DoStatus" name="DoStatus" value="<?php print($delivery->DoStatus);?>"/>
                 </td>
             </tr>
             <tr>
                 <td>Keterangan</td>
-                <td colspan="3"><b><input type="text" class="f1 easyui-textbox" id="RjDescs" name="RjDescs" size="89" maxlength="150" value="<?php print($arreturn->RjDescs != null ? $arreturn->RjDescs : '-'); ?>" required/></b></td>
+                <td colspan="3"><b><input type="text" class="easyui-textbox" id="DoDescs" name="DoDescs" style="width: 420px" value="<?php print($delivery->DoDescs != null ? $delivery->DoDescs : '-'); ?>" required/></b></td>
+                <td>Expedisi</td>
+                <td><select class="easyui-combobox" id="ExpeditionId" name="ExpeditionId" style="width: 150px">
+                        <option value="0"></option>
+                        <?php
+                        /** @var $expeditions Expedition[] */
+                        foreach ($expeditions as $expedisi){
+                            if ($delivery->ExpeditionId == $expedisi->Id){
+                                printf('<option value="%d" selected="selected">%s</option>',$expedisi->Id,$expedisi->ExpName);
+                            }else{
+                                printf('<option value="%d">%s</option>',$expedisi->Id,$expedisi->ExpName);
+                            }
+                        }
+                        ?>
+                    </select>
+                </td>
                 <td colspan="2" align="right">
-                    <a id="btKembali" href="<?php print($helper->site_url("ar.arreturn")); ?>" class="button">Kembali</a>
+                    <a id="btKembali" href="<?php print($helper->site_url("inventory.delivery")); ?>" class="button">Kembali</a>
                     <button id="btSubmit" type="submit">Berikutnya &gt;</button>
                 </td>
             </tr>

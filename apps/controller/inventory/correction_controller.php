@@ -5,6 +5,8 @@ class CorrectionController extends AppController {
     private $userCompanyId;
     private $userCabangId;
     private $userLevel;
+    private $trxMonth;
+    private $trxYear;
 
 	protected function Initialize() {
 		require_once(MODEL . "inventory/correction.php");
@@ -13,6 +15,8 @@ class CorrectionController extends AppController {
         $this->userCompanyId = $this->persistence->LoadState("entity_id");
         $this->userCabangId = $this->persistence->LoadState("cabang_id");
         $this->userLevel = $this->persistence->LoadState("user_lvl");
+        $this->trxMonth = $this->persistence->LoadState("acc_month");
+        $this->trxYear = $this->persistence->LoadState("acc_year");
 	}
 
 	public function index() {
@@ -52,7 +56,7 @@ class CorrectionController extends AppController {
         $sfield = isset($_POST['sfield']) ? strval($_POST['sfield']) : '';
         $scontent = isset($_POST['scontent']) ? strval($_POST['scontent']) : '';
         $offset = ($offset-1)*$limit;
-        $data   = $koreksi->GetData($cabangId,$offset,$limit,$sfield,$scontent,$sort,$order);
+        $data   = $koreksi->GetData($this->trxYear,$cabangId,$offset,$limit,$sfield,$scontent,$sort,$order);
         echo json_encode($data); //return nya json
     }
 

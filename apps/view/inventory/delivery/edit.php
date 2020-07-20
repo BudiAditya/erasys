@@ -1,9 +1,9 @@
 <!DOCTYPE HTML>
 <html>
 <?php
-/** @var $arreturn ArReturn */ ?>
+/** @var $delivery Delivery */ ?>
 <head>
-    <title>ERASYS - Entry Return Penjualan</title>
+    <title>ERASYS - Entry Delivery Order (D/O)</title>
     <meta http-equiv="Content-type" content="text/html;charset=UTF-8"/>
     <link rel="stylesheet" type="text/css" href="<?php print($helper->path("public/css/common.css")); ?>"/>
     <link rel="stylesheet" type="text/css" href="<?php print($helper->path("public/css/jquery-ui.css")); ?>"/>
@@ -28,9 +28,9 @@
     <script type="text/javascript">
 
         $( function() {
-            //var addmaster = ["CabangId", "RjDate","CustomerId", "RjDescs", "btSubmit", "btKembali"];
+            //var addmaster = ["CabangId", "DoDate","CustomerId", "DoDescs", "btSubmit", "btKembali"];
             //BatchFocusRegister(addmaster);
-            $("#RjDate").customDatePicker({ showOn: "focus" });
+            $("#DoDate").customDatePicker({ showOn: "focus" });
 
             $('#CustomerId').combogrid({
                 panelWidth:600,
@@ -49,7 +49,7 @@
 
             $('#aExInvoiceNo').combogrid({
                 panelWidth:250,
-                url: "<?php print($helper->site_url("ar.invoice/getjson_invoicelists/".$arreturn->CabangId.'/'.$arreturn->CustomerId));?>",
+                url: "<?php print($helper->site_url("ar.invoice/getjson_invoicedolists/".$delivery->CabangId.'/'.$delivery->CustomerId));?>",
                 idField:'invoice_no',
                 textField:'invoice_no',
                 mode:'remote',
@@ -62,24 +62,23 @@
                     var ivi = row.id;
                     console.log(ivi);
                     $("#aExInvoiceId").val(ivi);
-                    var urz = "<?php print($helper->site_url("ar.invoice/getjson_invoiceitems/"));?>"+ivi;
+                    var urz = "<?php print($helper->site_url("ar.invoice/getjson_invoicedoitems/"));?>"+ivi;
                     $('#aItemSearch').combogrid('grid').datagrid('load',urz);
                 }
             });
 
             $('#aItemSearch').combogrid({
                 panelWidth:600,
-                url: "<?php print($helper->site_url("ar.invoice/getjson_invoiceitems/0"));?>",
+                url: "<?php print($helper->site_url("ar.invoice/getjson_invoicedoitems/0"));?>",
                 idField:'item_id',
                 textField:'item_id',
                 mode:'remote',
                 fitColumns:true,
                 columns:[[
-                    {field:'item_code',title:'Kode Barang',width:30},
+                    {field:'item_code',title:'Kode',width:30},
                     {field:'item_descs',title:'Nama Barang',width:70},
                     {field:'qty_jual',title:'QTY',width:20,align:'right'},
-                    {field:'satuan',title:'Satuan',width:20},
-                    {field:'price',title:'Harga',width:20,align:'right'}
+                    {field:'satuan',title:'Satuan',width:20}
                 ]],
                 onSelect: function(index,row){
                     var idi = row.id;
@@ -94,20 +93,13 @@
                     console.log(qtj);
                     var sat = row.satuan;
                     console.log(sat);
-                    var prc = row.price;
-                    console.log(prc);
-                    var hpp = row.hpp;
-                    console.log(hpp);
                     $('#aExInvDetailId').val(idi);
                     $('#aItemId').val(iti);
                     $('#aItemCode').val(itc);
                     $('#aItemDescs').val(itd);
                     $('#aSatuan').val(sat);
-                    $('#aPrice').val(prc);
-                    $('#aQtyJual').val(qtj);
-                    $('#aQtyRetur').val('0');
-                    $('#aSubTotal').val(0);
-                    $('#aHpp').val(hpp);
+                    $('#aQtyOrder').val(qtj);
+                    $('#aQtyDelivered').val('0');
                 }
             });
 
@@ -117,12 +109,9 @@
                 $('#aItemCode').val('');
                 $('#aItemDescs').val('');
                 $('#aSatuan').val('');
-                $('#aPrice').val(0);
-                $('#aQtyJual').val(0);
-                $('#aQtyReturn').val('0');
+                $('#aQtyOrder').val(0);
+                $('#aQtyDelivered').val('0');
                 $('#aExInvoiceNo').val(0);
-                $('#aSubTotal').val(0);
-                $('#aHpp').val(0);
                 newItem();
             });                        
 
@@ -134,40 +123,34 @@
 
             $("#bTambah").click(function(){
                 if (confirm('Buat Retur Penjualan baru?')){
-                    location.href="<?php print($helper->site_url("ar.arreturn/add")); ?>";
+                    location.href="<?php print($helper->site_url("inventory.delivery/add")); ?>";
                 }
             });
 
             $("#bHapus").click(function(){
-                if (confirm('Anda yakin akan membatalkan return ini?')){
-                    location.href="<?php print($helper->site_url("ar.arreturn/void/").$arreturn->Id); ?>";
+                if (confirm('Anda yakin akan membatalkan D/O ini?')){
+                    location.href="<?php print($helper->site_url("inventory.delivery/void/").$delivery->Id); ?>";
                 }
             });
 
             $("#bCetak").click(function(){
                 if (confirm('Cetak bukti retur ini?')){
-                    location.href="<?php print($helper->site_url("ar.arreturn/print_pdf/").$arreturn->Id); ?>";
+                    location.href = "<?php print($helper->site_url("inventory.delivery/print_pdf/").$delivery->Id);?>";
                 }
             });
 
             $("#bKembali").click(function(){
-                location.href="<?php print($helper->site_url("ar.arreturn")); ?>";
+                location.href = "<?php print($helper->site_url("inventory.delivery")); ?>";
             });
 
-            $("#aQtyRetur").change(function(e){
-                var qty = Number($('#aQtyJual').val());
-                var qtr = Number($('#aQtyRetur').val());
-                var prc = Number($('#aPrice').val());
-                var sbt = 0;
+            $("#aQtyDelivered").change(function(e){
+                var qty = Number($('#aQtyOrder').val());
+                var qtr = Number($('#aQtyDelivered').val());
                 if (qtr > 0){
                     if (qtr > qty){
                         alert('Qty Retur tidak boleh melebihi Qty penjualan!');
-                        $('#aQtyRetur').val(qty);
-                        sbt = qty * prc;
-                    }else{
-                        sbt = qtr * prc;
+                        $('#aQtyDelivered').val(qty);
                     }
-                    $('#aSubTotal').val(sbt);
                 }
             });
         });
@@ -178,7 +161,7 @@
             var id = dtx[0];
             var kode = dtx[2];
             var barang = dtx[3];
-            var urx = '<?php print($helper->site_url("ar.arreturn/delete_detail/"));?>'+id;
+            var urx = '<?php print($helper->site_url("inventory.delivery/delete_detail/"));?>'+id;
             if (confirm('Hapus Data Detail Barang \nKode: '+kode+ '\nNama: '+barang+' ?')) {
                 $.get(urx, function(data){
                     alert(data);
@@ -188,14 +171,14 @@
         }        
 
         function newItem(){
-            $('#dlg').dialog('open').dialog('setTitle','Tambah Detail Barang yang dikembalikan');
+            $('#dlg').dialog('open').dialog('setTitle','Tambah Detail Barang yang dikirim');
             $('#fm').form('clear');
-            url= "<?php print($helper->site_url("ar.arreturn/add_detail/".$arreturn->Id));?>";
+            url= "<?php print($helper->site_url("inventory.delivery/add_detail/".$delivery->Id));?>";
             $('#aItemCode').focus();
         }
 
         function saveDetail(){
-            var rqty = Number($('#aQtyRetur').val());
+            var rqty = Number($('#aQtyDelivered').val());
             if (rqty > 0){
                 $('#fm').form('submit',{
                     url: url,
@@ -266,97 +249,112 @@ $bsubmit = base_url('public/images/button/').'ok.png';
 $baddnew = base_url('public/images/button/').'create_new.png';
 ?>
 <br />
-<div id="p" class="easyui-panel" title="Entry Return Penjualan" style="width:100%;height:100%;padding:10px;" data-options="footer:'#ft'">
-    <form id="frmMaster" action="<?php print($helper->site_url("ar.arreturn/edit/".$arreturn->Id)); ?>" method="post">
+<div id="p" class="easyui-panel" title="Entry Delivery Order (D/O)" style="width:100%;height:100%;padding:10px;" data-options="footer:'#ft'">
+    <form id="frmMaster" action="<?php print($helper->site_url("inventory.delivery/edit/".$delivery->Id)); ?>" method="post">
         <table cellpadding="0" cellspacing="0" class="tablePadding" align="left" style="font-size: 13px;font-family: tahoma">
             <tr>
                 <td>Cabang</td>
-                <td><input type="text" class="f1 easyui-textbox" maxlength="20" style="width: 250px" id="CabangCode" name="CabangCode" value="<?php print($arreturn->CabangCode != null ? $arreturn->CabangCode : $userCabCode); ?>" disabled/>
-                    <input type="hidden" id="CabangId" name="CabangId" value="<?php print($arreturn->CabangId == null ? $userCabId : $arreturn->CabangId);?>"/>
+                <td><input type="text" class="easyui-textbox" maxlength="20" style="width: 250px" id="CabangCode" name="CabangCode" value="<?php print($delivery->CabangCode != null ? $delivery->CabangCode : $userCabCode); ?>" disabled/>
+                    <input type="hidden" id="CabangId" name="CabangId" value="<?php print($delivery->CabangId == null ? $userCabId : $delivery->CabangId);?>"/>
                 </td>
                 <td>Tanggal</td>
-                <td><input type="text" size="12" id="RjDate" name="RjDate" value="<?php print($arreturn->FormatRjDate(JS_DATE));?>"/></td>
-                <td>No. Bukti</td>
-                <td><input type="text" class="f1 easyui-textbox" maxlength="20" style="width: 150px" id="RjNo" name="RjNo" value="<?php print($arreturn->RjNo != null ? $arreturn->RjNo : '-'); ?>" readonly/></td>
+                <td><input type="text" size="10" id="DoDate" name="DoDate" value="<?php print($delivery->FormatDoDate(JS_DATE));?>" readonly/></td>
+                <td>No. D/O</td>
+                <td><input type="text" class="easyui-textbox" maxlength="20" style="width: 150px" id="DoNo" name="DoNo" value="<?php print($delivery->DoNo != null ? $delivery->DoNo : '-'); ?>" readonly/></td>
+                <td>Status</td>
+                <td><select class="easyui-combobox" id="DoStatus1" name="DoStatus1" style="width: 100px" disabled>
+                        <option value="0" <?php print($delivery->DoStatus == 0 ? 'selected="selected"' : '');?>>0 - Draft</option>
+                        <option value="1" <?php print($delivery->DoStatus == 1 ? 'selected="selected"' : '');?>>1 - Posted</option>
+                        <option value="2" <?php print($delivery->DoStatus == 2 ? 'selected="selected"' : '');?>>2 - Closed</option>
+                        <option value="3" <?php print($delivery->DoStatus == 3 ? 'selected="selected"' : '');?>>3 - Void</option>
+                    </select>
+                    <input type="hidden" id="DoStatus" name="DoStatus" value="<?php print($delivery->DoStatus);?>"/>
+                </td>
             </tr>
             <tr>
                 <td>Customer</td>
-                <td><input class="easyui-combogrid" id="CustomerId" name="CustomerId" style="width: 250px" value="<?php print($arreturn->CustomerId);?>" readonly/></td>
-                <td>Status</td>
-                <td><select class="easyui-combobox" id="RjStatus" name="RjStatus" style="width: 150px" readonly>
-                        <option value="0" <?php print($arreturn->RjStatus == 0 ? 'selected="selected"' : '');?>>0 - Draft</option>
-                        <option value="1" <?php print($arreturn->RjStatus == 1 ? 'selected="selected"' : '');?>>1 - Posted</option>
-                        <option value="2" <?php print($arreturn->RjStatus == 2 ? 'selected="selected"' : '');?>>2 - Batal</option>
-                    </select>
-                </td>
+                <td><input class="easyui-combogrid" id="CustomerId" name="CustomerId" value="<?=$delivery->CustomerId;?>" style="width: 250px" readonly/></td>
+                <td>No. Plat</td>
+                <td><input class="easyui-textbox" id="VehicleNumber" name="VehicleNumber" value="<?=$delivery->VehicleNumber;?>" style="width: 100px" readonly/></td>
+                <td>Sopir</td>
+                <td><input class="easyui-textbox" id="DriverName" name="DriverName" value="<?=$delivery->DriverName;?>" style="width: 150px" readonly/></td>
             </tr>
             <tr>
                 <td>Keterangan</td>
-                <td colspan="3"><b><input type="text" class="f1 easyui-textbox" id="RjDescs" name="RjDescs" size="89" maxlength="150" value="<?php print($arreturn->RjDescs != null ? $arreturn->RjDescs : '-'); ?>" required/></b></td>
+                <td colspan="3"><b><input type="text" class="easyui-textbox" id="DoDescs" name="DoDescs" style="width: 420px" value="<?php print($delivery->DoDescs != null ? $delivery->DoDescs : '-'); ?>" readonly/></b></td>
+                <td>Expedisi</td>
+                <td><select class="easyui-combobox" id="ExpeditionId" name="ExpeditionId" style="width: 150px">
+                        <option value="0"></option>
+                        <?php
+                        /** @var $expeditions Expedition[] */
+                        foreach ($expeditions as $expedisi){
+                            if ($delivery->ExpeditionId == $expedisi->Id){
+                                printf('<option value="%d" selected="selected">%s</option>',$expedisi->Id,$expedisi->ExpName);
+                            }else{
+                                printf('<option value="%d">%s</option>',$expedisi->Id,$expedisi->ExpName);
+                            }
+                        }
+                        ?>
+                    </select>
+                </td>
             </tr>
             <tr>
                 <td colspan="7">
                     <table cellpadding="0" cellspacing="0" class="tablePadding tableBorder" align="left" style="font-size: 12px;font-family: tahoma">
                         <tr>
-                            <th colspan="9">DETAIL BARANG YANG DIKEMBALIKAN</th>
+                            <th colspan="7">DETAIL BARANG YANG DIKIRIM</th>
                             <th rowspan="2">Action</th>
                         </tr>
                         <tr>
                             <th>No.</th>
                             <th>Ex. Invoice No.</th>
-                            <th>Kode Barang</th>
+                            <th>Kode</th>
                             <th>Nama Barang</th>
-                            <th>Qty Jual</th>
-                            <th>Qty Retur</th>
+                            <th>Qty Order</th>
+                            <th>Qty Kirim</th>
                             <th>Satuan</th>
-                            <th>Harga</th>
-                            <th>Jumlah</th>
                         </tr>
                         <?php
                         $counter = 0;
                         $total = 0;
                         $dta = null;
-                        foreach($arreturn->Details as $idx => $detail) {
+                        foreach($delivery->Details as $idx => $detail) {
                             $counter++;
                             print("<tr>");
                             printf('<td class="right">%s.</td>', $counter);
                             printf('<td>%s</td>', $detail->ExInvoiceNo);
                             printf('<td>%s</td>', $detail->ItemCode);
                             printf('<td>%s</td>', $detail->ItemDescs);
-                            printf('<td class="right">%s</td>', number_format($detail->QtyJual,0));
-                            printf('<td class="right">%s</td>', number_format($detail->QtyRetur,0));
-                            printf('<td>%s</td>', $detail->SatRetur);
-                            printf('<td class="right">%s</td>', number_format($detail->Price,0));
-                            printf('<td class="right">%s</td>', number_format($detail->SubTotal,0));
+                            printf('<td class="right">%s</td>', number_format($detail->QtyOrder,0));
+                            printf('<td class="right">%s</td>', number_format($detail->QtyDelivered,0));
+                            printf('<td>%s</td>', $detail->SatBesar);
                             print("<td class='center'>");
                             $dta = addslashes($detail->Id.'|'.$detail->ExInvoiceNo.'|'.$detail->ItemCode.'|'.str_replace('"',' in',$detail->ItemDescs));
                             printf('&nbsp<img src="%s" alt="Hapus barang" title="Hapus barang" style="cursor: pointer" onclick="return fdeldetail(%s);"/>',$bclose,"'".$dta."'");
                             print("</td>");
                             print("</tr>");
-                            $total += $detail->SubTotal;
                         }
                         ?>
                         <tr>
-                            <td colspan="8" align="right">Sub Total :</td>
-                            <td class="right bold"><?php print($arreturn->RjAmount != null ? number_format($arreturn->RjAmount,0) : 0);?></td>
+                            <td colspan="7" align="right">&nbsp;</td>
                             <td class='center'><?php printf('<img src="%s" alt="Tambah Barang" title="Tambah barang" id="bAdDetail" style="cursor: pointer;"/>',$badd);?></td>
                         </tr>
                         <tr>
-                            <td colspan="10" class="right">
+                            <td colspan="8" class="right">
                                 <?php
-                                if ($acl->CheckUserAccess("ar.arreturn", "edit")) {
+                                if ($acl->CheckUserAccess("inventory.delivery", "edit")) {
                                     printf('<img src="%s" alt="Simpan Data" title="Simpan data master" id="bUpdate" style="cursor: pointer;"/> &nbsp',$bsubmit);
                                 }
-                                if ($acl->CheckUserAccess("ar.arreturn", "add")) {
+                                if ($acl->CheckUserAccess("inventory.delivery", "add")) {
                                     printf('<img src="%s" alt="Data Baru" title="Buat Data Baru" id="bTambah" style="cursor: pointer;"/> &nbsp',$baddnew);
                                 }
-                                if ($acl->CheckUserAccess("ar.arreturn", "delete")) {
+                                if ($acl->CheckUserAccess("inventory.delivery", "delete")) {
                                     printf('<img src="%s" alt="Hapus Data" title="Hapus Data" id="bHapus" style="cursor: pointer;"/> &nbsp',$bdelete);
                                 }
-                                if ($acl->CheckUserAccess("ar.arreturn", "print")) {
+                                if ($acl->CheckUserAccess("inventory.delivery", "print")) {
                                     printf('<img src="%s" alt="Cetak Bukti" title="Cetak Receipt" id="bCetak" style="cursor: pointer;"/> &nbsp',$bcetak);
                                 }
-                                printf('<img src="%s" id="bKembali" alt="Daftar Return" title="Kembali ke daftar return" style="cursor: pointer;"/>',$bkembali);
+                                printf('<img src="%s" id="bKembali" alt="Daftar Return" title="Kembali ke daftar D/O" style="cursor: pointer;"/>',$bkembali);
                                 ?>
                             </td>
                         </tr>
@@ -369,8 +367,8 @@ $baddnew = base_url('public/images/button/').'create_new.png';
 <div id="ft" style="padding:5px; text-align: center; font-family: verdana; font-size: 9px" >
     Copyright &copy; 2016 - 2020  <a href='http://rekasys.com'><b>Rekasys Inc</b></a>
 </div>
-<!-- Form Add ArRreturn Detail -->
-<div id="dlg" class="easyui-dialog" style="width:1100px;height:150px;padding:5px 5px"
+<!-- Form Add ArRD/O Detail -->
+<div id="dlg" class="easyui-dialog" style="width:1000px;height:150px;padding:5px 5px"
      closed="true" buttons="#dlg-buttons">
     <form id="fm" method="post" novalidate>
         <table cellpadding="0" cellspacing="0" class="tablePadding tableBorder" style="font-size: 12px;font-family: tahoma;width: 100%">
@@ -378,11 +376,9 @@ $baddnew = base_url('public/images/button/').'create_new.png';
                 <th>Ex. Invoice No.</th>
                 <th>Kode Barang</th>
                 <th>Nama Barang</th>
-                <th>Qty Jual</th>
-                <th>Qty Return</th>
+                <th>Qty Order</th>
+                <th>Qty Kirim</th>
                 <th>Satuan</th>
-                <th>Harga</th>
-                <th>Jumlah</th>
             </tr>
             <tr>
                 <td>
@@ -395,25 +391,18 @@ $baddnew = base_url('public/images/button/').'create_new.png';
                     <input id="aItemSearch" name="aItemSearch" style="width: 20px"/>
                     <input type="hidden" id="aItemId" name="aItemId" value="0"/>
                     <input type="hidden" id="aId" name="aId" value="0"/>
-                    <input type="hidden" id="aHpp" name="aHpp" value="0"/>
                 </td>
                 <td>
                     <input type="text" id="aItemDescs" name="aItemDescs" size="38" value="" readonly/>
                 </td>
                 <td>
-                    <input class="right" type="text" id="aQtyJual" name="aQtyJual" size="5" value="0" readonly/>
+                    <input class="right" type="text" id="aQtyOrder" name="aQtyOrder" size="5" value="0" readonly/>
                 </td>
                 <td>
-                    <input class="right" type="text" id="aQtyRetur" name="aQtyRetur" size="5" value="0"/>
+                    <input class="right" type="text" id="aQtyDelivered" name="aQtyDelivered" size="5" value="0"/>
                 </td>
                 <td>
                     <input type="text" id="aSatuan" name="aSatuan" size="5" value="" readonly/>
-                </td>
-                <td>
-                    <input class="right" type="text" id="aPrice" name="aPrice" size="10" value="0" readonly/>
-                </td>
-                <td>
-                    <input class="right" type="text" id="aSubTotal" name="aSubTotal" size="12" value="0" readonly/>
                 </td>
             </tr>
         </table>

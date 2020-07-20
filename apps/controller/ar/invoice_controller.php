@@ -535,13 +535,26 @@ class InvoiceController extends AppController {
         }
 
         $report = array();
+        $jdt = 0;
         foreach ($ids as $id) {
             $inv = new Invoice();
             $inv = $inv->LoadById($id);
             $inv->LoadDetails();
-            $report[] = $inv;
+            if ($doctype == 'do' || $doctype == 'suratjalan'){
+                if ($inv->DeliveryType == 1){
+                    $report[] = $inv;
+                    $jdt++;
+                }
+            }else{
+                $report[] = $inv;
+                $jdt++;
+            }
         }
-
+        if ($jdt == 0) {
+            $this->persistence->SaveState("error", "Data yang dipilih tidak memenuhi syarat !");
+            redirect_url("ar.invoice");
+            return;
+        }
         $this->Set("doctype", $doctype);
         $this->Set("report", $report);
     }
@@ -1523,6 +1536,18 @@ class InvoiceController extends AppController {
         $this->Set("report", $report);
     }
 
+    public function getjson_invoicedolists($cabangId,$customerId){
+        $filter = isset($_POST['q']) ? strval($_POST['q']) : '';
+        $invoices = new Invoice();
+        $invlists = $invoices->GetJSonDoInvoices($cabangId,$customerId,$filter);
+        echo json_encode($invlists);
+    }
+
+    public function getjson_invoicedoitems($invoiceId = 0){
+        $invoices = new Invoice();
+        $itemlists = $invoices->GetJSonDoInvoiceItems($invoiceId);
+        echo json_encode($itemlists);
+    }
 }
 
 

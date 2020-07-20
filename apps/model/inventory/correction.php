@@ -150,8 +150,8 @@ class Correction extends EntityBase {
         return $rs;
     }
 
-    public function GetData($cabangId = 0,$offset,$limit,$field,$search='',$sort = 'a.item_code',$order = 'ASC') {
-        $sql = "SELECT a.* FROM vw_ic_stockcorrection as a Where a.item_id > 0 ";
+    public function GetData($trxYear,$cabangId = 0,$offset,$limit,$field,$search='',$sort = 'a.item_code',$order = 'ASC') {
+        $sql = "SELECT a.* FROM vw_ic_stockcorrection as a Where Year(a.corr_date) = $trxYear";
         if ($cabangId > 0){
             $sql.= " And cabang_id = ".$cabangId;
         }

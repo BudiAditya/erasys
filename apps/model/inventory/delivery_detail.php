@@ -1,6 +1,6 @@
 <?php
 
-class IcDoDetail extends EntityBase {
+class DeliveryDetail extends EntityBase {
 	public $Id;
     public $CabangId;
 	public $DoId;
@@ -36,7 +36,7 @@ class IcDoDetail extends EntityBase {
 	}
 
 	public function LoadById($id) {
-		$this->connector->CommandText = "SELECT a.*,b.bsatbesar,b.bsatkecil,b.bisisatkecil FROM t_ic_do_detail AS a Join m_barang AS b On a.item_code = b.bkode WHERE a.id = ?id";
+		$this->connector->CommandText = "SELECT a.*,b.bsatbesar,b.bsatkecil,b.bisisatkecil FROM t_ic_delivery_detail AS a Join m_barang AS b On a.item_code = b.bkode WHERE a.id = ?id";
 		$this->connector->AddParameter("?id", $id);
 		$rs = $this->connector->ExecuteQuery();
 		if ($rs == null || $rs->GetNumRows() == 0) {
@@ -47,7 +47,7 @@ class IcDoDetail extends EntityBase {
 	}
 
     public function FindById($id) {
-        $this->connector->CommandText = "SELECT a.*,b.bsatbesar,b.bsatkecil,b.bisisatkecil FROM t_ic_do_detail AS a Join m_barang AS b On a.item_code = b.bkode WHERE a.id = ?id";
+        $this->connector->CommandText = "SELECT a.*,b.bsatbesar,b.bsatkecil,b.bisisatkecil FROM t_ic_delivery_detail AS a Join m_barang AS b On a.item_code = b.bkode WHERE a.id = ?id";
         $this->connector->AddParameter("?id", $id);
         $rs = $this->connector->ExecuteQuery();
         if ($rs == null || $rs->GetNumRows() == 0) {
@@ -58,13 +58,13 @@ class IcDoDetail extends EntityBase {
     }
 
 	public function LoadByDoId($DoId, $orderBy = "a.id") {
-		$this->connector->CommandText = "SELECT a.*,b.bsatbesar,b.bsatkecil,b.bisisatkecil FROM t_ic_do_detail AS a Join m_barang AS b On a.item_code = b.bkode WHERE a.do_id = ?DoId ORDER BY $orderBy";
+		$this->connector->CommandText = "SELECT a.*,b.bsatbesar,b.bsatkecil,b.bisisatkecil FROM t_ic_delivery_detail AS a Join m_barang AS b On a.item_code = b.bkode WHERE a.do_id = ?DoId ORDER BY $orderBy";
 		$this->connector->AddParameter("?DoId", $DoId);
 		$result = array();
 		$rs = $this->connector->ExecuteQuery();
 		if ($rs) {
 			while ($row = $rs->FetchAssoc()) {
-				$temp = new IcDoDetail();
+				$temp = new DeliveryDetail();
 				$temp->FillProperties($row);
 				$result[] = $temp;
 			}
@@ -73,13 +73,13 @@ class IcDoDetail extends EntityBase {
 	}
 
     public function LoadByDoNo($invoiceNo, $orderBy = "a.id") {
-        $this->connector->CommandText = "SELECT a.*,b.bsatbesar,b.bsatkecil FROM t_ic_do_detail AS a Join m_barang AS b On a.item_code = b.bkode WHERE a.do_no = ?invoiceNo ORDER BY $orderBy";
+        $this->connector->CommandText = "SELECT a.*,b.bsatbesar,b.bsatkecil FROM t_ic_delivery_detail AS a Join m_barang AS b On a.item_code = b.bkode WHERE a.do_no = ?invoiceNo ORDER BY $orderBy";
         $this->connector->AddParameter("?invoiceNo", $invoiceNo);
         $result = array();
         $rs = $this->connector->ExecuteQuery();
         if ($rs) {
             while ($row = $rs->FetchAssoc()) {
-                $temp = new IcDoDetail();
+                $temp = new DeliveryDetail();
                 $temp->FillProperties($row);
                 $result[] = $temp;
             }
@@ -89,7 +89,7 @@ class IcDoDetail extends EntityBase {
 
 	public function Insert() {
 		$this->connector->CommandText =
-"INSERT INTO t_ic_do_detail(do_id, cabang_id, do_no, item_id, item_code, item_descs, ex_invoice_id, ex_invoice_no, qty_order, qty_delivered, ex_invdetail_id)
+"INSERT INTO t_ic_delivery_detail(do_id, cabang_id, do_no, item_id, item_code, item_descs, ex_invoice_id, ex_invoice_no, qty_order, qty_delivered, ex_invdetail_id)
 VALUES(?do_id, ?cabang_id, ?do_no, ?item_id, ?item_code, ?item_descs, ?ex_invoice_id, ?ex_invoice_no, ?qty_order, ?qty_delivered, ?ex_invdetail_id)";
 		$this->connector->AddParameter("?do_id", $this->DoId);
         $this->connector->AddParameter("?cabang_id", $this->CabangId);
@@ -108,15 +108,31 @@ VALUES(?do_id, ?cabang_id, ?do_no, ?item_id, ?item_code, ?item_descs, ?ex_invoic
 		if ($rs == 1) {
 			$this->connector->CommandText = "SELECT LAST_INSERT_ID();";
 			$this->Id = (int)$this->connector->ExecuteScalar();
+			$sql = "Update t_ar_invoice_detail a 
+Left Join (Select c.ex_invoice_id,c.ex_invdetail_id,sum(c.qty_delivered) as qty_del From t_ic_delivery_detail c Group By c.ex_invoice_id,c.ex_invdetail_id) b
+ON a.invoice_id = b.ex_invoice_id And a.id = b.ex_invdetail_id
+Set a.qty_delivered = coalesce(b.qty_del,0)
+Where a.invoice_id = ".$this->ExInvoiceId;
+            $this->connector->CommandText = $sql;
+            $this->connector->ExecuteNonQuery();
 		}
 		return $rs;
 	}
 
-	public function Delete($id) {
+	public function Delete($id,$ivi) {
         //baru hapus detail
-		$this->connector->CommandText = "DELETE FROM t_ic_do_detail WHERE id = ?id";
+		$this->connector->CommandText = "DELETE FROM t_ic_delivery_detail WHERE id = ?id";
 		$this->connector->AddParameter("?id", $id);
         $rs = $this->connector->ExecuteNonQuery();
+        if ($rs){
+            $sql = "Update t_ar_invoice_detail a 
+Left Join (Select c.ex_invoice_id,c.ex_invdetail_id,sum(c.qty_delivered) as qty_del From t_ic_delivery_detail c Group By c.ex_invoice_id,c.ex_invdetail_id) b
+ON a.invoice_id = b.ex_invoice_id And a.id = b.ex_invdetail_id
+Set a.qty_delivered = coalesce(b.qty_del,0)
+Where a.invoice_id = ".$ivi;
+            $this->connector->CommandText = $sql;
+            $this->connector->ExecuteNonQuery();
+        }
         return $rs;
 	}
 }
