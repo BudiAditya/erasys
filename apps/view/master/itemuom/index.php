@@ -118,7 +118,7 @@
 <body>
 <?php include(VIEW . "main/menu.php"); ?>
 <div align="center">
-    <table id="dg" title="Daftar Satuan Barang" class="easyui-datagrid" style="width:700px;height:500px"
+    <table id="dg" title="Daftar Satuan Barang" class="easyui-datagrid" style="width:100%;height:500px"
            url="<?php print($helper->site_url("master.itemuom/get_data"));?>"
            toolbar="#toolbar"
            pagination="true"

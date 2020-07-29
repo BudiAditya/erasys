@@ -21,6 +21,8 @@ class DashboardController extends AppController {
         $invoice = new Invoice();
         $dataInvoices = $invoice->GetInvoiceSumByYear($this->trxYear,$this->userCabangId);
         $this->Set("dataInvoices",$dataInvoices);
+        $dataInvMonthly = $invoice->GetDataInvoiceSumByMonth($this->trxYear,$this->userCabangId);
+        $this->Set("dataInvMonthly",$dataInvMonthly);
         $dataReceipts = $invoice->GetReceiptSumByYear($this->trxYear,$this->userCabangId);
         $this->Set("dataReceipts",$dataReceipts);
         $this->Set("dataTahun",$this->trxYear);
