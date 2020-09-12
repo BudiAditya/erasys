@@ -65,48 +65,43 @@ if ($JnsLaporan < 3) {
         $ivn = null;
         while ($rpt = $Reports->FetchAssoc()) {
             $row++;
-            if ($ivn <> $rpt["rb_no"]) {
-                $nmr++;
-                $sma = false;
-            } else {
-                $sma = true;
-            }
-            if (!$sma) {
-                $sheet->setCellValue("A$row", $nmr);
-                $sheet->getStyle("A$row")->applyFromArray($center);
-                $sheet->setCellValue("B$row", $rpt["cabang_code"]);
-                $sheet->setCellValue("C$row", date('d-m-Y', strtotime($rpt["rb_date"])));
-                $sheet->setCellValue("D$row", $rpt["rb_no"]);
-                $sheet->setCellValue("E$row", $rpt["supplier_name"]);
-                $sheet->setCellValue("F$row", $rpt["rb_descs"]);
-                $sheet->setCellValue("G$row", $rpt["rb_amount"]);
+            $nmr++;
+            $sheet->setCellValue("A$row", $nmr);
+            $sheet->getStyle("A$row")->applyFromArray($center);
+            $sheet->setCellValue("B$row", $rpt["cabang_code"]);
+            $sheet->setCellValue("C$row", date('d-m-Y', strtotime($rpt["rb_date"])));
+            $sheet->setCellValue("D$row", $rpt["rb_no"]);
+            $sheet->setCellValue("E$row", $rpt["supplier_name"]);
+            $sheet->setCellValue("F$row", $rpt["rb_descs"]);
+            $sheet->setCellValue("G$row", $rpt["rb_amount"]);
+            if ($JnsLaporan == 1) {
                 $sheet->getStyle("A$row:G$row")->applyFromArray(array_merge($allBorders));
-            }
-            if ($JnsLaporan == 2) {
+            }elseif ($JnsLaporan == 2) {
                 $sheet->setCellValue("H$row", $rpt['ex_grn_no']);
                 $sheet->setCellValueExplicit("I$row", $rpt['item_code'], PHPExcel_Cell_DataType::TYPE_STRING);
                 $sheet->setCellValue("J$row", $rpt['item_descs']);
                 $sheet->setCellValue("K$row", $rpt['qty_retur']);
                 $sheet->setCellValue("L$row", $rpt['price']);
                 $sheet->setCellValue("M$row", $rpt['sub_total']);
-                $sheet->getStyle("H$row:M$row")->applyFromArray(array_merge($allBorders));
+                $sheet->getStyle("A$row:M$row")->applyFromArray(array_merge($allBorders));
             }
             $ivn = $rpt["rb_no"];
         }
         $edr = $row;
         $row++;
-        $sheet->setCellValue("A$row", "TOTAL RETUR");
-        $sheet->mergeCells("A$row:F$row");
-        $sheet->getStyle("A$row")->applyFromArray($center);
-        $sheet->setCellValue("G$row", "=SUM(G$str:G$edr)");
-        $sheet->getStyle("G$str:G$row")->applyFromArray($idrFormat);
-        if ($JnsLaporan == 2) {
-            $sheet->mergeCells("H$row:L$row");
+        if ($JnsLaporan == 1) {
+            $sheet->setCellValue("A$row", "TOTAL RETUR");
+            $sheet->mergeCells("A$row:F$row");
+            $sheet->getStyle("A$row")->applyFromArray($center);
+            $sheet->setCellValue("G$row", "=SUM(G$str:G$edr)");
+            $sheet->getStyle("G$str:G$row")->applyFromArray($idrFormat);
+            $sheet->getStyle("A$row:G$row")->applyFromArray(array_merge($allBorders));
+        }elseif ($JnsLaporan == 2) {
+            $sheet->setCellValue("A$row", "TOTAL RETUR");
+            $sheet->mergeCells("A$row:L$row");
             $sheet->getStyle("A$row:M$row")->applyFromArray(array_merge($allBorders));
             $sheet->setCellValue("M$row", "=SUM(M$str:M$edr)");
             $sheet->getStyle("K$str:M$row")->applyFromArray($idrFormat);
-        } else {
-            $sheet->getStyle("A$row:G$row")->applyFromArray(array_merge($allBorders));
         }
         $row++;
     }

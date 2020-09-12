@@ -133,49 +133,37 @@ if ($JnsLaporan < 3){
             $sts = null;
             $ivn = null;
             while ($row = $Reports->FetchAssoc()) {
-                if ($ivn <> $row["rb_no"]) {
-                    $nmr++;
-                    $sma = false;
-                } else {
-                    $sma = true;
-                }
-                if (!$sma) {
-                    $url = $helper->site_url("ap.apreturn/view/" . $row["id"]);
-                    print("<tr valign='Top'>");
-                    printf("<td>%s</td>", $nmr);
-                    printf("<td>%s</td>", $row["cabang_code"]);
-                    printf("<td>%s</td>", date('d-m-Y', strtotime($row["rb_date"])));
-                    printf("<td><a href= '%s' target='_blank'>%s</a></td>", $url, $row["rb_no"]);
-                    printf("<td nowrap='nowrap'>%s</td>", $row["supplier_name"]);
-                    printf("<td nowrap='nowrap'>%s</td>", $row["rb_descs"]);
-                    printf("<td align='right'>%s</td>", number_format($row["rb_amount"], 0));
-                    if ($JnsLaporan == 1) {
-                        print("</tr>");
-                    };
-                    $nmr++;
+                $nmr++;
+                $url = $helper->site_url("ap.apreturn/view/" . $row["id"]);
+                print("<tr valign='Top'>");
+                printf("<td>%s</td>", $nmr);
+                printf("<td nowrap='nowrap'>%s</td>", $row["cabang_code"]);
+                printf("<td nowrap='nowrap'>%s</td>", date('d-m-Y', strtotime($row["rb_date"])));
+                printf("<td nowrap='nowrap'><a href= '%s' target='_blank'>%s</a></td>", $url, $row["rb_no"]);
+                printf("<td nowrap='nowrap'>%s</td>", $row["supplier_name"]);
+                printf("<td nowrap='nowrap'>%s</td>", $row["rb_descs"]);
+                printf("<td align='right'>%s</td>", number_format($row["rb_amount"], 0));
+                if ($JnsLaporan == 1) {
                     $total += $row["rb_amount"];
-                }
+                };
                 if ($JnsLaporan == 2) {
-                    if ($sma) {
-                        print("</tr>");
-                        print("<td colspan='7'>&nbsp;</td>");
-                    }
                     printf("<td nowrap='nowrap'>%s</td>", $row['ex_grn_no']);
                     printf("<td nowrap='nowrap'>%s</td>", $row['item_code']);
                     printf("<td nowrap='nowrap'>%s</td>", $row['item_descs']);
                     printf("<td align='right'>%s</td>", number_format($row['qty_retur'], 0));
                     printf("<td align='right' >%s</td>", number_format($row['price'], 0));
                     printf("<td align='right'>%s</td>", number_format($row['sub_total'], 0));
-                    print("</tr>");
                     $subtotal += $row['sub_total'];
                 }
+                print("</tr>");
                 $ivn = $row["rb_no"];
             }
         print("<tr>");
-        print("<td colspan='6' align='right'>Total Retur</td>");
-        printf("<td align='right'>%s</td>",number_format($total,0));
-        if ($JnsLaporan == 2) {
-            print("<td colspan='5'>&nbsp;</td>");
+        if ($JnsLaporan == 1) {
+            print("<td colspan='6' align='right'>Total Retur</td>");
+            printf("<td align='right'>%s</td>", number_format($total, 0));
+        }elseif ($JnsLaporan == 2) {
+            print("<td colspan='12' align='right'>Total Retur</td>");
             printf("<td align='right'>%s</td>", number_format($subtotal, 0));
         }
         print("</tr>");

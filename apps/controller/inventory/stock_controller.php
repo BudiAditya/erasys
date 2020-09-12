@@ -46,6 +46,8 @@ class StockController extends AppController {
             if ($_GET["query"] == "") {
                 $_GET["query"] = null;
                 $settings["where"] = "a.cabang_id = " . $this->userCabangId;
+            }else{
+                $settings["where"] = "a.entity_id = " . $this->userCompanyId;
             }
         }
         $dispatcher = Dispatcher::CreateInstance();

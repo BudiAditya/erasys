@@ -9,20 +9,9 @@
 	<script type="text/javascript" src="<?php print($helper->path("public/js/common.js")); ?>"></script>
 	<script type="text/javascript">
 		$(document).ready(function() {
-            var elements = ["user_id", "user_pwd", "user_captcha","user_cabang_id","btn_login"];
+            //var elements = ["user_id", "user_pwd", "user_captcha", "user_trxmonth", "user_trxyear", "btn_login"];
+			var elements = ["user_cabang_id","user_id", "user_pwd", "user_captcha", "btn_login"];
 			BatchFocusRegister(elements);
-			//check user
-            $("#user_pwd").change(function(){
-                var unm = $("#user_id").val();
-                var ups = $("#user_pwd").val();
-                var uid = 0;
-                var url = "<?php print($helper->site_url("home/getuserdata/")); ?>"+unm+"/"+ups;
-                $.get(url, function(data){
-                    if (data.substring(1) != '0'){
-                        $("#user_cabang_id").html(data);
-                    }
-                });
-            });
 		});
 	</script>
 
@@ -64,11 +53,23 @@
 	<form action="<?php echo site_url("home/login"); ?>" method="post" autocomplete="off">
 		<table width="500" border="0" align="center" cellpadding="2" cellspacing="0">
 			<tr>
-				<td class="text4" width="128">User ID/Email</td>
+				<td class="text4">Cabang/Outlet/Gudang</td>
+				<td><select name="user_cabang_id" id="user_cabang_id" style="width:175px" required>
+						<option value="0">-- PILIH CABANG --</option>
+						<?php
+								foreach($cablists as $cabang){
+								printf("<option value='%d'>%s</option>",$cabang->Id,$cabang->Kode);
+							}
+						?>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td class="text4" width="128">Nama Pemakai</td>
 				<td width="302"><input type="text" name="user_id" style="width:170px" value="" id="user_id" autocomplete="off" required/></td>
 			</tr>
             <tr>
-                <td class="text4">User Password</td>
+                <td class="text4">Kata Sandi</td>
                 <td><input type="password" name="user_pwd" style="width:170px" value="" id="user_pwd" autocomplete="off" required/></td>
             </tr>
 			<tr>
@@ -78,13 +79,6 @@
             <tr>
                 <td class="text4">Isikan Nilai Captcha</td>
                 <td><input type="text" name="user_captcha" style="width:170px" value="" id="user_captcha" required/></td>
-            </tr>
-            <tr>
-                <td class="text4">Cabang/Outlet/Gudang</td>
-                <td><select name="user_cabang_id" id="user_cabang_id" style="width:175px" required>
-                        <option value="">-- PILIH CABANG --</option>
-                    </select>
-                </td>
             </tr>
             <tr>
                 <td class="text4">Periode Transaksi</td>

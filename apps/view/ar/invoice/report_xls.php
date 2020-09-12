@@ -81,7 +81,7 @@ if ($JnsLaporan < 3) {
                 } else {
                     $sma = true;
                 }
-            }else{
+            } else {
                 //lainnya laporan aneh :)
                 $nmr++;
                 $sma = false;
@@ -102,7 +102,7 @@ if ($JnsLaporan < 3) {
                 $sheet->getStyle("A$row:K$row")->applyFromArray(array_merge($allBorders));
             }
             if ($JnsLaporan == 2) {
-                $sheet->setCellValueExplicit("L$row", $rpt['item_code'],PHPExcel_Cell_DataType::TYPE_STRING);
+                $sheet->setCellValueExplicit("L$row", $rpt['item_code'], PHPExcel_Cell_DataType::TYPE_STRING);
                 $sheet->setCellValue("M$row", $rpt['item_descs']);
                 $sheet->setCellValue("N$row", $rpt['qty']);
                 $sheet->setCellValue("O$row", $rpt['price']);
@@ -115,18 +115,19 @@ if ($JnsLaporan < 3) {
         }
         $edr = $row;
         $row++;
-        $sheet->setCellValue("A$row", "GRAND TOTAL INVOICE");
-        $sheet->mergeCells("A$row:H$row");
-        $sheet->getStyle("A$row")->applyFromArray($center);
-        $sheet->setCellValue("I$row", "=SUM(I$str:I$edr)");
-        $sheet->setCellValue("J$row", "=SUM(J$str:J$edr)");
-        $sheet->setCellValue("K$row", "=SUM(K$str:K$edr)");
-        $sheet->setCellValue("R$row", "=SUM(R$str:R$edr)");
-        $sheet->getStyle("I$str:K$row")->applyFromArray($idrFormat);
-        $sheet->getStyle("N$str:R$row")->applyFromArray($idrFormat);
-        if ($JnsLaporan == 1) {
+        $sheet->setCellValue("A$row", "TOTAL INVOICE");
+        if ($JnsLaporan == 1){
+            $sheet->mergeCells("A$row:H$row");
+            $sheet->getStyle("A$row")->applyFromArray($center);
+            $sheet->setCellValue("I$row", "=SUM(I$str:I$edr)");
+            $sheet->setCellValue("J$row", "=SUM(J$str:J$edr)");
+            $sheet->setCellValue("K$row", "=SUM(K$str:K$edr)");
             $sheet->getStyle("A$row:K$row")->applyFromArray(array_merge($allBorders));
         }else{
+            $sheet->mergeCells("A$row:Q$row");
+            $sheet->setCellValue("R$row", "=SUM(R$str:R$edr)");
+            $sheet->getStyle("I$str:K$row")->applyFromArray($idrFormat);
+            $sheet->getStyle("N$str:R$row")->applyFromArray($idrFormat);
             $sheet->getStyle("A$row:R$row")->applyFromArray(array_merge($allBorders));
         }
         $row++;

@@ -365,6 +365,7 @@ if ($rType < 5) {
 foreach ($headers as $header) {
     header($header);
 }
+
 // Hack agar client menutup loading dialog box... (Ada JS yang checking cookie ini pada common.js)
 $writer->save("php://output");
 

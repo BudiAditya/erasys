@@ -380,4 +380,10 @@ class UserAdminController extends AppController {
 			redirect_url("master.useradmin");
 		}
 	}
+
+    public function checkuser($userId,$userPass){
+	    $user = new UserAdmin();
+	    $uid = $user->CheckUser($userId,$userPass);
+	    echo $uid;
+    }
 }

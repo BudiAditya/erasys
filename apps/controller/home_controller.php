@@ -25,88 +25,92 @@ class HomeController extends AppController {
             $year = trim($this->GetPostValue("user_trxyear"));
             if ($this->persistence->LoadState("user_captcha") == $captcha){
                 //jika login berhasil
-                if ($this->doLogin($username, $password, $usercabang)) {
-                    $acl = AclManager::GetInstance(); //load class acl untuk session user id
-                    $uid = $acl->CurrentUser->Id;
-                    $router = Router::GetInstance();
-                    $userAdmin = new UserAdmin();
-                    $userAdmin->FindById($uid);
-                    $usercomp = null;
-                    $usercab = null;
-                    $oke = false;
-                    if ($userAdmin != null) {
-                        // periksa status user aktif atau tidak
-                        if ($userAdmin->IsAktif == 1) {
-                            // update table sys_users dengan info login
-                            // cabang2 apa saja yg boleh diakses
-                            $usercabakses = $userAdmin->ACabangId;
-                            $usercabakses = explode(",", $usercabakses);
-                            if (in_array($usercabang, $usercabakses)) {
-                                $oke = true;
-                            }
-                            if (!$oke && $userAdmin->CabangId != $usercabang && $userAdmin->UserLvl < 4) {
-                                $this->Set("error", "Maaf, Anda tidak boleh mengakses cabang ini!"); //tampilkan pesan error
-                                $log = $userAdmin->LoginActivityWriter($usercabang, $username, 'Akses cabang ditolak');
-                            } else {
+                if ($usercabang > 0) {
+                    if ($this->doLogin($username, $password, $usercabang)) {
+                        $acl = AclManager::GetInstance(); //load class acl untuk session user id
+                        $uid = $acl->CurrentUser->Id;
+                        $router = Router::GetInstance();
+                        $userAdmin = new UserAdmin();
+                        $userAdmin->FindById($uid);
+                        $usercomp = null;
+                        $usercab = null;
+                        $oke = false;
+                        if ($userAdmin != null) {
+                            // periksa status user aktif atau tidak
+                            if ($userAdmin->IsAktif == 1) {
                                 // update table sys_users dengan info login
-                                $userAdmin->Status = "6";
-                                $userAdmin->LoginTime = date('Y-m-d H:i:s');
-                                $userAdmin->LoginFrom = $router->IpAddress;
-                                $userAdmin->SessionId = $this->persistence->GetPersistenceId();
-                                $userAdmin->LoginRecord($userAdmin->UserUid);
-                                // ambil data entity dan project user yang login simpan ke session
-                                $usercab = new Cabang($usercabang);
-                                if ($usercab == null) {
-                                    $this->persistence->SaveState("entity_id", $userAdmin->EntityId);
-                                    $this->persistence->SaveState("entity_cd", $userAdmin->EntityCd);
-                                    $this->persistence->SaveState("entity_name", $userAdmin->CompanyName);
-                                    $this->persistence->SaveState("cabang_id", $userAdmin->CabangId);
-                                    $this->persistence->SaveState("cabang_kode", $userAdmin->CabangKode);
-                                    $this->persistence->SaveState("cabang_name", $userAdmin->CabangName);
-                                    $this->persistence->SaveState("area_id", $userAdmin->AreaId);
-                                    $this->persistence->SaveState("is_global_items",1);
-                                    $this->persistence->SaveState("is_allow_minus",1);
-                                    $this->persistence->SaveState("is_auto_price",0);
-                                } else {
-                                    /** @var $usercab Cabang */
-                                    $this->persistence->SaveState("entity_id", $usercab->EntityId);
-                                    $this->persistence->SaveState("entity_cd", $usercab->EntityCd);
-                                    $this->persistence->SaveState("entity_name", $usercab->CompanyName);
-                                    $this->persistence->SaveState("cabang_id", $usercabang);
-                                    $this->persistence->SaveState("cabang_kode", $usercab->Kode);
-                                    $this->persistence->SaveState("cabang_name", $usercab->NamaCabang);
-                                    $this->persistence->SaveState("area_id", $usercab->AreaId);
-                                    $this->persistence->SaveState("is_global_items", $usercab->IsUseGlobalItems);
-                                    $this->persistence->SaveState("is_allow_minus", $usercab->AllowMinus);
-                                    $this->persistence->SaveState("is_auto_price", $usercab->IsAutoUpdateSalePrice);
+                                // cabang2 apa saja yg boleh diakses
+                                $usercabakses = $userAdmin->ACabangId;
+                                $usercabakses = explode(",", $usercabakses);
+                                if (in_array($usercabang, $usercabakses)) {
+                                    $oke = true;
                                 }
-                                $this->persistence->SaveState("user_lvl", $userAdmin->UserLvl);
-                                $this->persistence->SaveState("sys_start_date", $userAdmin->SysStartDate);
-                                $this->persistence->SaveState("empdept_id", $userAdmin->EmpDepId);
-                                // Simpan data untuk lock tanggal periode ad / edit voucher
-                                $this->persistence->SaveState("force_periode", $userAdmin->IsForceAccountingPeriod);
-                                $this->persistence->SaveState("acc_year", $year);
-                                $this->persistence->SaveState("acc_month", $month);
-                                $log = $userAdmin->LoginActivityWriter($usercabang, $username, 'Login success');
-                                $log = $userAdmin->UserActivityWriter($usercabang, 'home.login', 'LogIn to System', '', 'Success');
-                                if ($userAdmin->IsForceAccountingPeriod) {
-                                    redirect_url("main/set_periode");
+                                if (!$oke && $userAdmin->CabangId != $usercabang && $userAdmin->UserLvl < 4) {
+                                    $this->Set("error", "Maaf, Anda tidak boleh mengakses cabang ini!"); //tampilkan pesan error
+                                    $log = $userAdmin->LoginActivityWriter($usercabang, $username, 'Akses cabang ditolak');
                                 } else {
-                                    redirect_url("main");
+                                    // update table sys_users dengan info login
+                                    $userAdmin->Status = "6";
+                                    $userAdmin->LoginTime = date('Y-m-d H:i:s');
+                                    $userAdmin->LoginFrom = $router->IpAddress;
+                                    $userAdmin->SessionId = $this->persistence->GetPersistenceId();
+                                    $userAdmin->LoginRecord($userAdmin->UserUid);
+                                    // ambil data entity dan project user yang login simpan ke session
+                                    $usercab = new Cabang($usercabang);
+                                    if ($usercab == null) {
+                                        $this->persistence->SaveState("entity_id", $userAdmin->EntityId);
+                                        $this->persistence->SaveState("entity_cd", $userAdmin->EntityCd);
+                                        $this->persistence->SaveState("entity_name", $userAdmin->CompanyName);
+                                        $this->persistence->SaveState("cabang_id", $userAdmin->CabangId);
+                                        $this->persistence->SaveState("cabang_kode", $userAdmin->CabangKode);
+                                        $this->persistence->SaveState("cabang_name", $userAdmin->CabangName);
+                                        $this->persistence->SaveState("area_id", $userAdmin->AreaId);
+                                        $this->persistence->SaveState("is_global_items", 1);
+                                        $this->persistence->SaveState("is_allow_minus", 1);
+                                        $this->persistence->SaveState("is_auto_price", 0);
+                                    } else {
+                                        /** @var $usercab Cabang */
+                                        $this->persistence->SaveState("entity_id", $usercab->EntityId);
+                                        $this->persistence->SaveState("entity_cd", $usercab->EntityCd);
+                                        $this->persistence->SaveState("entity_name", $usercab->CompanyName);
+                                        $this->persistence->SaveState("cabang_id", $usercabang);
+                                        $this->persistence->SaveState("cabang_kode", $usercab->Kode);
+                                        $this->persistence->SaveState("cabang_name", $usercab->NamaCabang);
+                                        $this->persistence->SaveState("area_id", $usercab->AreaId);
+                                        $this->persistence->SaveState("is_global_items", $usercab->IsUseGlobalItems);
+                                        $this->persistence->SaveState("is_allow_minus", $usercab->AllowMinus);
+                                        $this->persistence->SaveState("is_auto_price", $usercab->IsAutoUpdateSalePrice);
+                                    }
+                                    $this->persistence->SaveState("user_lvl", $userAdmin->UserLvl);
+                                    $this->persistence->SaveState("sys_start_date", $userAdmin->SysStartDate);
+                                    $this->persistence->SaveState("empdept_id", $userAdmin->EmpDepId);
+                                    // Simpan data untuk lock tanggal periode ad / edit voucher
+                                    $this->persistence->SaveState("force_periode", $userAdmin->IsForceAccountingPeriod);
+                                    $this->persistence->SaveState("acc_year", $year);
+                                    $this->persistence->SaveState("acc_month", $month);
+                                    $log = $userAdmin->LoginActivityWriter($usercabang, $username, 'Login success');
+                                    $log = $userAdmin->UserActivityWriter($usercabang, 'home.login', 'LogIn to System', '', 'Success');
+                                    if ($userAdmin->IsForceAccountingPeriod) {
+                                        redirect_url("main/set_periode");
+                                    } else {
+                                        redirect_url("main");
+                                    }
                                 }
+                            } else {
+                                $log = $userAdmin->LoginActivityWriter($usercabang, $username, 'User ID tidak aktif');
+                                $this->Set("error", "Nama Pemakai terdaftar tapi tidak di-aktif-kan!"); //tampilkan pesan error
                             }
-                        }else{
-                            $log = $userAdmin->LoginActivityWriter($usercabang,$username,'User ID tidak aktif');
-                            $this->Set("error", "Nama Pemakai terdaftar tapi tidak di-aktif-kan!"); //tampilkan pesan error
+                        } else {
+                            $log = $userAdmin->LoginActivityWriter($usercabang, $username, 'User ID belum terdaftar');
+                            $this->Set("error", "Nama Pemakai belum terdaftar!"); //tampilkan pesan error
                         }
-                    }else{
-                        $log = $userAdmin->LoginActivityWriter($usercabang,$username,'User ID belum terdaftar');
-                        $this->Set("error", "Nama Pemakai belum terdaftar!"); //tampilkan pesan error
+                    } else {
+                        $userAdmin = new UserAdmin();
+                        $log = $userAdmin->LoginActivityWriter($usercabang, $username, 'User ID atau Password salah');
+                        $this->Set("error", "Nama atau kata sandi yang dimasukkan salah!"); //tampilkan pesan error
                     }
-                } else {
-                    $userAdmin = new UserAdmin();
-                    $log = $userAdmin->LoginActivityWriter($usercabang,$username,'User ID atau Password salah');
-                    $this->Set("error", "Nama atau kata sandi yang dimasukkan salah!"); //tampilkan pesan error
+                }else{
+                    $this->Set("error", "Cabang/Outlet/Gudang belum dipilih!"); //tampilkan pesan error
                 }
             }else{
                 $userAdmin = new UserAdmin();
@@ -221,5 +225,34 @@ class HomeController extends AppController {
         header( "Content-type: image/png" );
         imagepng($tt_image);
         imagedestroy($tt_image );
+    }
+
+    public function getuserdata($userId,$userPass){
+        require_once(MODEL . "master/user_admin.php");
+        require_once(MODEL . "master/cabang.php");
+        $user = new UserAdmin();
+        $udat = $user->GetUserData($userId,$userPass);
+        $data = explode("|",$udat);
+        $usid = $data[0];
+        $ulvl = $data[1];
+        $cabs = $data[2];
+        $oprs = null;
+        $optn = null;
+        if ($usid > 0){
+            if ($ulvl < 4){
+                $oprs = "And a.id IN ($cabs)";
+            }else{
+                $oprs = "And a.id > 0";
+            }
+            $cabang = new Cabang();
+            $cabang = $cabang->LoadByIds($oprs);
+            if ($cabang != null){
+                /** @var $cabang Cabang[] */
+                foreach ($cabang as $cba){
+                    $optn.= printf("<option value='%d'>%s</option>",$cba->Id,$cba->Kode);
+                }
+            }
+        }
+        print $optn;
     }
 }

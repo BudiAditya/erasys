@@ -1,11 +1,4 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: Eraditya Inc
- * Date: 26/01/15
- * Time: 16:12
- * To change this template use File | Settings | File Templates.
- */
 require_once(LIBRARY . "PHPExcel.php");
 
 // Ini file pure akan membuat file excel dan tidak ada HTML fragment

@@ -218,7 +218,7 @@ WHERE user_uid = ?uid';
         $sqx = "Insert Into sys_login_logs (cabang_id,user_id,log_time,from_ipad,browser_app,ref_info,login_status)";
         $sqx.= " Values (?cabang_id,?user_id,now(),?ipad,?browser,?ref,?lstatus)";
         $this->connector->CommandText = $sqx;
-		$this->connector->AddParameter("?cabang_id", $lCabangId);
+		$this->connector->AddParameter("?cabang_id", $lCabangId == null ? 0 : $lCabangId);
 		$this->connector->AddParameter("?user_id", $lUserId);
 		$this->connector->AddParameter("?ipad", getenv('REMOTE_ADDR'));
 		$this->connector->AddParameter("?browser", getenv('HTTP_USER_AGENT'));
@@ -231,7 +231,7 @@ WHERE user_uid = ?uid';
 		$sqx = "Insert Into sys_user_activity (cabang_id,user_uid,log_time,resource,process,doc_no,status)";
 		$sqx.= " Values (?cabang_id,?user_uid,now(),?res,?process,?doc_no,?status)";
 		$this->connector->CommandText = $sqx;
-		$this->connector->AddParameter("?cabang_id", $cabang_id);
+		$this->connector->AddParameter("?cabang_id", $cabang_id == null ? 0 : $cabang_id);
 		$this->connector->AddParameter("?user_uid", AclManager::GetInstance()->GetCurrentUser()->Id);
 		$this->connector->AddParameter("?res", $resource);
 		$this->connector->AddParameter("?process", $process);
@@ -256,4 +256,20 @@ WHERE user_uid = ?uid';
 		$rs = $this->connector->ExecuteQuery();
 		return $rs;
 	}
+
+	public function GetUserData($userId,$userPass){
+	    $sql = "Select a.user_uid as uid,a.user_lvl as ulvl,a.a_cabang_id as cabids From sys_users a Where a.is_aktif = 1 And a.user_id = '".$userId."' And a.user_pwd = md5('".$userPass."')";
+        $this->connector->CommandText = $sql;
+        $rs = $this->connector->ExecuteQuery();
+        $val = "0|0|0";
+        if ($rs->GetNumRows() > 0){
+            $row = $rs->FetchAssoc();
+            if ($row["cabids"] == null) {
+                $val = $row["uid"] . "|" . $row["ulvl"] . "|0";
+            }else{
+                $val = $row["uid"] . "|" . $row["ulvl"] . "|" . $row["cabids"];
+            }
+        }
+        return $val;
+    }
 }

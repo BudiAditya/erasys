@@ -176,6 +176,23 @@ ORDER BY $orderBy";
 		return $result;
 	}
 
+    public function LoadByIds($opr, $orderBy = "a.kode") {
+	    $sql = "SELECT a.*, b.entity_cd, c.id as area_id, c.area_name,b.company_name FROM m_cabang AS a JOIN sys_company AS b ON a.entity_id = b.entity_id";
+	    $sql.= " JOIN m_area As c On a.area_id = c.id WHERE a.is_deleted = 0 ".$opr." ORDER BY $orderBy";
+        $this->connector->CommandText = $sql;
+        //$this->connector->AddParameter("?opr", $opr);
+        $rs = $this->connector->ExecuteQuery();
+        $result = array();
+        if ($rs != null) {
+            while ($row = $rs->FetchAssoc()) {
+                $temp = new Cabang();
+                $temp->FillProperties($row);
+                $result[] = $temp;
+            }
+        }
+        return $result;
+    }
+
 	public function LoadByEntityId1($eti) {
 		$this->connector->CommandText = "SELECT a.*, b.entity_cd, c.id as area_id, c.area_name,b.company_name FROM m_cabang AS a
 	JOIN sys_company AS b ON a.entity_id = b.entity_id JOIN m_area As c On a.area_id = c.id WHERE a.entity_id = ?eti Order By a.id Limit 1";
